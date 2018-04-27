@@ -45,7 +45,13 @@ brew install zsh zsh-completions
 
 if [[ ! -d ~/.dotfiles ]]; then
     msg "Deploying dotfiles repository..."
-    git clone --recursive git@github.com:AyeCaptn/dotfiles.git "$DOTFILES"
+    status=$(git clone --recursive git@github.com:AyeCaptn/dotfiles.git "$DOTFILES" || printf "fail")
+    if  [[ $status == "fail" ]]; then
+        msg "Cloning over ssh failed, using https..."
+        git clone --recursive https://github.com/AyeCaptn/dotfiles.git "$DOTFILES"
+    fi
+else
+    msg "Dotfiles folder already exists at ~/.dotfiles..."
 fi
 
 msg "Finished bootstrapping your machine!"
