@@ -3,7 +3,7 @@
 # Installs brew, bash, zsh and git, then clones this repo to ~/.dotfiles.
 # Run this script by executing the following command:
 #
-# Curl -s https://raw.githubusercontent.com/AyeCaptn/dotfiles/master/bootstrap_macos.sh
+# bash <(curl -s https://raw.githubusercontent.com/AyeCaptn/dotfiles/master/bootstrap_macos.sh)
 
 export DOTFILES=~/.dotfiles
 
