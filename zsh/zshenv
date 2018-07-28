@@ -1,0 +1,23 @@
+# Gopath
+export GOPATH=$HOME/go
+export GOROOT=/usr/local/opt/go/libexec
+export PATH=$PATH:$GOPATH/bin
+export PATH=$PATH:$GOROOT/bin
+
+# Anaconda PATH
+export PATH=$HOME/anaconda/bin:$PATH
+
+# Zsh completions
+fpath=(/usr/local/share/zsh-completions $fpath)
+
+# Java PATH
+export JAVA_HOME="$(/usr/libexec/java_home -v 1.8)"
+
+# Locale
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+
+# export PATH="$(yarn global bin):$PATH"
+
+export PATH="./bin:/usr/local/bin:/usr/local/sbin:$ZSH/bin:$PATH"

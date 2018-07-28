@@ -54,6 +54,7 @@
 
 - link:
     ~/.zshrc: 'zsh/zshrc'
+    ~/.zshenv: 'zsh/zshenv'
 
 - shell:
     - ['wget https://repo.continuum.io/archive/Anaconda3-5.2.0-MacOSX-x86_64.sh -O ~/anaconda.sh && bash ~/anaconda.sh -b -p $HOME/anaconda && export PATH="$HOME/anaconda/bin:$PATH"', Installing Anaconda]
