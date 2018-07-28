@@ -11,8 +11,12 @@
 - shell:
     - [mkdir ~/go, Creating golang folder]
 
+- tap:
+    - homebrew/cask-versions
+
 - cask:
     - java
+    - java8
 
 - brew:
     - wget 
@@ -52,7 +56,7 @@
     ~/.zshrc: 'zsh/zshrc'
 
 - shell:
-#    - ['wget https://repo.continuum.io/archive/Anaconda3-5.2.0-MacOSX-x86_64.sh -O ~/anaconda.sh && bash ~/anaconda.sh -b -p $HOME/anaconda && export PATH="$HOME/anaconda/bin:$PATH"', Installing Anaconda]
+    - ['wget https://repo.continuum.io/archive/Anaconda3-5.2.0-MacOSX-x86_64.sh -O ~/anaconda.sh && bash ~/anaconda.sh -b -p $HOME/anaconda && export PATH="$HOME/anaconda/bin:$PATH"', Installing Anaconda]
     - ['git clone https://github.com/tarjoilija/zgen.git "${HOME}/.zgen"', Installing zgen]
     - [mas install 824171161, Installing Affinity Designer]
     - [mas install 409183694, Installing Keynote]
