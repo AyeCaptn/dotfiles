@@ -1,11 +1,22 @@
 # Dotfiles
 
-## Bootstrap
+Attempt at managing my dotfiles and bootstrapping a fresh system.
 
-`bash <(curl -s https://raw.githubusercontent.com/AyeCaptn/dotfiles/master/bootstrap_macos.sh)`
+Bootstrapping is done by [Dotbot]("https://github.com/anishathalye/dotbot").
 
-## Credits
+# Apple ID
 
-- https://github.com/hlissner/dotfiles
-- https://gist.github.com/codeinthehole/26b37efa67041e1307db
+Make sure you are logged in to the App Store before running `install.sh`.
+
+# Run
+
+```
+./install
+```
+
+# Upgrade
+
+```
+git submodule update --remote dotbot dotbot-brew dotbot-go
+```
 

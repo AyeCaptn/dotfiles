@@ -1,0 +1,63 @@
+- defaults:
+    link: null
+    relink: true
+
+- clean:
+    - '~'
+
+- shell:
+    - [git submodule update --init --recursive, Installing submodules]
+
+- shell:
+    - [mkdir ~/go, Creating golang folder]
+
+- cask:
+    - java
+
+- brew:
+    - wget 
+    - mas
+    - zsh 
+    - zsh-syntax-highlighting
+    - zsh-completions 
+    - go 
+    - r
+    - sbt 
+    - yarn 
+    - maven 
+    - nvm 
+    - tmux 
+    - openssl 
+    - ctags 
+    - unrar 
+
+- cask:
+    - google-chrome 
+    - vlc 
+    - transmission 
+    - virtualbox 
+    - cyberduck 
+    - plex-media-server 
+    - spotify 
+#    - spotify-notifications 
+    - 1password 
+    - firefox
+    - intellij-idea
+    - franz
+    - docker
+    - iterm2
+    - visual-studio-code
+
+- link:
+    ~/.zshrc: 'zsh/zshrc'
+
+- shell:
+#    - ['wget https://repo.continuum.io/archive/Anaconda3-5.2.0-MacOSX-x86_64.sh -O ~/anaconda.sh && bash ~/anaconda.sh -b -p $HOME/anaconda && export PATH="$HOME/anaconda/bin:$PATH"', Installing Anaconda]
+    - ['git clone https://github.com/tarjoilija/zgen.git "${HOME}/.zgen"', Installing zgen]
+    - [mas install 824171161, Installing Affinity Designer]
+    - [mas install 409183694, Installing Keynote]
+    - [mas install 409201541, Installing Pages]
+    - [mas install 409203825, Installing Numbers]
+    - [mas install 497799835, Installing XCode]
+
+
