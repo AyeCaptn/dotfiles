@@ -34,16 +34,17 @@
     - openssl 
     - ctags 
     - unrar 
+    - emacs
 
 - cask:
     - google-chrome 
     - vlc 
     - transmission 
     - virtualbox 
-    - cyberduck 
+    - filezilla 
     - plex-media-server 
     - spotify 
-#    - spotify-notifications 
+    - spotify-notifications 
     - 1password 
     - firefox
     - intellij-idea
@@ -52,9 +53,15 @@
     - iterm2
     - visual-studio-code
 
+- shell:
+    - ['git clone -b develop https://github.com/hlissner/doom-emacs ~/.emacs.d', Cloning Doom emacs]
+
 - link:
     ~/.zshrc: 'zsh/zshrc'
     ~/.zshenv: 'zsh/zshenv'
+    ~/.vim: 'vim/vim'
+    ~/.vimrc: 'vim/vimrc'
+    ~/.doom.d: 'doom'
 
 - shell:
     - ['wget https://repo.continuum.io/archive/Anaconda3-5.2.0-MacOSX-x86_64.sh -O ~/anaconda.sh && bash ~/anaconda.sh -b -p $HOME/anaconda && export PATH="$HOME/anaconda/bin:$PATH"', Installing Anaconda]
@@ -64,5 +71,6 @@
     - [mas install 409201541, Installing Pages]
     - [mas install 409203825, Installing Numbers]
     - [mas install 497799835, Installing XCode]
+    - [cd ~/.emacs.d && make, Installing Doom emacs]
 
 
