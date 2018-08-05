@@ -4,9 +4,11 @@ Attempt at managing my dotfiles and bootstrapping a fresh system.
 
 Bootstrapping is done by [Dotbot]("https://github.com/anishathalye/dotbot").
 
-# Apple ID
+# Before
 
-Make sure you are logged in to the App Store before running `install.sh`.
+* Log in to the App store
+* Set up git
+* Set up trackpad gestures 
 
 # Run
 

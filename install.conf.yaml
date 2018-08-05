@@ -1,5 +1,4 @@
 - defaults:
-    link: null
     relink: true
 
 - clean:
