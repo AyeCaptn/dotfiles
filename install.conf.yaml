@@ -52,6 +52,7 @@
     - docker
     - iterm2
     - visual-studio-code
+    - resilio-sync
 
 - shell:
     - ['git clone -b develop https://github.com/hlissner/doom-emacs ~/.emacs.d', Cloning Doom emacs]
