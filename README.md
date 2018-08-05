@@ -20,3 +20,15 @@ Make sure you are logged in to the App Store before running `install.sh`.
 git submodule update --remote dotbot dotbot-brew dotbot-go
 ```
 
+# Manual
+
+## Resilio Sync
+
+Set up sync for the following folders.
+
+* Documents/
+* .ssh/
+
+## VS Code
+
+Set up configuration sync (github gist).
