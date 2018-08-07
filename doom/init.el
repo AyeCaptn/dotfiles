@@ -64,7 +64,7 @@
       ;editorconfig      ; let someone else argue about tabs vs spaces
       ;ein               ; tame Jupyter notebooks with emacs
       ;gist              ; interacting with github gists
-      ;macos             ; MacOS-specific commands
+       macos             ; MacOS-specific commands
       ;make              ; run make tasks from Emacs
        magit             ;
       ;password-store    ; password manager for nerds
@@ -117,7 +117,7 @@
       ;rest              ; Emacs as a REST client
       ;ruby              ; 1.step do {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
       ;rust              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
-      ;scala             ; java, but good
+       scala             ; java, but good
       ;(sh +fish)        ; she sells (ba|z)sh shells on the C xor
       ;solidity          ; do you need a blockchain? No.
       ;swift             ; who asked for emoji variables?
@@ -149,4 +149,6 @@
        ;; and additional ex commands for evil-mode. Use it as a reference for
        ;; your own modules.
        (default +bindings +snippets +evil-commands))
+       
+       (add-hook 'after-init-hook #'magit-status)
 
