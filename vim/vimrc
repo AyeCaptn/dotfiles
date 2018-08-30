@@ -8,6 +8,7 @@ Plug 'airblade/vim-gitgutter'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'easymotion/vim-easymotion'
+Plug 'osyo-manga/vim-over'
 
 " List ends here. Plugins become visible to Vim after this call.
 call plug#end()
