@@ -34,6 +34,8 @@
     - ctags 
     - unrar 
     - emacs
+    - scala
+    - openconnect
 
 - cask:
     - google-chrome 
