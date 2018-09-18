@@ -75,4 +75,5 @@
     - [mas install 497799835, Installing XCode]
     - [cd ~/.emacs.d && make, Installing Doom emacs]
 
-
+- shell:
+    - ['conda config --set changeps1 False', Disabling conda env notification]
