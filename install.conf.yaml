@@ -36,6 +36,8 @@
     - emacs
     - scala
     - openconnect
+    - git-flow
+    - awscli
 
 - cask:
     - google-chrome 
