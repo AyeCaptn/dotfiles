@@ -19,7 +19,7 @@ Bootstrapping is done by [Dotbot]("https://github.com/anishathalye/dotbot").
 # Upgrade
 
 ```
-git submodule update --remote dotbot dotbot-brew dotbot-go
+git submodule update --remote dotbot dotbot-brew dotbot-golang
 ```
 
 # Manual
