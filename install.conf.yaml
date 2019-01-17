@@ -44,12 +44,11 @@
     - vlc 
     - transmission 
     - virtualbox 
-    - filezilla 
-    - plex-media-server 
+    - cyberduck
     - spotify 
     - spotify-notifications 
     - 1password 
-    - firefox
+    - brave-browser
     - intellij-idea
     - franz
     - docker
