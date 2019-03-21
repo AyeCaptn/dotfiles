@@ -26,4 +26,3 @@ if ! zgen saved; then
 fi
 
 alias magit=emacs
-alias gg=lazygit
