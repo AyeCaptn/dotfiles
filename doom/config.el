@@ -2,7 +2,7 @@
 
 (add-hook 'after-init-hook #'magit-status)
 
-(def-package! magit-gitflow
+(use-package! magit-gitflow
   :init (add-hook 'magit-mode-hook 'turn-on-magit-gitflow)
   :after magit)
 
