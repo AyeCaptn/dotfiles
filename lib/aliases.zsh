@@ -67,8 +67,7 @@ fi
 alias git-root='cd $(git rev-parse --show-toplevel)'
 
 # VPN aliases
-#alias porphyriovpn="sudo openfortivpn -c ~/.vpn/porphyrio" 
-alias porphyriovpn="sudo openfortivpn vpn.porphyrio.net:10443 -u sem.uytterhoeven -p 'JpdZfxaKHj8LYuFwzFM76Zpd'" 
+alias porphyriovpn="openfortivpn -c ~/.vpn/porphyrio"
 
 # Docker
 alias dstop='docker stop $(docker ps -a -q)'
