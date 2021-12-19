@@ -1,0 +1,8 @@
+darker
+isort
+mypy
+pylint
+flake8
+pirate-get
+youtube-dl
+awsume

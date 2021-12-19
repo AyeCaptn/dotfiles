@@ -1,4 +1,9 @@
-.DS_Store
-
 # Vim
 vim/vim/plugged
+
+# Backup folder
+backup
+
+# Sheldon
+tilde/.sheldon/repos
+tilde/.sheldon/plugins.lock

@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# Renames a git branch locally and remote
+#
+# Usage:
+#   git-rename <old name> <new name>
+#
+#
+
+# Exit on any failed command
+set -e
+
+if [[ -z "$1" || -z "$2" ]]; then
+    echo "Usage: $0 old_name new_name"
+    return 1
+fi
+
+# Rename branch locally
+git branch -m "$1" "$2"
+
+# Rename branch in origin remote
+if git push origin :"$1"; then
+    git push --set-upstream origin "$2"
+fi
+
+echo "Done."
