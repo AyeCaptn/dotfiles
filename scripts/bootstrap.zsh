@@ -6,34 +6,53 @@
 # Ask for the administrator password upfront
 sudo -v
 
+e='\033'
+RESET="${e}[0m"
+CYAN="${e}[0;96m"
+
 _exists() {
   command -v $1 > /dev/null 2>&1
+}
+
+# Success reporter
+info() {
+  echo -e "${CYAN}${*}${RESET}"
 }
 
 export DOTFILES=${DOTFILES:="$HOME/.dotfiles"}
 
 # Go to dotfiles directory
-cd $DOTFILES/scripts
+cd $DOTFILES
 
 # Homebrew Bundle
 if _exists brew; then
+  info "running brew bundle"
   brew bundle
+else
+  info "brew not installed"
 fi
 
 # Python global packages
 if _exists pipx; then
+  info "installing python packages"
   cat python-packages.txt | xargs -I % pipx install %
+else
+  info "pipx not installed"
 fi
 
 # NPM global packages
 if _exists npm; then
+  info "installing npm packages"
   npm install -g
+else
+  info "npm not installed"
 fi
 
 # Fonts
 eval "find \"$DOTFILES/fonts\" \( -name '*.[o,t]tf' -or -name '*.pcf.gz' \) -type f -print0" | xargs -0 -I % cp "%" "$HOME/Library/Fonts/"
 
 # Vim plug
+info "Setting up vim"
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 # TODO: Restic restore
@@ -41,6 +60,7 @@ curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.c
 # TODO: Set up backups
 
 # Folders
+info "creating project folders"
 mkdir -p ~/Projects/Forks
 mkdir -p ~/Projects/Job
 mkdir -p ~/Projects/Playground
