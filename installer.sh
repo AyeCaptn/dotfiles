@@ -100,6 +100,9 @@ install_homebrew() {
 
     info "Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL ${HOMEBREW_INSTALLER_URL})"
+
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+
     brew update
     brew upgrade
     brew cleanup
