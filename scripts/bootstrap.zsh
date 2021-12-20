@@ -1,6 +1,7 @@
 #!/usr/bin/env zsh
 
 # Bootstrap script for installing applications, tools, fonts and applying application config
+# Source: https://raw.githubusercontent.com/denysdovhan/dotfiles/master/scripts/bootstrap.zsh
 
 # Ask for the administrator password upfront
 sudo -v
@@ -34,6 +35,10 @@ eval "find \"$DOTFILES/fonts\" \( -name '*.[o,t]tf' -or -name '*.pcf.gz' \) -typ
 
 # Vim plug
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+# TODO: Restic restore
+
+# TODO: Set up backups
 
 # Folders
 mkdir -p ~/Projects/Forks
