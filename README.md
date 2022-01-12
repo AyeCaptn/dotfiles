@@ -42,10 +42,16 @@ git config -f ~/.gitlocal user.name "Name Lastname"
     - Tabs prominent outline -> 0.1
     - Prominence of selected tabs underline indicator -> 0
 - Enable blinking cursor
+- Set window size to 125x25
+- Enable unlimited scrollback
 
 **Finder**
 
 - Add shortcut for the Projects folder to the finder window
+
+**Icloud**
+
+- Make sure icloud photos sync is disabled
 
 **Backups**
 

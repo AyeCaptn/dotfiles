@@ -7,3 +7,6 @@ backup
 # Sheldon
 tilde/.sheldon/repos
 tilde/.sheldon/plugins.lock
+
+# macOS
+.DS_Store

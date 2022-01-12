@@ -24,7 +24,7 @@ fi
 [ -d ~/Projects ]             && alias pj='cd ~/Projects'
 [ -d ~/Projects/Forks ]       && alias pjf='cd ~/Projects/Forks'
 [ -d ~/Projects/Job ]         && alias pjj='cd ~/Projects/Job'
-[ -d ~/Projects/Playground ]  && alias pjl='cd ~/Projects/Playground'
+[ -d ~/Projects/Playground ]  && alias pjp='cd ~/Projects/Playground'
 [ -d ~/Projects/Repos ]       && alias pjr='cd ~/Projects/Repos'
 
 # Open aliases
@@ -76,5 +76,8 @@ alias dstart='docker restart $(docker ps -q -f "status=exited" -f "name=$1")'
 # Shortcuts
 alias lg=lazygit
 
-#AWSume
+# AWSume
 alias awsume=". awsume"
+
+# Private repo token fetch before pip
+alias pip="pip-login && pip"

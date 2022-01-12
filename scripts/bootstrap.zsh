@@ -32,6 +32,9 @@ else
   info "brew not installed"
 fi
 
+# Accept xcode license
+xcodebuild -license accept
+
 # Python global packages
 if _exists pipx; then
   info "installing python packages"
@@ -59,12 +62,16 @@ curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.c
 
 # TODO: Set up backups
 
+# Remove terminal last login text
+touch ~/.hushlogin
+
 # Folders
 info "creating project folders"
 mkdir -p ~/Projects/Forks
 mkdir -p ~/Projects/Job
 mkdir -p ~/Projects/Playground
 mkdir -p ~/Projects/Repos
+mkdir -p ~/Projects/Personal
 
 # Get back to previous directory
 cd -

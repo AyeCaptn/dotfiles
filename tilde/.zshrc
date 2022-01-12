@@ -7,7 +7,7 @@
 # ------------------------------------------------------------------------------
 
 # Export path to root of dotfiles repo
-export DOTFILES=${DOTFILES:="$HOME/Repositories/dotfiles"}
+export DOTFILES=${DOTFILES:="$HOME/.dotfiles"}
 
 # Locale
 export LC_ALL=en_US.UTF-8
@@ -24,8 +24,8 @@ setopt HIST_IGNORE_ALL_DUPS
 # Autoswitch
 AUTOSWITCH_SILENT=true
 
-# Java
-export JAVA_HOME="$(/usr/libexec/java_home -v 1.8)"
+# Conda
+export CONDA_CHANGEPS1=no
 
 # Do not override files using `>`, but it's still possible using `>!`
 set -o noclobber
@@ -41,9 +41,10 @@ _extend_path() {
 [[ -d "$HOME/.bin" ]] && _extend_path "$HOME/.bin"
 [[ -d "$DOTFILES/bin" ]] && _extend_path "$DOTFILES/bin"
 [[ -d "$HOME/.npm-global" ]] && _extend_path "$HOME/.npm-global/bin"
-[[ -d "/usr/local/bin" ]] && _extend_path "/usr/local/bin"
-[[ -d "/usr/local/sbin" ]] && _extend_path "/usr/local/sbin"
 [[ -d "$HOME/.local/bin" ]] && _extend_path "$HOME/.local/bin"
+[[ -d "/opt/homebrew/bin" ]] && _extend_path "/opt/homebrew/bin"
+[[ -d "/opt/homebrew/sbin" ]] && _extend_path "/opt/homebrew/sbin"
+[[ -d "$HOME/go/bin" ]] && _extend_path "$HOME/go/bin"
 
 
 # Extend $NODE_PATH
@@ -87,14 +88,15 @@ if [[ -f "$HOME/.zshlocal" ]]; then
 fi
 
 # setup miniconda
-_conda_init() { 
+_conda_init() {
+  local __conda_setup="$('/opt/homebrew/Caskroom/miniconda/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
   if [ $? -eq 0 ]; then
-      eval "$('/usr/local/Caskroom/miniconda/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+      eval "$__conda_setup"
   else
-      if [ -f "/usr/local/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
-          . "/usr/local/Caskroom/miniconda/base/etc/profile.d/conda.sh"
+      if [ -f "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
+          . "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
       else
-          export PATH="/usr/local/Caskroom/miniconda/base/bin:$PATH"
+          [[ -d "/opt/homebrew/Caskroom/miniconda/base/bin" ]] && _extend_path "/opt/homebrew/Caskroom/miniconda/base/bin"
       fi
   fi
 }

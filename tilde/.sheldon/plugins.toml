@@ -15,7 +15,7 @@ shell = "zsh"
 [plugins]
 
 [plugins.lib]
-local = "~/Repositories/dotfiles/lib"
+local = "~/.dotfiles/lib"
 
 [plugins.spaceship]
 github = "spaceship-prompt/spaceship-prompt"

@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+
+# Setup the pip configuration file.
+# These files should exist in the ~/.pipfiles directory.
+# Every pip config file should have the filename <client_name>.conf
+#
+
+# Usage:
+#   pip-setup <client_name> [--list]
+#
+#
+# Author: Sem Uytterhoeven
+
+# Exit on any failed command
+set -e
+
+CYAN="$(tput setaf 6)"
+UNDERLINE="$(tput sgr 0 1)"
+NOCOLOR="$(tput sgr0)"
+
+function header() { echo -e "\n$UNDERLINE$CYAN$1$NOCOLOR\n"; }
+
+CONFIG_DIR=$HOME/.pipfiles
+
+if [[ ! $# -eq 1 ]]; then
+  echo "Please supply only one argument, this can be a client or the --list option"
+  exit 1
+fi
+
+if [[ ! -d $CONFIG_DIR ]]; then
+  echo "$CONFIG_DIR does not exists, this should contain your pip config files"
+  exit 1
+fi
+
+if [[ "$1" == "--list" ]]; then
+  for entry in "$CONFIG_DIR"/*; do
+    entry="${entry##*/}"
+    echo "${entry%.*}"
+  done
+else
+  FILE="$CONFIG_DIR/$1.conf"
+  OUTPUT=$CONDA_PREFIX/pip.conf
+
+  if [[ -f $OUTPUT ]]; then
+    echo "Output file exists, please remove before linking"
+    echo "$OUTPUT"
+    exit 1
+  fi
+
+  header "Symlinking $1.conf to $CONDA_PREFIX/pip.conf"
+
+  if [[ -f $FILE ]]; then
+    ln -s $FILE $CONDA_PREFIX/pip.conf
+    echo "Symlinked $1.conf to $CONDA_PREFIX/pip.conf"
+  else
+    echo "$1 has no config file, use --list to list the available files"
+  fi
+fi
