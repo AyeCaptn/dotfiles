@@ -25,8 +25,8 @@ update
 **Configure git**
 
 ```
-git config -f ~/.gitlocal user.email "email@yoursite.com"
-git config -f ~/.gitlocal user.name "Name Lastname"
+git config --global user.email "email@yoursite.com"
+git config --global user.name "Name Lastname"
 ```
 
 **Sync VS code**
