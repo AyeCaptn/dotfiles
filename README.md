@@ -49,10 +49,6 @@ git config -f ~/.gitlocal user.name "Name Lastname"
 
 - Add shortcut for the Projects folder to the finder window
 
-**Icloud**
-
-- Make sure icloud photos sync is disabled
-
 **Backups**
 
 - Restore the backups
