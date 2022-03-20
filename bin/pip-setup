@@ -14,12 +14,6 @@
 # Exit on any failed command
 set -e
 
-CYAN="$(tput setaf 6)"
-UNDERLINE="$(tput sgr 0 1)"
-NOCOLOR="$(tput sgr0)"
-
-function header() { echo -e "\n$UNDERLINE$CYAN$1$NOCOLOR\n"; }
-
 CONFIG_DIR=$HOME/.pipfiles
 
 if [[ ! $# -eq 1 ]]; then
@@ -47,11 +41,11 @@ else
     exit 1
   fi
 
-  header "Symlinking $1.conf to $CONDA_PREFIX/pip.conf"
+  echo "Symlinking $1.conf to $CONDA_PREFIX/pip.conf"
 
   if [[ -f $FILE ]]; then
     ln -s $FILE $CONDA_PREFIX/pip.conf
-    echo "Symlinked $1.conf to $CONDA_PREFIX/pip.conf"
+    echo "Symlinked $1.conf"
   else
     echo "$1 has no config file, use --list to list the available files"
   fi
