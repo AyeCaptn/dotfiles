@@ -12,7 +12,7 @@ RED="${e}[0;91m"
 GREEN="${e}[0;92m"
 
 _exists() {
-  command -v $1 > /dev/null 2>&1
+  command -v $1 >/dev/null 2>&1
 }
 
 # Success reporter
@@ -55,7 +55,7 @@ update_dotfiles() {
   cd $DOTFILES
   git pull origin master
   ./sync.py
-  cd - > /dev/null 2>&1
+  cd - >/dev/null 2>&1
 
   info "Updating Zsh plugins..."
   sheldon lock --update

@@ -11,7 +11,7 @@ RESET="${e}[0m"
 CYAN="${e}[0;96m"
 
 _exists() {
-  command -v $1 > /dev/null 2>&1
+  command -v $1 >/dev/null 2>&1
 }
 
 # Success reporter

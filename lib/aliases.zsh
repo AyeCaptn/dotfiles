@@ -7,7 +7,7 @@
 alias sudo='sudo '
 
 _exists() {
-  command -v $1 > /dev/null 2>&1
+  command -v $1 >/dev/null 2>&1
 }
 
 # Avoid stupidity with trash-cli:
@@ -17,15 +17,14 @@ if _exists trash; then
   alias rm='trash'
 fi
 
-
 # Folders Shortcuts
-[ -d ~/Downloads ]            && alias dl='cd ~/Downloads'
-[ -d ~/Desktop ]              && alias dt='cd ~/Desktop'
-[ -d ~/Projects ]             && alias pj='cd ~/Projects'
-[ -d ~/Projects/Forks ]       && alias pjf='cd ~/Projects/Forks'
-[ -d ~/Projects/Job ]         && alias pjj='cd ~/Projects/Job'
-[ -d ~/Projects/Playground ]  && alias pjp='cd ~/Projects/Playground'
-[ -d ~/Projects/Repos ]       && alias pjr='cd ~/Projects/Repos'
+[ -d ~/Downloads ] && alias dl='cd ~/Downloads'
+[ -d ~/Desktop ] && alias dt='cd ~/Desktop'
+[ -d ~/Projects ] && alias pj='cd ~/Projects'
+[ -d ~/Projects/Forks ] && alias pjf='cd ~/Projects/Forks'
+[ -d ~/Projects/Job ] && alias pjj='cd ~/Projects/Job'
+[ -d ~/Projects/Playground ] && alias pjp='cd ~/Projects/Playground'
+[ -d ~/Projects/Repos ] && alias pjr='cd ~/Projects/Repos'
 
 # Open aliases
 alias o='open'
