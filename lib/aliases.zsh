@@ -81,3 +81,6 @@ alias awsume=". awsume"
 
 # Private repo token fetch before pip
 alias pip="pip-login && pip"
+
+# Backup all files
+alias backup="resticprofile -c ~/.resticprofiles.conf --name full-backup backup"

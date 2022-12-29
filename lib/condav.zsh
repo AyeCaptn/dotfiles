@@ -9,6 +9,7 @@
 # ------------------------------------------------------------------------------
 
 SPACESHIP_CONDA_SHOW="${SPACESHIP_CONDA_SHOW=true}"
+SPACESHIP_CONDA_ASYNC="${SPACESHIP_CONDA_ASYNC=false}"
 SPACESHIP_CONDA_PREFIX="${SPACESHIP_CONDA_PREFIX="$SPACESHIP_PROMPT_DEFAULT_PREFIX"}"
 SPACESHIP_CONDA_SUFFIX="${SPACESHIP_CONDA_SUFFIX="$SPACESHIP_PROMPT_DEFAULT_SUFFIX"}"
 SPACESHIP_CONDA_SYMBOL="${SPACESHIP_CONDA_SYMBOL="🅒 "}"
@@ -20,7 +21,7 @@ SPACESHIP_CONDA_VERBOSE="${SPACESHIP_CONDA_VERBOSE=true}"
 # ------------------------------------------------------------------------------
 
 # Show current conda virtual environment
- spaceship_condav() {
+spaceship_condav() {
   [[ $SPACESHIP_CONDA_SHOW == false ]] && return
 
   # Check if running via conda virtualenv
@@ -38,8 +39,9 @@ SPACESHIP_CONDA_VERBOSE="${SPACESHIP_CONDA_VERBOSE=true}"
   local python_version=$(python --version | sed "s/^[^ ]* //")
 
   spaceship::section \
-    "$SPACESHIP_CONDA_COLOR" \
-    "$SPACESHIP_CONDA_PREFIX" \
-    "${SPACESHIP_CONDA_SYMBOL}${conda_env}:${python_version}" \
-    "$SPACESHIP_CONDA_SUFFIX"
+    --color "$SPACESHIP_CONDA_COLOR" \
+    --prefix "$SPACESHIP_CONDA_PREFIX" \
+    --suffix "$SPACESHIP_CONDA_SUFFIX" \
+    --symbol "$SPACESHIP_CONDA_SYMBOL" \
+    "${conda_env}:${python_version}"
 }
