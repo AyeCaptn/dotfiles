@@ -4,8 +4,8 @@
     "private": true,
     "scripts": {
         "lint": "eslint . --cache --fix",
-        "test": "npm run lint",
-        "posttest": "npm run format",
+        "test": "pnpm run lint",
+        "posttest": "pnpm run format",
         "format": "prettier --loglevel warn --write \"**/*.{js,md}\""
     },
     "engines": {
@@ -16,7 +16,6 @@
         "eslint": "^7.9.0",
         "prettier": "^2.1.2",
         "trash-cli": "^3.1.0",
-        "serverless": "^3.3.0",
-        "npm": "^6.32.3"
+        "serverless": "^3.3.0"
     }
 }

@@ -27,6 +27,9 @@ AUTOSWITCH_SILENT=true
 # Conda
 export CONDA_CHANGEPS1=no
 
+# AWS Vault
+export AWS_VAULT_PL_BROWSER=com.google.chrome
+
 # Do not override files using `>`, but it's still possible using `>!`
 set -o noclobber
 

@@ -1,9 +1,9 @@
-darker
+awsume
 black
+darker
+flake8
 isort
 mypy
-pylint
-flake8
 pirate-get
-youtube-dl
-awsume
+pylint
+shandy-sqlfmt[jinjafmt]
