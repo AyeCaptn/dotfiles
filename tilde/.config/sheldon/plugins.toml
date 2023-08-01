@@ -19,7 +19,6 @@ local = "~/.dotfiles/lib"
 
 [plugins.spaceship]
 github = "spaceship-prompt/spaceship-prompt"
-apply = ["spaceship"]
 
 [plugins.zsh-defer]
 github = "romkatv/zsh-defer"
@@ -68,7 +67,4 @@ defer = '''
   {% for file in files %}
     zsh-defer source "{{ file }}"
   {% endfor %}
-'''
-spaceship = '''
-  spaceship-loader "{{ dir }}"
 '''
