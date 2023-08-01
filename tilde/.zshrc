@@ -103,11 +103,17 @@ _conda_init() {
   fi
 }
 
+# setup pnpm
+export PNPM_HOME="$HOME/Library/pnpm"
+case ":$PATH:" in
+*":$PNPM_HOME:"*) ;;
+*) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+
 # OMZ is managed by Sheldon
-export ZSH="$HOME/.sheldon/repos/github.com/ohmyzsh/ohmyzsh"
+export ZSH="$HOME/.local/share/sheldon/repos/github.com/ohmyzsh/ohmyzsh"
 
 plugins=(
-  nvm
   sudo
   extract
   gpg-agent
@@ -137,7 +143,7 @@ SPACESHIP_PROMPT_ORDER=(
   swift     # Swift section
   golang    # Go section
   rust      # Rust section
-  docker    # Docker section
+  orbstack  # Docker section
   aws       # Amazon Web Services section
   awsume    # AWSume section
   venv      # virtualenv section
