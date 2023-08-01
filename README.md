@@ -35,15 +35,15 @@ git config --global user.name "Name Lastname"
 
 **Set up iTerm2**
 
-- Set theme in preferences -> profile -> colors
-- Set font to Fira code retina in preferences -> profile -> text
+- Set theme in preferences -> profiles -> colors
+- Set font to Fira code retina in preferences -> profiles -> text
 - Set theme to minimal in appearance -> general -> theme
 - Set settings in advanced:
     - Tabs prominent outline -> 0.1
     - Prominence of selected tabs underline indicator -> 0
-- Enable blinking cursor
-- Set window size to 125x25
-- Enable unlimited scrollback
+- Enable blinking cursor in preferences -> profiles -> text
+- Set window size to 125x25 in preferences -> profiles -> window
+- Enable unlimited scrollback in preferences -> profiles -> terminal
 
 **Finder**
 
