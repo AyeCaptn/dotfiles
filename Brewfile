@@ -3,6 +3,7 @@
 
 # Taps
 tap "creativeprojects/tap"
+tap "nahive/spotify-notify"
 
 # CLI Tools
 brew "awscli"
@@ -30,7 +31,6 @@ brew "openvpn"
 brew "parquet-cli"
 brew "pdm"
 brew "pipx"
-brew "pnpm"
 brew "python"
 brew "restic"
 brew "resticprofile"
@@ -65,11 +65,10 @@ cask "obsidian"
 cask "orbstack"
 cask "plex-media-server"
 cask "poedit"
-cask "postman"
 cask "powerphotos"
 cask "session-manager-plugin"
 cask "slack"
-cask "spotify-notifications"
+cask "spotify-notify"
 cask "spotify"
 cask "transmission"
 cask "visual-studio-code"
