@@ -78,13 +78,13 @@ update_brew() {
 }
 
 update_npm() {
-  if ! _exists npm; then
+  if ! _exists pnpm; then
     return
   fi
 
-  info "Updating NPM..."
+  info "Updating PNPM..."
 
-  npm install npm -g
+  pnpm update -g
 
   finish
 }

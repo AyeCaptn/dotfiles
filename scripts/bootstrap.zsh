@@ -44,11 +44,11 @@ else
 fi
 
 # NPM global packages
-if _exists npm; then
-  info "installing npm packages"
-  npm install -g
+if _exists pnpm; then
+  info "installing pnpm packages"
+  cat pnpm-packages.txt | xargs -n1 pnpm add -g
 else
-  info "npm not installed"
+  info "pnpm not installed"
 fi
 
 # Fonts

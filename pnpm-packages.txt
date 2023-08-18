@@ -1,0 +1,4 @@
+diff-so-fancy
+eslint
+prettier
+trash-cli

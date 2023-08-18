@@ -24,9 +24,6 @@ setopt HIST_IGNORE_ALL_DUPS
 # Autoswitch
 AUTOSWITCH_SILENT=true
 
-# Conda
-export CONDA_CHANGEPS1=no
-
 # AWS Vault
 export AWS_VAULT_PL_BROWSER=com.google.chrome
 
@@ -84,24 +81,15 @@ else
   export EDITOR='vim'
 fi
 
+# Source secrets
+if [[ -f "$HOME/.secrets" ]]; then
+  source "$HOME/.secrets"
+fi
+
 # Source local configuration
 if [[ -f "$HOME/.zshlocal" ]]; then
   source "$HOME/.zshlocal"
 fi
-
-# setup miniconda
-_conda_init() {
-  local __conda_setup="$('/opt/homebrew/Caskroom/miniconda/base/bin/conda' 'shell.zsh' 'hook' 2>/dev/null)"
-  if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-  else
-    if [ -f "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
-      . "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
-    else
-      [[ -d "/opt/homebrew/Caskroom/miniconda/base/bin" ]] && _extend_path "/opt/homebrew/Caskroom/miniconda/base/bin"
-    fi
-  fi
-}
 
 # setup pnpm
 export PNPM_HOME="$HOME/Library/pnpm"
@@ -110,16 +98,23 @@ case ":$PATH:" in
 *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 
+# Setup pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+export PIPENV_PYTHON="$PYENV_ROOT/shims/python"
+eval "$(pyenv init -)"
+
 # OMZ is managed by Sheldon
 export ZSH="$HOME/.local/share/sheldon/repos/github.com/ohmyzsh/ohmyzsh"
 
 plugins=(
-  sudo
+  command-not-found
+  docker
   extract
   gpg-agent
   macos
-  command-not-found
-  docker
+  pyenv
+  sudo
 )
 
 # ------------------------------------------------------------------------------
@@ -127,8 +122,6 @@ plugins=(
 # ------------------------------------------------------------------------------
 
 eval "$(sheldon source)"
-
-zsh-defer _conda_init
 
 # Spaceship
 SPACESHIP_PROMPT_ORDER=(
@@ -143,11 +136,9 @@ SPACESHIP_PROMPT_ORDER=(
   swift     # Swift section
   golang    # Go section
   rust      # Rust section
-  orbstack  # Docker section
+  docker    # Docker section
   aws       # Amazon Web Services section
-  awsume    # AWSume section
   venv      # virtualenv section
-  condav    # conda virtualenv section
   kubectl   # Kubectl context section
   terraform # Terraform workspace section
   exec_time # Execution time

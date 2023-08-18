@@ -65,9 +65,6 @@ fi
 
 alias git-root='cd $(git rev-parse --show-toplevel)'
 
-# VPN aliases
-alias porphyriovpn="openfortivpn -c ~/.vpn/porphyrio"
-
 # Docker
 alias dstop='docker stop $(docker ps -a -q)'
 alias dstart='docker restart $(docker ps -q -f "status=exited" -f "name=$1")'
@@ -75,11 +72,9 @@ alias dstart='docker restart $(docker ps -q -f "status=exited" -f "name=$1")'
 # Shortcuts
 alias lg=lazygit
 
-# AWSume
-alias awsume=". awsume"
-
-# Private repo token fetch before pip
-alias pip="pip-login && pip"
-
 # Backup all files
 alias backup="resticprofile -c ~/.resticprofiles.conf --name full-backup backup"
+
+# Disable press and hold in VSCode
+alias vscode-press-and-hold-off="defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false"
+alias vscode-press-and-hold-on="defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool true"

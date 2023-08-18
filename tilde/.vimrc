@@ -2,6 +2,9 @@
 " Set how many lines of history VIM should remember
 set history=500
 
+" Set relative line numbers
+set relativenumber
+
 " Plugins will be downloaded under the specified directory.
 call plug#begin('~/.vim/plugged')
 

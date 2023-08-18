@@ -58,8 +58,12 @@ apply = ["defer"]
 github = "zsh-users/zsh-history-substring-search"
 apply = ["defer"]
 
-[plugins.zsh-autoswitch-conda]
-github = "rappdw/zsh-autoswitch-conda"
+[plugins.zsh-poetry]
+github = "darvid/zsh-poetry"
+apply = ["defer"]
+
+[plugins.zsh-aws-vault]
+github = "blimmer/zsh-aws-vault"
 apply = ["defer"]
 
 [templates]

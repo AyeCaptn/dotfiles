@@ -5,11 +5,8 @@ vim/vim/plugged
 backup
 
 # Sheldon
-tilde/.config/sheldon/repos
-tilde/.config/sheldon/plugins.lock
-
-# Iterm
-tilde/.config/iterm2
+tilde/.config/*
+!tilde/.config/sheldon/plugins.toml
 
 # macOS
 .DS_Store
