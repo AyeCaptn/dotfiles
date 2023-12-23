@@ -98,11 +98,17 @@ case ":$PATH:" in
 *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 
+# Launch tmux
+export ZSH_TMUX_AUTOSTART=true
+
 # Setup pyenv
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
 export PIPENV_PYTHON="$PYENV_ROOT/shims/python"
 eval "$(pyenv init -)"
+
+# Set k9s config directory
+export K9SCONFIG="$HOME/.config/k9s"
 
 # OMZ is managed by Sheldon
 export ZSH="$HOME/.local/share/sheldon/repos/github.com/ohmyzsh/ohmyzsh"
@@ -115,6 +121,8 @@ plugins=(
   macos
   pyenv
   sudo
+  tmux
+  vi-mode
 )
 
 # ------------------------------------------------------------------------------

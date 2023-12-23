@@ -10,3 +10,6 @@ tilde/.config/*
 
 # macOS
 .DS_Store
+.gitsecret/keys/random_seed
+!*.secret
+bin/py-lsp

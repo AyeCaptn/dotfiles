@@ -78,3 +78,6 @@ alias backup="resticprofile -c ~/.resticprofiles.conf --name full-backup backup"
 # Disable press and hold in VSCode
 alias vscode-press-and-hold-off="defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false"
 alias vscode-press-and-hold-on="defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool true"
+
+# NeoVim
+alias vi=nvim
