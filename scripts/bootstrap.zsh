@@ -51,12 +51,6 @@ else
   info "pnpm not installed"
 fi
 
-# Fonts
-eval "find \"$DOTFILES/fonts\" \( -name '*.[o,t]tf' -or -name '*.pcf.gz' \) -type f -print0" | xargs -0 -I % cp "%" "$HOME/Library/Fonts/"
-
-# Vim plug
-info "Setting up vim"
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 # TODO: Restic restore
 
