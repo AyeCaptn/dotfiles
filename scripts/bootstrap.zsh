@@ -33,7 +33,7 @@ else
 fi
 
 # Accept xcode license
-xcodebuild -license accept
+sudo xcodebuild -license accept
 
 # Python global packages
 if _exists pipx; then
