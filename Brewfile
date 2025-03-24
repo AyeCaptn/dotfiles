@@ -5,6 +5,7 @@
 tap "creativeprojects/tap"
 tap "nahive/spotify-notify"
 tap "warrensbox/tap"
+tap "homebrew/cask-fonts"
 
 # CLI Tools
 brew "awscli"
@@ -12,6 +13,7 @@ brew "coreutils"
 brew "ctags"
 brew "curl"
 brew "duckdb"
+brew "font-jetbrains-mono-nerd-font"
 brew "fzf"
 brew "git-secret"
 brew "go"
