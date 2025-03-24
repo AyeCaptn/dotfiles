@@ -97,9 +97,11 @@ case ":$PATH:" in
 *":$PNPM_HOME:"*) ;;
 *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
+[[ -d "$(pnpm root -g)/bin" ]] && _extend_path "$(pnpm root -g)/bin"
 
 # Launch tmux
 export ZSH_TMUX_AUTOSTART=true
+export ZSH_TMUX_FIXTERM_WITH_256COLOR=true
 
 # Setup pyenv
 export PYENV_ROOT="$HOME/.pyenv"
@@ -107,8 +109,12 @@ export PATH="$PYENV_ROOT/bin:$PATH"
 export PIPENV_PYTHON="$PYENV_ROOT/shims/python"
 eval "$(pyenv init -)"
 
+# Setup java
+export JAVA_HOME=$(/usr/libexec/java_home -v 11)
+export PATH="$JAVA_HOME/bin:$PATH"
+
 # Set k9s config directory
-export K9SCONFIG="$HOME/.config/k9s"
+export K9S_CONFIG_DIR="$HOME/.config/k9s"
 
 # OMZ is managed by Sheldon
 export ZSH="$HOME/.local/share/sheldon/repos/github.com/ohmyzsh/ohmyzsh"
@@ -157,4 +163,4 @@ SPACESHIP_PROMPT_ORDER=(
   char      # Prompt character
 )
 
-export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
+# export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
