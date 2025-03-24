@@ -81,3 +81,6 @@ alias vscode-press-and-hold-on="defaults write com.microsoft.VSCode ApplePressAn
 
 # NeoVim
 alias vi=nvim
+
+# AWSume
+alias awsume=". awsume"
