@@ -17,7 +17,7 @@ YELLOW="${e}[0;93m"
 GREEN="${e}[0;92m"
 
 _exists() {
-  command -v "$1" > /dev/null 2>&1
+  command -v "$1" >/dev/null 2>&1
 }
 
 # Success reporter
@@ -46,6 +46,8 @@ finish() {
 export DOTFILES=${1:-"$HOME/.dotfiles"}
 GITHUB_REPO_URL_BASE="https://github.com/AyeCaptn/dotfiles"
 HOMEBREW_INSTALLER_URL="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
+TPM_GITHUB_REPO=https://github.com/tmux-plugins/tpm
+TPM_INSTALLATION_PATH=~/.tmux/plugins/tpm
 
 on_start() {
   info "           __        __   ____ _  __           "
@@ -125,7 +127,7 @@ install_git() {
     fi
 
     info "Installing Git..."
-    
+
     brew install git
   else
     success "You already have Git installed. Skipping..."
@@ -153,6 +155,20 @@ install_dotfiles() {
 
   info "Linking dotfiles..."
   cd $DOTFILES && ./sync.py && cd -
+
+  finish
+}
+
+install_tmux_plugin_manager() {
+  if [ ! -d $TPM_INSTALLATION_PATH ]; then
+    echo "Seems like you don't have the tmux plugin manager installed!"
+    read -p "Would you like to install the tmux plugin manager? [y/N]" -n 1 answer
+    echo
+    if [ ${answer} != "y" ]; then
+      return
+    fi
+    git clone $TPM_GITHUB_REPO $TPM_INSTALLATION_PATH
+  fi
 
   finish
 }
@@ -189,8 +205,10 @@ main() {
   install_homebrew "$*"
   install_git "$*"
   install_dotfiles "$*"
+  install_tmux_plugin_manager "$*"
   bootstrap "$*"
   on_finish "$*"
 }
 
 main "$*"
+
