@@ -1,0 +1,68 @@
+return {
+    {
+        -- https://github.com/hrsh7th/nvim-cmp
+        "hrsh7th/nvim-cmp",
+        commit = "b356f2c",
+        pin = true,
+    },
+    {
+        "nvim-treesitter/nvim-treesitter",
+        opts = function(_, opts)
+            if type(opts.ensure_installed) == "table" then
+                vim.list_extend(opts.ensure_installed, { "svelte" })
+            end
+        end,
+    },
+    {
+        "neovim/nvim-lspconfig",
+        opts = {
+            inlay_hints = {
+                enabled = true,
+            },
+            servers = {
+                svelte = {
+                    on_attach = function(client, bufnr)
+                        vim.api.nvim_create_autocmd("BufWritePost", {
+                            pattern = { "*.js", "*.ts" },
+                            callback = function(ctx)
+                                -- Here use ctx.match instead of ctx.file
+                                client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.match })
+                            end,
+                        })
+                    end,
+                },
+                tsserver = {
+                    enabled = false,
+                },
+            },
+        },
+    },
+    {
+        "williamboman/mason.nvim",
+        opts = {
+            ensure_installed = {
+                "svelte-language-server",
+            },
+        },
+    },
+    {
+        "pmizio/typescript-tools.nvim",
+        dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+        opts = {},
+    },
+    {
+        "nvim-neotest/neotest",
+        optional = true,
+        dependencies = {
+            "nvim-neotest/neotest-jest",
+        },
+        opts = {
+            adapters = {
+                ["neotest-jest"] = {
+                    jestCommand = "npm test --",
+                    jestConfigFile = "jest.config.ts",
+                },
+            },
+        },
+    },
+}
