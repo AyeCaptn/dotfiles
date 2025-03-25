@@ -1,9 +1,3 @@
 awsume
-black
-darker
-flake8
-isort
-mypy
 pirate-get
-pylint
 shandy-sqlfmt[jinjafmt]
