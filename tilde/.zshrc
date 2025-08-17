@@ -164,3 +164,6 @@ SPACESHIP_PROMPT_ORDER=(
 )
 
 # export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
+
+# opencode
+export PATH=/Users/sem/.opencode/bin:$PATH
