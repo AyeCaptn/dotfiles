@@ -51,10 +51,21 @@ else
   info "pnpm not installed"
 fi
 
+# Restic restore
+if _exists restic; then
+  if _exists op; then
+    info "restoring the restic password from 1password"
+    op read "op://Private/Restic Password/password" > ~/.restic-password
+    chmod 600 ~/.restic-password
 
-# TODO: Restic restore
+    info "restoring all files from restic backup"
+    sudo resticprofile --config ~/.resticprofiles.conf --group full-backup restore --latest --target /
 
-# TODO: Set up backups
+    info "set up schedule for restic backups"
+    #resticprofile --config ~/.resticprofiles.conf schedule --all
+else
+  info "restic not installed"
+fi
 
 # Remove terminal last login text
 touch ~/.hushlogin
