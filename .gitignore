@@ -8,6 +8,10 @@ backup
 tilde/.config/*
 !tilde/.config/sheldon/plugins.toml
 !tilde/.config/nvim
+!tilde/.config/ghostty
+!tilde/.config/opencode/config.json
+!tilde/.config/k9s/skins
+!tilde/.config/k9s/config.yaml
 
 # macOS
 .DS_Store
