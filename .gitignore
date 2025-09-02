@@ -16,6 +16,8 @@ tilde/.config/*
 !tilde/.config/k9s/config.yaml
 !tilde/.config/lazygit/
 !tilde/.config/lazygit/config.yml
+!tilde/.config/raycast/
+!tilde/.config/raycast/default.rayconfig
 
 # macOS
 .DS_Store
