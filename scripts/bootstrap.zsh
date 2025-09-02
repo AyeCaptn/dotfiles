@@ -54,17 +54,47 @@ fi
 # Restic restore
 if _exists restic; then
   if _exists op; then
+    #TODO: Ask me to sign in using 1password app and enable cli integration
     info "restoring the restic password from 1password"
     op read "op://Private/Restic Password/password" > ~/.restic-password
+    op item get "Restic AWS ENV" --format json | jq -r '.details.notesPlain // (.fields[]? | select(.id=="notesPlain" or .label=="notesPlain") | .value)' > ~/.restic-env
     chmod 600 ~/.restic-password
 
+    #TODO: list all available tags and ask the user what tags to restore
     info "restoring all files from restic backup"
-    sudo resticprofile --config ~/.resticprofiles.conf --group full-backup restore --latest --target /
+    awk -F\" '/^tag = /{print $2}' ~/.resticprofiles.conf \
+    | tr , '\n' | awk '{$1=$1}1' | sort -u \
+    | while IFS= read -r TAG; do
+      resticprofile -c ~/.resticprofiles.conf --name full-backup restore latest --tag "$TAG" --overwrite if-changed --target /
+    done
 
     info "set up schedule for restic backups"
     #resticprofile --config ~/.resticprofiles.conf schedule --all
 else
   info "restic not installed"
+fi
+
+info "setting desktop background"
+osascript -e "tell application \"System Events\" to set picture of every desktop to POSIX file \"$DOTFILES/wallpapers/midnight-reflections-moonlit-sea.jpg\""
+
+info "setting screensaver"
+osascript -e 'tell application "System Events" to set current screen saver to screen saver "Drift"'
+
+# Install tmux plugins
+if _exists tmux; then
+  info "installing tmux plugins"
+  
+  # Clone TPM if it doesn't exist
+  if [ ! -d ~/.tmux/plugins/tpm ]; then
+    info "cloning TPM (Tmux Plugin Manager)"
+    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+  fi
+  
+  # Source tmux config and install plugins
+  tmux source-file ~/.tmux.conf 2>/dev/null || true
+  ~/.tmux/plugins/tpm/bin/install_plugins
+else
+  info "tmux not installed"
 fi
 
 # Remove terminal last login text
