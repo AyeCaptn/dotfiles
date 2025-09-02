@@ -47,9 +47,12 @@ brew "yt-dlp"
 brew "yq"
 brew "zsh-completions"
 brew "zsh"
+brew "neovim"
+brew "sst/tap/opencode"
 
 # Desktop applications
 cask "1password"
+cask "1password-cli"
 cask "alcove"
 cask "aws-vault"
 cask "bruno"
@@ -69,6 +72,7 @@ cask "visual-studio-code"
 cask "vlc"
 cask "zen-browser"
 cask "raycast"
+cask "whatsapp"
 
 # cask "slack"
 # cask "messenger"
@@ -79,8 +83,6 @@ cask "raycast"
 # cask "swish"
 
 # App store applications
-mas "Affinity Designer", id: 824171161
-mas "Affinity Photo", id: 824183456
 mas "Logic Pro", id: 634148309
 mas "Keynote", id: 409183694
 mas "Numbers", id: 409203825
