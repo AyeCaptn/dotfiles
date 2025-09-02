@@ -104,17 +104,21 @@ export ZSH_TMUX_AUTOSTART=true
 export ZSH_TMUX_FIXTERM_WITH_256COLOR=true
 
 # Setup pyenv
+#
 export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-export PIPENV_PYTHON="$PYENV_ROOT/shims/python"
-eval "$(pyenv init -)"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+# export PIPENV_PYTHON="$PYENV_ROOT/shims/python"
+eval "$(pyenv init - zsh)"
 
 # Setup java
-export JAVA_HOME=$(/usr/libexec/java_home -v 11)
+export JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home
 export PATH="$JAVA_HOME/bin:$PATH"
 
 # Set k9s config directory
 export K9S_CONFIG_DIR="$HOME/.config/k9s"
+
+# Set Lazygit config directory
+export LG_CONFIG_FILE="$HOME/.config/lazygit/config.yml"
 
 # OMZ is managed by Sheldon
 export ZSH="$HOME/.local/share/sheldon/repos/github.com/ohmyzsh/ohmyzsh"
@@ -163,7 +167,3 @@ SPACESHIP_PROMPT_ORDER=(
   char      # Prompt character
 )
 
-# export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
-
-# opencode
-export PATH=/Users/sem/.opencode/bin:$PATH
