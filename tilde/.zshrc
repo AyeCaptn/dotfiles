@@ -99,6 +99,9 @@ case ":$PATH:" in
 esac
 [[ -d "$(pnpm root -g)/bin" ]] && _extend_path "$(pnpm root -g)/bin"
 
+# setup fnm
+eval "$(fnm env --use-on-cd --shell zsh)"
+
 # Launch tmux
 export ZSH_TMUX_AUTOSTART=true
 export ZSH_TMUX_FIXTERM_WITH_256COLOR=true
