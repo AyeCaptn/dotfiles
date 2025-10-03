@@ -66,6 +66,10 @@ apply = ["defer"]
 github = "blimmer/zsh-aws-vault"
 apply = ["defer"]
 
+[plugins.zsh-uv-env]
+github = "matthiasha/zsh-uv-env"
+apply = ["defer"]
+
 [templates]
 defer = '''
   {% for file in files %}
