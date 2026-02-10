@@ -22,3 +22,6 @@ gui:
 
   authorColors:
     "*": "#b7bdf8"
+
+services:
+  "github.tools.digital.engie.com": "github:github.tools.digital.engie.com"

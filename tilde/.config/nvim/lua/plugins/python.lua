@@ -1,74 +1,77 @@
 return {
     {
-        "nvim-treesitter/nvim-treesitter",
-        opts = { ensure_installed = { "ninja", "rst" } },
-    },
-    {
         "neovim/nvim-lspconfig",
         opts = {
             inlay_hints = {
                 enabled = true,
             },
             servers = {
-                pylance = {
-                    cmd = {
-                        "node",
-                        vim.fn.expand(
-                            "~/.vscode/extensions/ms-python.vscode-pylance-2025.3.1/dist/server_nvim.js",
-                            false,
-                            true
-                        )[1],
-                        "--stdio",
+                pytest_lsp = {
+                    cmd = { "pytest-language-server" },
+                    filetypes = { "python" },
+                    root_markers = {
+                        "pytest.ini",
+                        "pyproject.toml",
+                        "setup.py",
+                        "setup.cfg",
+                        ".git",
                     },
+                },
+                ty = {
                     settings = {
-                        python = {
-                            analysis = {
-                                inlayHints = {
-                                    variableTypes = false,
-                                    functionReturnTypes = true,
-                                    callArgumentNames = false,
-                                },
-                                typeCheckingMode = "basic",
-                                autoImportCompletions = true,
-                                enablePytestSupport = true,
+                        ty = {
+                            -- Diagnostic settings
+                            diagnosticMode = "workspace", -- "off" | "workspace" | "openFilesOnly"
+                            showSyntaxErrors = true,
+
+                            -- Inlay hints settings (matching your basedpyright config)
+                            inlayHints = {
+                                variableTypes = false,
+                                callArgumentNames = false,
                             },
+
+                            -- Completions settings
+                            completions = {
+                                autoImport = true, -- equivalent to autoImportCompletions
+                            },
+
+                            -- Optional: Configuration inline (takes precedence over config files)
+                            -- configuration = {
+                            --     rules = {
+                            --         ["unresolved-reference"] = "warn",
+                            --     },
+                            -- },
+
+                            -- Optional: Path to custom ty.toml config file
+                            -- configurationFile = nil,
+
+                            -- Optional: Disable language services if you only want type checking
+                            -- disableLanguageServices = false,
                         },
                     },
                 },
+                -- Keep basedpyright config for reference/fallback
+                -- basedpyright = {
+                --     settings = {
+                --         basedpyright = {
+                --             analysis = {
+                --                 inlayHints = {
+                --                     variableTypes = false,
+                --                     functionReturnTypes = true,
+                --                     callArgumentNames = false,
+                --                 },
+                --                 typeCheckingMode = "basic",
+                --                 autoImportCompletions = true,
+                --                 enablePytestSupport = true,
+                --             },
+                --         },
+                --     },
+                -- },
             },
         },
     },
-    -- {
-    --     "neovim/nvim-lspconfig",
-    --     opts = {
-    --         inlay_hints = {
-    --             enabled = true,
-    --         },
-    --         servers = {
-    --             basedpyright = {
-    --                 settings = {
-    --                     basedpyright = {
-    --                         analysis = {
-    --                             inlayHints = {
-    --                                 variableTypes = false,
-    --                                 functionReturnTypes = true,
-    --                                 callArgumentNames = false,
-    --                             },
-    --                             typeCheckingMode = "basic",
-    --                             autoImportCompletions = true,
-    --                             enablePytestSupport = true,
-    --                         },
-    --                     },
-    --                 },
-    --             },
-    --         },
-    --     },
-    -- },
     {
         "nvim-neotest/neotest",
-        dependencies = {
-            "nvim-neotest/neotest-python",
-        },
         opts = {
             adapters = {
                 ["neotest-python"] = {
@@ -81,54 +84,17 @@ return {
         },
     },
     {
-        "mfussenegger/nvim-dap",
-        dependencies = {
-            "mfussenegger/nvim-dap-python",
-            -- stylua: ignore
-            keys = {
-              { "<leader>dPt", function() require('dap-python').test_method() end, desc = "Debug Method", ft = "python" },
-              { "<leader>dPc", function() require('dap-python').test_class() end, desc = "Debug Class", ft = "python" },
-            },
-            config = function()
-                if vim.fn.has("win32") == 1 then
-                    require("dap-python").setup(LazyVim.get_pkg_path("debugpy", "/venv/Scripts/pythonw.exe"))
-                else
-                    require("dap-python").setup(LazyVim.get_pkg_path("debugpy", "/venv/bin/python"))
-                end
-            end,
-        },
-    },
-    {
-        "linux-cultist/venv-selector.nvim",
-        cmd = "VenvSelect",
-        opts = function(_, opts)
-            if require("lazyvim.util").has("nvim-dap-python") then
-                opts.dap_enabled = true
-            end
-            return vim.tbl_deep_extend("force", opts, {
-                name = {
-                    "venv",
-                    ".venv",
-                    "env",
-                    ".env",
-                },
-                poetry_path = "/Users/sem/Library/Caches/pypoetry/virtualenvs/",
-            })
-        end,
-        keys = { { "<leader>cv", "<cmd>:VenvSelect<cr>", desc = "Select VirtualEnv" } },
-    },
-    {
         "mfussenegger/nvim-lint",
         opts = {
             linters_by_ft = {
-                python = { "mypy", "ruff" },
+                python = { "ruff" }, -- mypy
             },
             linters = {
-                mypy = {
-                    condition = function(ctx)
-                        return not ctx.filename:match("/tests?/")
-                    end,
-                },
+                -- mypy = {
+                --     condition = function(ctx)
+                --         return not ctx.filename:match("/tests?/")
+                --     end,
+                -- },
             },
         },
     },
@@ -144,22 +110,6 @@ return {
                         return { "isort", "black" }
                     end
                 end,
-            },
-        },
-    },
-    {
-        "williamboman/mason.nvim",
-        opts = {
-            ensure_installed = {
-                "black",
-            },
-        },
-    },
-    {
-        "jay-babu/mason-nvim-dap.nvim",
-        opts = {
-            handlers = {
-                python = function() end,
             },
         },
     },
