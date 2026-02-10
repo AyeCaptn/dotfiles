@@ -70,6 +70,10 @@ apply = ["defer"]
 github = "matthiasha/zsh-uv-env"
 apply = ["defer"]
 
+[plugins.zsh-fzf-history-search]
+github = 'joshskidmore/zsh-fzf-history-search'
+apply = ["defer"]
+
 [templates]
 defer = '''
   {% for file in files %}
