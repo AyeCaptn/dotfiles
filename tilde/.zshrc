@@ -6,6 +6,12 @@
 # Environment
 # ------------------------------------------------------------------------------
 
+# Optional startup profiling
+if [[ -n "${DOTFILES_ZSH_PROFILE:-}" ]]; then
+  zmodload zsh/zprof
+  _dotfiles_zprof_enabled=1
+fi
+
 # Export path to root of dotfiles repo
 export DOTFILES=${DOTFILES:="$HOME/.dotfiles"}
 
@@ -97,21 +103,11 @@ case ":$PATH:" in
 *":$PNPM_HOME:"*) ;;
 *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
-[[ -d "$(pnpm root -g)/bin" ]] && _extend_path "$(pnpm root -g)/bin"
-
-# setup fnm
-eval "$(fnm env --use-on-cd --shell zsh)"
 
 # Launch tmux
 export ZSH_TMUX_AUTOSTART=true
 export ZSH_TMUX_FIXTERM_WITH_256COLOR=true
 
-# Setup pyenv
-#
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-# export PIPENV_PYTHON="$PYENV_ROOT/shims/python"
-eval "$(pyenv init - zsh)"
 
 # Setup java
 export JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home
@@ -126,13 +122,16 @@ export LG_CONFIG_FILE="$HOME/.config/lazygit/config.yml"
 # OMZ is managed by Sheldon
 export ZSH="$HOME/.local/share/sheldon/repos/github.com/ohmyzsh/ohmyzsh"
 
+# Engie specific
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+export REQUESTS_CA_BUNDLE=~/.engie-full-ca.pem
+
 plugins=(
   command-not-found
   docker
   extract
   gpg-agent
   macos
-  pyenv
   sudo
   tmux
   vi-mode
@@ -143,6 +142,15 @@ plugins=(
 # ------------------------------------------------------------------------------
 
 eval "$(sheldon source)"
+
+# Defer expensive setup until just before first prompt
+if command -v zsh-defer >/dev/null 2>&1; then
+  zsh-defer _dotfiles_pnpm_global_bin
+  zsh-defer _dotfiles_fnm_env
+else
+  _dotfiles_pnpm_global_bin
+  _dotfiles_fnm_env
+fi
 
 # Spaceship
 SPACESHIP_PROMPT_ORDER=(
@@ -170,3 +178,29 @@ SPACESHIP_PROMPT_ORDER=(
   char      # Prompt character
 )
 
+_dotfiles_pnpm_global_bin() {
+  if command -v pnpm >/dev/null 2>&1; then
+    local pnpm_bin
+    pnpm_bin="$(pnpm root -g)/bin"
+    [[ -d "$pnpm_bin" ]] && _extend_path "$pnpm_bin"
+  fi
+}
+
+_dotfiles_fnm_env() {
+  if command -v fnm >/dev/null 2>&1; then
+    eval "$(fnm env --use-on-cd --shell zsh)"
+  fi
+}
+
+
+_dotfiles_zprof_finish() {
+  if [[ -n "${_dotfiles_zprof_enabled:-}" ]]; then
+    zprof > "$HOME/.zsh_profile.log"
+  fi
+  add-zsh-hook -d precmd _dotfiles_zprof_finish
+}
+
+if [[ -n "${_dotfiles_zprof_enabled:-}" ]]; then
+  autoload -Uz add-zsh-hook
+  add-zsh-hook precmd _dotfiles_zprof_finish
+fi

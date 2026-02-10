@@ -36,11 +36,11 @@ fi
 sudo xcodebuild -license accept
 
 # Python global packages
-if _exists pipx; then
+if _exists uv; then
   info "installing python packages"
-  cat python-packages.txt | xargs -I % pipx install %
+  cat python-packages.txt | xargs -I % uv tool install %
 else
-  info "pipx not installed"
+  info "uv not installed"
 fi
 
 # NPM global packages
