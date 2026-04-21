@@ -1,0 +1,2 @@
+# Keep runtime data out of the repo if Pi writes here
+*.log

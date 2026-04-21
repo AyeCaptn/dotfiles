@@ -119,6 +119,9 @@ export K9S_CONFIG_DIR="$HOME/.config/k9s"
 # Set Lazygit config directory
 export LG_CONFIG_FILE="$HOME/.config/lazygit/config.yml"
 
+# Let pi use an XDG-style config directory
+export PI_CODING_AGENT_DIR="${PI_CODING_AGENT_DIR:-$HOME/.config/pi/agent}"
+
 # OMZ is managed by Sheldon
 export ZSH="$HOME/.local/share/sheldon/repos/github.com/ohmyzsh/ohmyzsh"
 
