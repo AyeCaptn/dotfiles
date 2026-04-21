@@ -1,0 +1,191 @@
+#!/usr/bin/env bash
+
+# Converts music files to MP3, uploads them to S3, and generates a markdown
+# playlist document with audio elements.
+#
+# Dependencies:
+#   - aws (AWS CLI)
+#   - ffmpeg (with libmp3lame support)
+#
+# Usage:
+#   playlist-upload [--replace]
+#
+# Options:
+#   --replace  Remove all existing files in the playlist before uploading
+
+# Exit on any failed command
+set -e
+
+S3_BUCKET="ke-ola"
+S3_PREFIX="data/playlists"
+S3_BASE_URL="https://${S3_BUCKET}.s3.amazonaws.com/${S3_PREFIX}"
+
+MUSIC_EXTENSIONS=("mp3" "m4a" "wav" "flac" "ogg" "aac" "wma" "opus" "aif" "aiff")
+MP3_BITRATE="192k"
+
+CYAN="$(tput setaf 6)"
+GREEN="$(tput setaf 2)"
+YELLOW="$(tput setaf 3)"
+RED="$(tput setaf 1)"
+UNDERLINE="$(tput sgr 0 1)"
+NOCOLOR="$(tput sgr0)"
+
+function header() { echo -e "\n$UNDERLINE$CYAN$1$NOCOLOR\n"; }
+function success() { echo -e "$GREEN$1$NOCOLOR"; }
+function warning() { echo -e "$YELLOW$1$NOCOLOR"; }
+function error() { echo -e "$RED$1$NOCOLOR"; }
+
+REPLACE=false
+
+for arg in "$@"; do
+    case "$arg" in
+        --replace) REPLACE=true ;;
+        *)
+            error "Unknown option: $arg"
+            echo "Usage: playlist-upload [--replace]"
+            exit 1
+            ;;
+    esac
+done
+
+# Check dependencies
+if ! command -v aws &>/dev/null; then
+    error "AWS CLI is not installed. Please install it first."
+    exit 1
+fi
+
+if ! command -v ffmpeg &>/dev/null; then
+    error "ffmpeg is not installed. Please install it first."
+    exit 1
+fi
+
+# Collect music files
+MUSIC_FILES=()
+for ext in "${MUSIC_EXTENSIONS[@]}"; do
+    while IFS= read -r -d '' file; do
+        MUSIC_FILES+=("$file")
+    done < <(find . -maxdepth 1 -iname "*.${ext}" -print0)
+done
+
+if [ ${#MUSIC_FILES[@]} -eq 0 ]; then
+    error "No music files found in the current directory."
+    exit 1
+fi
+
+# Sort files naturally (by number prefix)
+IFS=$'\n' MUSIC_FILES=($(printf '%s\n' "${MUSIC_FILES[@]}" | sort -V))
+unset IFS
+
+header "Found ${#MUSIC_FILES[@]} music file(s)"
+for file in "${MUSIC_FILES[@]}"; do
+    echo "  ${file#./}"
+done
+
+# Ask for playlist name
+echo ""
+read -rp "${CYAN}Playlist name: ${NOCOLOR}" PLAYLIST_NAME
+
+if [ -z "$PLAYLIST_NAME" ]; then
+    error "Playlist name cannot be empty."
+    exit 1
+fi
+
+S3_KEY_PREFIX="${S3_PREFIX}/${PLAYLIST_NAME}"
+S3_URI="s3://${S3_BUCKET}/${S3_KEY_PREFIX}/"
+
+# Replace existing files if --replace flag is set
+if [ "$REPLACE" = true ]; then
+    header "Removing existing files at ${S3_URI}..."
+    aws s3 rm "$S3_URI" --recursive
+    success "Existing files removed."
+fi
+
+# Create temp directory for converted files
+TEMP_DIR=$(mktemp -d)
+trap "rm -rf $TEMP_DIR" EXIT
+
+# Convert files to MP3
+header "Converting to MP3 (${MP3_BITRATE})..."
+
+CONVERTED_FILES=()
+for file in "${MUSIC_FILES[@]}"; do
+    filename="$(basename "$file")"
+    name_without_ext="${filename%.*}"
+    ext="${filename##*.}"
+    output_filename="${name_without_ext}.mp3"
+    output_path="${TEMP_DIR}/${output_filename}"
+
+    if [ "$(echo "$ext" | tr '[:upper:]' '[:lower:]')" = "mp3" ]; then
+        warning "Skipping (already MP3): ${filename}"
+        cp "$file" "$output_path"
+    else
+        warning "Converting: ${filename} → ${output_filename}"
+        ffmpeg -i "$file" \
+            -c:a libmp3lame \
+            -b:a "$MP3_BITRATE" \
+            -q:a 0 \
+            -vn \
+            -y \
+            "$output_path" \
+            -loglevel warning
+    fi
+
+    CONVERTED_FILES+=("$output_filename")
+done
+
+success "All files converted!"
+
+# Upload files
+header "Uploading to ${S3_URI}..."
+
+for output_filename in "${CONVERTED_FILES[@]}"; do
+    warning "Uploading: ${output_filename}"
+    aws s3 cp "${TEMP_DIR}/${output_filename}" "${S3_URI}${output_filename}" \
+        --content-type "audio/mpeg" \
+        --acl public-read \
+        --quiet
+done
+
+success "All files uploaded!"
+
+# Generate markdown
+header "Generating markdown..."
+
+MARKDOWN=""
+
+for output_filename in "${CONVERTED_FILES[@]}"; do
+    display_name="${output_filename%.*}"
+
+    encoded_filename=$(python3 -c \
+        "import urllib.parse; print(urllib.parse.quote('''${output_filename}'''))")
+
+    url="${S3_BASE_URL}/${PLAYLIST_NAME}/${encoded_filename}"
+
+    MARKDOWN+="# ${display_name}"$'\n'
+    MARKDOWN+=""$'\n'
+    MARKDOWN+='<audio controls>'$'\n'
+    MARKDOWN+="  <source src=\"${url}\" type=\"audio/mpeg\">"$'\n'
+    MARKDOWN+='  Your browser does not support the audio element.'$'\n'
+    MARKDOWN+='</audio>'$'\n'
+    MARKDOWN+=""$'\n'
+done
+
+header "Markdown output (copy below):"
+echo "---"
+echo ""
+echo "$MARKDOWN"
+echo "---"
+
+# Copy to clipboard if possible
+if command -v pbcopy &>/dev/null; then
+    echo "$MARKDOWN" | pbcopy
+    success "Copied to clipboard! (pbcopy)"
+elif command -v xclip &>/dev/null; then
+    echo "$MARKDOWN" | xclip -selection clipboard
+    success "Copied to clipboard! (xclip)"
+elif command -v wl-copy &>/dev/null; then
+    echo "$MARKDOWN" | wl-copy
+    success "Copied to clipboard! (wl-copy)"
+else
+    warning "No clipboard tool found. Please copy manually."
+fi

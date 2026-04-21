@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+# Resets Neovim by removing cache, state, and share directories
+#
+# Usage:
+#   nvim-reset
+
+# Exit on any failed command
+set -e
+
+CYAN="$(tput setaf 6)"
+YELLOW="$(tput setaf 3)"
+UNDERLINE="$(tput sgr 0 1)"
+NOCOLOR="$(tput sgr0)"
+
+function header() { echo -e "\n$UNDERLINE$CYAN$1$NOCOLOR\n"; }
+function warning() { echo -e "$YELLOW$1$NOCOLOR"; }
+
+header "Resetting Neovim..."
+
+# Remove cache
+if [ -d ~/.cache/nvim ]; then
+    warning "Removing ~/.cache/nvim"
+    rm -rf ~/.cache/nvim
+else
+    echo "~/.cache/nvim does not exist, skipping"
+fi
+
+# Remove state
+if [ -d ~/.local/state/nvim ]; then
+    warning "Removing ~/.local/state/nvim"
+    rm -rf ~/.local/state/nvim
+else
+    echo "~/.local/state/nvim does not exist, skipping"
+fi
+
+# Remove share
+if [ -d ~/.local/share/nvim ]; then
+    warning "Removing ~/.local/share/nvim"
+    rm -rf ~/.local/share/nvim
+else
+    echo "~/.local/share/nvim does not exist, skipping"
+fi
+
+header "Neovim reset complete!"
+echo "Next time you start Neovim, it will rebuild its cache and state."
