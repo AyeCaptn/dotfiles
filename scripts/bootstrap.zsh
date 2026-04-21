@@ -38,7 +38,7 @@ sudo xcodebuild -license accept
 # Python global packages
 if _exists uv; then
   info "installing python packages"
-  cat python-packages.txt | xargs -I % uv tool install %
+  cat python-packages.txt | xargs -I % uv tool install % --force
 else
   info "uv not installed"
 fi

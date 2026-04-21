@@ -49,6 +49,8 @@ brew "zsh-completions"
 brew "zsh"
 brew "neovim"
 brew "opencode"
+brew "television"
+brew "bat"
 
 # Desktop applications
 cask "1password"
@@ -81,8 +83,8 @@ cask "whatsapp"
 # cask "swish"
 
 # App store applications
-mas "Logic Pro", id: 634148309
-mas "Keynote", id: 409183694
-mas "Numbers", id: 409203825
-mas "Pages", id: 409201541
-mas "XCode", id: 497799835
+# mas "Logic Pro", id: 634148309
+# mas "Keynote", id: 409183694
+# mas "Numbers", id: 409203825
+# mas "Pages", id: 409201541
+# mas "XCode", id: 497799835

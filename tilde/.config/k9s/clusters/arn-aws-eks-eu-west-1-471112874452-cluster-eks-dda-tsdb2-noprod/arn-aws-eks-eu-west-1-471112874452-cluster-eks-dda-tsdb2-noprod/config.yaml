@@ -5,11 +5,11 @@ k9s:
     lockFavorites: false
     favorites:
       - all
-      - argocd
       - dev
+      - argocd
       - default
   view:
-    active: v1/pods all
+    active: apps/v1/deployments all
   featureGates:
     nodeShell: false
   proxy: null

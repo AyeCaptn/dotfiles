@@ -204,3 +204,5 @@ if [[ -n "${_dotfiles_zprof_enabled:-}" ]]; then
   autoload -Uz add-zsh-hook
   add-zsh-hook precmd _dotfiles_zprof_finish
 fi
+
+eval "$(tv init zsh)"
