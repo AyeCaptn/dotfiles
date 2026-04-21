@@ -1,0 +1,11 @@
+{
+  "defaultProvider": "github-copilot",
+  "defaultModel": "gpt-5.4",
+  "enabledModels": [
+    "github-copilot/gpt-5.4"
+  ],
+  "defaultThinkingLevel": "medium",
+  "theme": "catppuccin-macchiato",
+  "sessionDir": "~/.local/state/pi/sessions",
+  "lastChangelogVersion": "0.68.0"
+}

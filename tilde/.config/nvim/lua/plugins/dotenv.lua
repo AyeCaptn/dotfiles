@@ -1,6 +1,6 @@
 return {
-    {
-        "tpope/vim-dotenv",
-        lazy = false,
-    },
+    -- {
+    --     "tpope/vim-dotenv",
+    --     lazy = false,
+    -- },
 }

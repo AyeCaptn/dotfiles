@@ -1,0 +1,15 @@
+k9s:
+  cluster: arn:aws:eks:eu-west-1:471112874452:cluster/eks-dda-tsdb2-noprod
+  namespace:
+    active: all
+    lockFavorites: false
+    favorites:
+      - all
+      - dev
+      - argocd
+      - default
+  view:
+    active: apps/v1/deployments all
+  featureGates:
+    nodeShell: false
+  proxy: null

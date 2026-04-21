@@ -1,0 +1,12 @@
+# Runtime/auth state
+/auth.json
+/sessions/
+/pi-debug.log
+
+# Package install locations
+/git/
+/npm/
+/node_modules/
+
+# OS cruft
+.DS_Store

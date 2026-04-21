@@ -89,14 +89,14 @@ update_npm() {
   finish
 }
 
-update_pipx() {
-  if ! _exists pipx; then
+update_uv_tools() {
+  if ! _exists uv; then
     return
   fi
 
-  info "Updating pipx..."
+  info "Updating uv tools..."
 
-  pipx upgrade-all
+  uv tool upgrade --all
 
   finish
 }
@@ -119,7 +119,7 @@ main() {
   update_dotfiles "$*"
   update_brew "$*"
   update_npm "$*"
-  update_pipx "$*"
+  update_uv_tools "$*"
   on_finish "$*"
 }
 

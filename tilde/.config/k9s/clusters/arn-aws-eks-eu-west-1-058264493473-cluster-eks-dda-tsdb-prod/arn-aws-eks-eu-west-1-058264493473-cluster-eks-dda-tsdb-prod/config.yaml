@@ -1,0 +1,14 @@
+k9s:
+  cluster: arn:aws:eks:eu-west-1:058264493473:cluster/eks-dda-tsdb-prod
+  namespace:
+    active: all
+    lockFavorites: false
+    favorites:
+      - all
+      - grafana
+      - default
+  view:
+    active: apps/v1/deployments all
+  featureGates:
+    nodeShell: false
+  proxy: null
