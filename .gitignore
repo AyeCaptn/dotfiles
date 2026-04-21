@@ -20,6 +20,12 @@ tilde/.config/*
 !tilde/.config/raycast/default.rayconfig
 !tilde/.config/pi/
 !tilde/.config/pi/**
+!tilde/.config/television/
+!tilde/.config/television/**
+
+# Pi local state should never be tracked
+/~
+tilde/.local/state/pi/
 
 # macOS
 .DS_Store
