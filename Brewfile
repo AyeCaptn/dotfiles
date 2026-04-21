@@ -51,6 +51,7 @@ brew "neovim"
 brew "opencode"
 brew "television"
 brew "bat"
+brew "fd"
 
 # Desktop applications
 cask "1password"
