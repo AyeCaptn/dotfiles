@@ -9,6 +9,7 @@
   "sessionDir": "~/.local/state/pi/sessions",
   "lastChangelogVersion": "0.69.0",
   "packages": [
-    "npm:pi-rewind"
+    "npm:pi-rewind",
+    "npm:pi-vim"
   ]
 }

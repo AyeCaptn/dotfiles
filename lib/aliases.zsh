@@ -85,5 +85,5 @@ alias vi=nvim
 # AWSume
 alias awsume=". awsume"
 
-alias ktx="tv aws-profiles"
-alias kaws="tv k8s-contexts"
+alias kaws="tv aws-profiles"
+alias ktx="tv k8s-contexts"
