@@ -108,5 +108,13 @@ mkdir -p ~/Projects/Playground
 mkdir -p ~/Projects/Repos
 mkdir -p ~/Projects/Personal
 
+# Dock
+info "configuring dock"
+defaults write com.apple.dock autohide-delay -float 0
+defaults delete com.apple.dock autohide-delay
+defaults write com.apple.dock orientation -string right
+defaults write com.apple.dock tilesize -int 32
+killall Dock
+
 # Get back to previous directory
 cd -
