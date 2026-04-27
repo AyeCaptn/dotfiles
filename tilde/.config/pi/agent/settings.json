@@ -6,6 +6,10 @@
   ],
   "defaultThinkingLevel": "medium",
   "theme": "catppuccin-macchiato",
-  "sessionDir": "/Users/sem/.local/state/pi/sessions",
-  "lastChangelogVersion": "0.70.2"
+  "sessionDir": "~/.local/state/pi/sessions",
+  "lastChangelogVersion": "0.69.0",
+  "packages": [
+    "npm:pi-rewind",
+    "npm:pi-vim"
+  ]
 }
