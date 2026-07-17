@@ -1,11 +1,17 @@
 local icons = require("icons")
+local settings = require("settings")
 
 local wifi = sbar.add("item", "wifi", {
   position = "right",
-  y_offset = require("settings").item.right_y_offset,
-  icon = { string = icons.wifi.connected },
+  y_offset = settings.item.right_y_offset,
+  icon = {
+    string = icons.wifi.connected,
+    padding_left = 5,
+    padding_right = 5,
+  },
   label = { drawing = false },
-  padding_left = 2,
+  padding_left = 0,
+  padding_right = 0,
   click_script = "open x-apple.systempreferences:com.apple.preference.network",
 })
 

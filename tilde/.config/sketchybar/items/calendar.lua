@@ -19,8 +19,8 @@ local calendar = sbar.add("item", "calendar", {
     height = settings.bracket.height,
     drawing = true,
   },
-  padding_left = 4,
-  padding_right = 4,
+  padding_left = 6,
+  padding_right = 0,
   click_script = "open -a Calendar",
 })
 

@@ -6,11 +6,16 @@ local battery = sbar.add("item", "battery", {
   position = "right",
   y_offset = settings.item.right_y_offset,
   update_freq = 180,
+  icon = {
+    padding_left = 5,
+    padding_right = 4,
+  },
   label = {
     font = { family = settings.font.text_mono, style = "Regular", size = 11.0 },
+    padding_right = 5,
   },
-  padding_left = 2,
-  padding_right = 2,
+  padding_left = 0,
+  padding_right = 0,
   click_script = "open x-apple.systempreferences:com.apple.preference.battery",
 })
 

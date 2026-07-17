@@ -14,23 +14,20 @@ local memory = sbar.add("graph", "memory", 30, {
     string = icons.memory,
     font = { family = settings.font.icon, style = "Semibold", size = 12.0 },
     color = colors.item,
-    padding_left = 14,
-    padding_right = 4,
+    padding_left = 6,
+    padding_right = 3,
   },
   label = {
     font = { family = settings.font.text_mono, style = "Regular", size = 11.0 },
     color = colors.item,
-    padding_left = 4,
-    padding_right = 14,
+    padding_left = 3,
+    padding_right = 6,
   },
   width = 90,
   padding_left = 0,
-  padding_right = 4,
+  padding_right = 12,
   background = {
-    color = colors.bracket,
-    corner_radius = settings.bracket.corner_radius,
-    height = settings.bracket.height,
-    drawing = true,
+    drawing = false,
   },
   click_script = "open -na /Applications/Ghostty.app --args -e btop",
 })
@@ -47,7 +44,7 @@ local function update_memory(used_percent)
   sbar.animate("tanh", 20, function()
     memory:set({
       graph = { color = color },
-      label = { string = math.floor(used_percent) .. "%" },
+      label = { string = string.format("%02d%%", math.floor(used_percent)) },
     })
   end)
   memory:push({ used_percent / 100 })

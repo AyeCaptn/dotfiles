@@ -12,8 +12,8 @@ local colors = require("colors")
 local settings = require("settings")
 
 sbar.add("bracket", "connectivity", { "volume", "battery", "wifi", "bluetooth" }, {
-  padding_left = 4,
-  padding_right = 4,
+  padding_left = 0,
+  padding_right = 0,
   background = {
     color = colors.bracket,
     corner_radius = settings.bracket.corner_radius,

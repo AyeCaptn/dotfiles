@@ -24,6 +24,6 @@ return {
   },
   bluetooth = {
     connected    = "􀤆",
-    disconnected = "􀅴",
+    disconnected = "􀤆",
   },
 }
