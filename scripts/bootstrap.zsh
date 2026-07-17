@@ -70,6 +70,9 @@ if _exists restic; then
 
     info "set up schedule for restic backups"
     #resticprofile --config ~/.resticprofiles.conf schedule --all
+  else
+    info "1Password CLI not installed"
+  fi
 else
   info "restic not installed"
 fi
@@ -95,6 +98,17 @@ if _exists tmux; then
   ~/.tmux/plugins/tpm/bin/install_plugins
 else
   info "tmux not installed"
+fi
+
+# Install SbarLua for SketchyBar Lua config
+if _exists sketchybar && _exists git && _exists make; then
+  if [ ! -f "$HOME/.local/share/sketchybar_lua/sketchybar.so" ]; then
+    info "installing SbarLua"
+    rm -rf /tmp/SbarLua
+    git clone https://github.com/FelixKratz/SbarLua.git /tmp/SbarLua
+    make -C /tmp/SbarLua -f makefile install
+    rm -rf /tmp/SbarLua
+  fi
 fi
 
 # Remove terminal last login text

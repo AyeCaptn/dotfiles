@@ -17,17 +17,15 @@ shell = "zsh"
 [plugins.lib]
 local = "~/.dotfiles/lib"
 
-[plugins.spaceship]
-github = "spaceship-prompt/spaceship-prompt"
-
 [plugins.zsh-defer]
 github = "romkatv/zsh-defer"
 
-[plugins.oh-my-zsh]
-github = "ohmyzsh/ohmyzsh"
-
 [plugins.base16]
 github = "chriskempson/base16-shell"
+
+[plugins.zsh-completions]
+github = "zsh-users/zsh-completions"
+apply = ["defer"]
 
 [plugins.alias-tips]
 github = "djui/alias-tips"

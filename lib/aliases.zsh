@@ -72,6 +72,29 @@ alias dstart='docker restart $(docker ps -q -f "status=exited" -f "name=$1")'
 # Shortcuts
 alias lg=lazygit
 
+# Modern CLI defaults. Guarded so a partial bootstrap still works.
+if _exists eza; then
+  alias ls='eza --icons --group-directories-first'
+  alias ll='eza --icons --group-directories-first -la'
+  alias lt='eza --icons --tree --level=2'
+fi
+
+if _exists bat; then
+  alias cat='bat --style=plain'
+fi
+
+if _exists yazi; then
+  y() {
+    local tmp cwd
+    tmp="$(mktemp -t yazi-cwd.XXXXXX)"
+    yazi "$@" --cwd-file="$tmp"
+    if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+      builtin cd -- "$cwd"
+    fi
+    rm -f -- "$tmp"
+  }
+fi
+
 # Backup all files
 alias backup="resticprofile -c ~/.resticprofiles.conf --name full-backup backup"
 

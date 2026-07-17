@@ -22,6 +22,9 @@ tilde/.config/*
 !tilde/.config/pi/**
 !tilde/.config/television/
 !tilde/.config/television/**
+!tilde/.config/sketchybar/
+!tilde/.config/sketchybar/**
+!tilde/.config/starship.toml
 
 # Pi local state should never be tracked
 /~

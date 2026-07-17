@@ -59,6 +59,13 @@ fi
 
 # Default pager
 export PAGER='less'
+export BAT_THEME='Catppuccin Macchiato'
+export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/ripgreprc"
+export FZF_DEFAULT_OPTS=" \
+  --color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796 \
+  --color=fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6 \
+  --color=marker:#f4dbd6,fg+:#cad3f5,prompt:#c6a0f6,hl+:#ed8796 \
+  --color=selected-bg:#494d64"
 
 # less options
 less_opts=(
@@ -97,17 +104,12 @@ if [[ -f "$HOME/.zshlocal" ]]; then
   source "$HOME/.zshlocal"
 fi
 
-# setup pnpm
+# pnpm
 export PNPM_HOME="$HOME/Library/pnpm"
 case ":$PATH:" in
-*":$PNPM_HOME:"*) ;;
-*) export PATH="$PNPM_HOME:$PATH" ;;
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
 esac
-
-# Launch tmux
-export ZSH_TMUX_AUTOSTART=true
-export ZSH_TMUX_FIXTERM_WITH_256COLOR=true
-
 
 # Setup java
 export JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home
@@ -122,27 +124,25 @@ export LG_CONFIG_FILE="$HOME/.config/lazygit/config.yml"
 # Let pi use an XDG-style config directory
 export PI_CODING_AGENT_DIR="${PI_CODING_AGENT_DIR:-$HOME/.config/pi/agent}"
 
-# OMZ is managed by Sheldon
-export ZSH="$HOME/.local/share/sheldon/repos/github.com/ohmyzsh/ohmyzsh"
-
 # Engie specific
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
 export REQUESTS_CA_BUNDLE=~/.engie-full-ca.pem
 
-plugins=(
-  command-not-found
-  docker
-  extract
-  gpg-agent
-  macos
-  sudo
-  tmux
-  vi-mode
-)
-
 # ------------------------------------------------------------------------------
 # Dependencies
 # ------------------------------------------------------------------------------
+
+autoload -Uz compinit
+compinit
+
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list \
+  'm:{a-zA-Z}={A-Za-z}' \
+  'r:|[._-]=* r:|=*' \
+  'l:|=* r:|=*'
+zstyle ':completion:*' special-dirs true
+zstyle ':completion:*' use-cache true
+zstyle ':completion:*' cache-path "$HOME/.cache/zsh/zcompcache"
 
 eval "$(sheldon source)"
 
@@ -154,32 +154,6 @@ else
   _dotfiles_pnpm_global_bin
   _dotfiles_fnm_env
 fi
-
-# Spaceship
-SPACESHIP_PROMPT_ORDER=(
-  time      # Time stamps section
-  user      # Username section
-  dir       # Current directory section
-  host      # Hostname section
-  git       # Git section (git_branch + git_status)
-  package   # Package version
-  node      # Node.js section
-  xcode     # Xcode section
-  swift     # Swift section
-  golang    # Go section
-  rust      # Rust section
-  docker    # Docker section
-  aws       # Amazon Web Services section
-  venv      # virtualenv section
-  kubectl   # Kubectl context section
-  terraform # Terraform workspace section
-  exec_time # Execution time
-  line_sep  # Line break
-  battery   # Battery level and status
-  jobs      # Background jobs indicator
-  exit_code # Exit code section
-  char      # Prompt character
-)
 
 _dotfiles_pnpm_global_bin() {
   if command -v pnpm >/dev/null 2>&1; then
@@ -208,4 +182,51 @@ if [[ -n "${_dotfiles_zprof_enabled:-}" ]]; then
   add-zsh-hook precmd _dotfiles_zprof_finish
 fi
 
-eval "$(tv init zsh)"
+command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
+command -v fzf >/dev/null 2>&1 && source <(fzf --zsh)
+command -v mise >/dev/null 2>&1 && eval "$(mise activate zsh)"
+command -v tv >/dev/null 2>&1 && eval "$(tv init zsh)"
+
+# bun completions
+[ -s "/Users/sem/.bun/_bun" ] && source "/Users/sem/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# zoxide should be initialized late so it can hook directory changes reliably.
+export _ZO_DOCTOR=0
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh --cmd cd)"
+
+# Automatically enter tmux from interactive top-level shells.
+if [[ -o interactive && -z "$TMUX" && "$TERM" != "dumb" ]] &&
+  command -v tmux >/dev/null 2>&1; then
+  main_session="main"
+
+  if ! tmux has-session -t "=$main_session" 2>/dev/null; then
+    # Create the persistent main session.
+    tmux new-session -d -s "$main_session"
+    tmux set-option -t "=$main_session" destroy-unattached off
+    exec tmux attach-session -t "=$main_session"
+  fi
+
+  # Count clients currently attached to the main session.
+  client_count="$(
+    tmux list-clients -t "=$main_session" -F '#{client_name}' \
+      2>/dev/null | wc -l | tr -d ' '
+  )"
+
+  if (( client_count == 0 )); then
+    # Main exists but is currently unattended, so reconnect to it.
+    tmux set-option -t "=$main_session" destroy-unattached off
+    exec tmux attach-session -t "=$main_session"
+  else
+    # Main is in use, so create an automatically cleaned-up session.
+    temporary_session="terminal-$(date +%s)-$$"
+
+    tmux new-session -d -s "$temporary_session"
+    tmux set-option -t "=$temporary_session" destroy-unattached on
+
+    exec tmux attach-session -t "=$temporary_session"
+  fi
+fi

@@ -3,6 +3,8 @@
 
 # Taps
 tap "creativeprojects/tap"  # Tap for resticprofile
+tap "FelixKratz/formulae"  # SketchyBar and borders
+tap "koekeishiya/formulae"  # yabai and skhd
 tap "warrensbox/tap"  # Tap for tfswitch
 
 # CLI Tools
@@ -22,6 +24,7 @@ brew "k9s"
 brew "kubernetes-cli"
 brew "eksctl"
 brew "lazygit"
+brew "lua"
 brew "mas"
 brew "maven"
 brew "parquet-cli"
@@ -52,6 +55,40 @@ brew "opencode"
 brew "television"
 brew "bat"
 brew "fd"
+brew "borders"
+brew "sketchybar"
+brew "koekeishiya/formulae/skhd"
+brew "koekeishiya/formulae/yabai"
+
+# Shell and prompt
+brew "starship"
+brew "zoxide"
+brew "eza"
+
+# Terminal UI and file tools
+brew "btop"
+brew "fastfetch"
+brew "yazi"
+brew "glow"
+brew "tailspin"
+
+# Git and code intelligence
+brew "gh"
+brew "git-delta"
+brew "difftastic"
+brew "ast-grep"
+brew "scc"
+brew "sd"
+
+# Runtime and development tooling
+brew "mise"
+brew "rust"
+brew "pipx"
+brew "cocoapods"
+brew "docker-compose"
+
+# Dotfile management experiments
+brew "stow"
 
 # Desktop applications
 cask "1password"
@@ -60,12 +97,12 @@ cask "alcove"
 cask "aws-vault-binary"
 cask "bruno"
 cask "docker-desktop"
-cask "font-jetbrains-mono-nerd-font"
 cask "ghostty"
 cask "handbrake-app"
 cask "obsidian"
 cask "poedit"
 cask "powerphotos"
+cask "sf-symbols"
 cask "session-manager-plugin"
 cask "spotify"
 cask "transmission"
@@ -74,6 +111,22 @@ cask "vlc"
 cask "zen"
 cask "raycast"
 cask "whatsapp"
+
+# Fonts
+cask "font-atkinson-hyperlegible-mono"
+cask "font-geist"
+cask "font-hack-nerd-font"
+cask "font-inter"
+cask "font-jetbrains-mono-nerd-font"
+cask "font-monaspace"
+cask "font-monaspice-nerd-font"
+cask "font-sf-pro"
+cask "font-symbols-only-nerd-font"
+
+# QuickLook plugins
+cask "qlcolorcode"
+cask "qlstephen"
+cask "syntax-highlight"
 
 # cask "slack"
 # cask "messenger"

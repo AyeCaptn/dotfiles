@@ -1,6 +1,7 @@
 # Dotfiles
 
-Attempt at managing my dotfiles and bootstrapping a fresh system.
+Personal macOS dotfiles for a keyboard-driven desktop built around Ghostty,
+tmux, yabai/skhd, SketchyBar, zsh, Starship, and Neovim.
 
 ## Install
 
@@ -18,6 +19,51 @@ Run the following command do update the dotfiles, brew, global npm dependencies 
 update
 ```
 
+## Desktop
+
+The desktop setup is configured through yabai, skhd, and SketchyBar config files
+under `tilde/.config`.
+
+Window/app navigation is handled by skhd:
+
+| Key | Action |
+| --- | --- |
+| `cmd + shift + return` | Open Ghostty attached to tmux session `main` |
+| `cmd + shift + b/m/w/s/o` | Open Zen, Mail, WhatsApp, Spotify, Obsidian |
+| `alt + h/j/k/l` | Focus yabai windows |
+| `alt + shift + h/j/k/l` | Swap yabai windows |
+| `alt + 1-9` | Focus spaces |
+| `alt + shift + 1-9` | Move window to space and follow |
+| `alt + shift + ;` | Enter skhd service mode |
+
+## SketchyBar
+
+SketchyBar is configured with SbarLua under `~/.config/sketchybar`.
+
+SbarLua is not installed by Homebrew. Install or update it with:
+
+```sh
+git clone https://github.com/FelixKratz/SbarLua.git /tmp/SbarLua
+make -C /tmp/SbarLua -f makefile install
+rm -rf /tmp/SbarLua
+```
+
+The bar shows spaces, focused app, system widgets, connectivity indicators, and
+calendar. See `tilde/.config/sketchybar` for the current modules.
+
+## Shell
+
+Zsh plugins are managed by Sheldon. The prompt is Starship. Oh My Zsh is not
+used.
+
+See `tilde/.zshrc`, `tilde/.config/sheldon/plugins.toml`, and the files under
+`lib/` for the current shell setup.
+
+## Ghostty And Tmux
+
+Ghostty opens zsh, and `.zshrc` handles tmux session attachment for interactive
+top-level shells. See `tilde/.config/ghostty/config` and `tilde/.zshrc`.
+
 ## Manual
 
 **Set up the trackpad**
@@ -33,17 +79,10 @@ git config --global user.name "Name Lastname"
 
 **Sync Intellij IDE's**
 
-**Set up iTerm2**
+**Grant permissions**
 
-- Set theme in preferences -> profiles -> colors
-- Set font to Fira code retina in preferences -> profiles -> text
-- Set theme to minimal in appearance -> general -> theme
-- Set settings in advanced:
-    - Tabs prominent outline -> 0.1
-    - Prominence of selected tabs underline indicator -> 0
-- Enable blinking cursor in preferences -> profiles -> text
-- Set window size to 125x25 in preferences -> profiles -> window
-- Enable unlimited scrollback in preferences -> profiles -> terminal
+- Grant Accessibility permissions to skhd, yabai, and borders if macOS prompts.
+- Start/restart services after changing configs: `yabai --restart-service`, `skhd --restart-service`, `sketchybar --reload`.
 
 **Finder**
 
@@ -53,8 +92,3 @@ git config --global user.name "Name Lastname"
 
 - Restore the backups
 - Enable the backup schedule
-
-
-## Resources
-
-[Denys Dovhan’s dotfiles](https://github.com/denysdovhan/dotfiles)
