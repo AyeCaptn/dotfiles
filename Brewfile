@@ -83,7 +83,6 @@ brew "sd"
 # Runtime and development tooling
 brew "mise"
 brew "rust"
-brew "pipx"
 brew "cocoapods"
 brew "docker-compose"
 

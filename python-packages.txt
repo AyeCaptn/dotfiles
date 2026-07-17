@@ -1,3 +1,1 @@
-awsume
-pirate-get
-shandy-sqlfmt[jinjafmt]
+yt-dlp
