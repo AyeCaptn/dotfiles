@@ -164,7 +164,7 @@ _dotfiles_pnpm_global_bin() {
 }
 
 _dotfiles_fnm_env() {
-  if command -v fnm >/dev/null 2>&1; then
+  if ! command -v mise >/dev/null 2>&1 && command -v fnm >/dev/null 2>&1; then
     eval "$(fnm env --use-on-cd --shell zsh)"
   fi
 }
@@ -224,9 +224,6 @@ if [[ -o interactive && -z "$TMUX" && "$TERM" != "dumb" ]] &&
     # Main is in use, so create an automatically cleaned-up session.
     temporary_session="terminal-$(date +%s)-$$"
 
-    tmux new-session -d -s "$temporary_session"
-    tmux set-option -t "=$temporary_session" destroy-unattached on
-
-    exec tmux attach-session -t "=$temporary_session"
+    exec tmux new-session -s "$temporary_session" 'zsh; tmux detach-client'
   fi
 fi

@@ -28,7 +28,7 @@ Window/app navigation is handled by skhd:
 
 | Key | Action |
 | --- | --- |
-| `cmd + shift + return` | Open Ghostty attached to tmux session `main` |
+| `cmd + shift + return` | Focus Ghostty with tmux session `main` |
 | `cmd + shift + b/m/w/s/o` | Open Zen, Mail, WhatsApp, Spotify, Obsidian |
 | `alt + h/j/k/l` | Focus yabai windows |
 | `alt + shift + h/j/k/l` | Swap yabai windows |
