@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+
+# Catppuccin Macchiato jankyborder.
+exec borders \
+  active_color=0xffc6a0f6 \
+  inactive_color=0xff24273a \
+  width=7.0 \
+  hidpi=on \
+  style=round

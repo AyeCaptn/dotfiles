@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+
+# Omarchy-inspired macOS tiling without scripting additions or SIP changes.
+
+YABAI_CONFIG_DIR="$HOME/.config/yabai"
+
+. "$YABAI_CONFIG_DIR/config.sh"
+. "$YABAI_CONFIG_DIR/spaces.sh"
+. "$YABAI_CONFIG_DIR/rules.sh"
+. "$YABAI_CONFIG_DIR/signals.sh"
+
+"$YABAI_CONFIG_DIR/startup_apps.sh"
+"$YABAI_CONFIG_DIR/display_setup.sh"

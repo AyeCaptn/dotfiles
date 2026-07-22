@@ -1,0 +1,10 @@
+theme = "catppuccin-macchiato"
+mode = "auto"
+vcs = "git"
+watch = true
+exclude_untracked = false
+line_numbers = true
+wrap_lines = false
+menu_bar = false
+agent_notes = true
+transparent_background = false

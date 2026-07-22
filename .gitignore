@@ -16,8 +16,6 @@ tilde/.config/*
 !tilde/.config/k9s/config.yaml
 !tilde/.config/lazygit/
 !tilde/.config/lazygit/config.yml
-!tilde/.config/raycast/
-!tilde/.config/raycast/default.rayconfig
 !tilde/.config/pi/
 !tilde/.config/pi/**
 !tilde/.config/television/
@@ -25,6 +23,22 @@ tilde/.config/*
 !tilde/.config/sketchybar/
 !tilde/.config/sketchybar/**
 !tilde/.config/starship.toml
+!tilde/.config/borders/
+!tilde/.config/borders/**
+!tilde/.config/hunk/
+!tilde/.config/hunk/**
+!tilde/.config/mise/
+!tilde/.config/mise/**
+!tilde/.config/ripgrep/
+!tilde/.config/ripgrep/**
+!tilde/.config/rift/
+!tilde/.config/rift/**
+!tilde/.config/skhd/
+!tilde/.config/skhd/**
+!tilde/.config/vicinae/
+!tilde/.config/vicinae/**
+!tilde/.config/yabai/
+!tilde/.config/yabai/**
 
 # Pi local state should never be tracked
 /~
