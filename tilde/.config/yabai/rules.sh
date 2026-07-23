@@ -1,8 +1,7 @@
 #!/usr/bin/env sh
 
-# Permanent rules should describe window behavior, not app startup placement.
-# App placement happens in startup_apps.sh with one-shot rules so future windows
-# open on the space you are currently using.
+# Permanent rules describe window behavior. Startup placement uses one-shot
+# rules so later windows open on the current space.
 
 for label in \
   mail_compose_float \
@@ -17,6 +16,7 @@ for label in \
   ghostty_main_terminal \
   onepassword_float \
   tailscale_float \
+  cisco_anyconnect_float \
   system_dialog_float; do
   yabai -m rule --remove "$label" 2>/dev/null
 done
@@ -38,4 +38,5 @@ yabai -m rule --add label="calculator_float" app="^Calculator$" manage=off
 yabai -m rule --add label="finder_utility_float" app="^Finder$" title="^(Copy|Move|Info|Preferences)" manage=off
 yabai -m rule --add label="onepassword_float" app="^1Password$" manage=off
 yabai -m rule --add label="tailscale_float" app="^Tailscale$" manage=off
+yabai -m rule --add label="cisco_anyconnect_float" app="^Cisco AnyConnect Secure Mobility Client$" manage=off
 yabai -m rule --add label="system_dialog_float" subrole="^AXSystemDialog$" manage=off sticky=on

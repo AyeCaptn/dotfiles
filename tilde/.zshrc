@@ -187,6 +187,29 @@ command -v fzf >/dev/null 2>&1 && source <(fzf --zsh)
 command -v mise >/dev/null 2>&1 && eval "$(mise activate zsh)"
 command -v tv >/dev/null 2>&1 && eval "$(tv init zsh)"
 
+# Search history by substring and retain Zsh's newest-first source order.
+if (( $+functions[_tv_shell_history] )); then
+  _tv_shell_history() {
+    emulate -L zsh
+    zle -I
+
+    _disable_bracketed_paste
+
+    local current_prompt
+    current_prompt=$LBUFFER
+    local output
+    output=$(history -n -1 0 | tv --exact --no-sort --no-status-bar --input "$current_prompt" --inline "$@")
+
+    zle reset-prompt
+    if [[ -n "$output" ]]; then
+      RBUFFER=""
+      LBUFFER="$output"
+    fi
+
+    _enable_bracketed_paste
+  }
+fi
+
 # bun completions
 [ -s "/Users/sem/.bun/_bun" ] && source "/Users/sem/.bun/_bun"
 

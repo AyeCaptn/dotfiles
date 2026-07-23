@@ -16,7 +16,8 @@ local calendar = sbar.add("item", "calendar", {
   background = {
     color = colors.bracket,
     corner_radius = settings.bracket.corner_radius,
-    height = settings.bracket.height,
+    height = settings.bracket.height + 1,
+    y_offset = -1,
     drawing = true,
   },
   padding_left = 6,

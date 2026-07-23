@@ -27,7 +27,9 @@ local memory = sbar.add("graph", "memory", 30, {
   padding_left = 0,
   padding_right = 12,
   background = {
-    drawing = false,
+    color = 0x00000000,
+    height = settings.bracket.height,
+    drawing = true,
   },
   click_script = "open -na /Applications/Ghostty.app --args -e btop",
 })

@@ -3,11 +3,11 @@
 
 # Launch/focus apps
 cmd + shift - return : yabai -m rule --remove startup_Ghostty_terminal 2>/dev/null; yabai -m space --focus 1; open -a "Ghostty"
-cmd + shift - b : open -a "Zen"
-cmd + shift - m : open -a "Mail"
-cmd + shift - w : open -a "WhatsApp"
-cmd + shift - s : open -a "Spotify"
-cmd + shift - o : open -a "Obsidian"
+cmd + shift - b : yabai -m space --focus 2; open -a "Zen"
+cmd + shift - m : yabai -m space --focus 3; open -a "Microsoft Outlook" 2>/dev/null || open -a "Mail"
+cmd + shift - w : yabai -m space --focus 3; open -a "Microsoft Teams" 2>/dev/null || open -a "WhatsApp"
+cmd + shift - s : yabai -m space --focus 5; open -a "Spotify"
+cmd + shift - o : yabai -m space --focus 4; open -a "Obsidian"
 cmd + shift - 0x2C : open -a "Finder"
 
 # New app windows
@@ -16,10 +16,10 @@ alt + shift - b : /Applications/Zen.app/Contents/MacOS/zen --new-window
 alt + shift - f : open -na "Finder"
 
 # Focus windows
-alt - h : yabai -m window --focus west
+alt - h : yabai -m window --focus west || yabai -m space --focus prev
 alt - j : yabai -m window --focus south
 alt - k : yabai -m window --focus north
-alt - l : yabai -m window --focus east
+alt - l : yabai -m window --focus east || yabai -m space --focus next
 
 # Swap windows
 alt + shift - h : yabai -m window --swap west
@@ -44,10 +44,9 @@ alt - 7 : yabai -m space --focus 7
 alt - 8 : yabai -m space --focus 8
 alt - 9 : yabai -m space --focus 9
 alt - tab : yabai -m space --focus recent
-alt - left : yabai -m space --focus prev
-alt - right : yabai -m space --focus next
 
-# Move windows to workspaces
+# Move windows to workspaces. `d` restores the focused app's default space.
+alt + shift - d : "$HOME/.config/yabai/move_to_default_space.sh"
 alt + shift - 1 : yabai -m window --space 1; yabai -m space --focus 1
 alt + shift - 2 : yabai -m window --space 2; yabai -m space --focus 2
 alt + shift - 3 : yabai -m window --space 3; yabai -m space --focus 3

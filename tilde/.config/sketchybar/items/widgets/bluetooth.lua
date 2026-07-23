@@ -7,6 +7,7 @@ local bluetooth = sbar.add("item", "bluetooth", {
   y_offset = settings.item.right_y_offset,
   icon = {
     string = icons.bluetooth.connected,
+    font = { family = "Symbols Nerd Font", style = "Regular", size = 14.0 },
     padding_left = 6,
     padding_right = 4,
   },

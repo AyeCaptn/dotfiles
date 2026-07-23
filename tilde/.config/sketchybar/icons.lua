@@ -23,7 +23,7 @@ return {
     disconnected = "􀙈",
   },
   bluetooth = {
-    connected    = "􀤆",
-    disconnected = "􀤆",
+    connected    = "\u{f293}",
+    disconnected = "\u{f293}",
   },
 }

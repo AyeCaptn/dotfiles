@@ -5,7 +5,6 @@
 tap "creativeprojects/tap"  # Tap for resticprofile
 tap "FelixKratz/formulae"  # SketchyBar and borders
 tap "koekeishiya/formulae"  # yabai and skhd
-tap "warrensbox/tap"  # Tap for tfswitch
 
 # CLI Tools
 brew "awscli"
@@ -41,7 +40,6 @@ brew "scala"
 brew "sheldon"
 brew "sops"
 brew "sqlite"
-brew "tfswitch"
 brew "tldr"
 brew "tmux"
 brew "tree"
@@ -93,8 +91,6 @@ brew "stow"
 cask "1password"
 cask "1password-cli"
 cask "alcove"
-cask "aws-vault-binary"
-cask "bruno"
 cask "docker-desktop"
 cask "ghostty"
 cask "handbrake-app"
@@ -108,7 +104,7 @@ cask "transmission"
 cask "visual-studio-code"
 cask "vlc"
 cask "zen"
-cask "raycast"
+cask "vicinae"
 cask "whatsapp"
 
 # Fonts
@@ -120,6 +116,7 @@ cask "font-jetbrains-mono-nerd-font"
 cask "font-monaspace"
 cask "font-monaspice-nerd-font"
 cask "font-sf-pro"
+cask "font-sketchybar-app-font"
 cask "font-symbols-only-nerd-font"
 
 # QuickLook plugins
@@ -133,7 +130,6 @@ cask "syntax-highlight"
 # cask "microsoft-powerpoint"
 # cask "microsoft-teams"
 # cask "microsoft-word"
-# cask "swish"
 
 # App store applications
 # mas "Logic Pro", id: 634148309

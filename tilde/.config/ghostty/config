@@ -18,6 +18,7 @@ copy-on-select = clipboard
 confirm-close-surface = false
 mouse-hide-while-typing = true
 shell-integration = zsh
+macos-auto-secure-input = false
 
 # Cursor
 cursor-style = block

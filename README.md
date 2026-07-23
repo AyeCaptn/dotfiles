@@ -34,6 +34,7 @@ Window/app navigation is handled by skhd:
 | `alt + shift + h/j/k/l` | Swap yabai windows |
 | `alt + 1-9` | Focus spaces |
 | `alt + shift + 1-9` | Move window to space and follow |
+| `alt + shift + d` | Move window to its app's default space and follow |
 | `alt + shift + ;` | Enter skhd service mode |
 
 ## SketchyBar

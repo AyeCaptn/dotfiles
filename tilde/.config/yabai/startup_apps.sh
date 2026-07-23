@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
-# Startup placement is intentionally one-shot. The first window of each app goes
-# to its default space; later windows open wherever you currently are.
+# The first window of each app starts in its default space. Later windows open
+# on the space currently in use.
 
 launch_once() {
   app_name="$1"
@@ -15,11 +15,9 @@ launch_once() {
   fi
 }
 
-yabai -m rule --remove startup_Ghostty_terminal 2>/dev/null
-
 launch_once "Zen" browser
-launch_once "Mail" comms
-launch_once "WhatsApp" comms
+launch_once "Microsoft Outlook" comms
+launch_once "Microsoft Teams" comms
 launch_once "Obsidian" notes
 launch_once "Notes" notes
 launch_once "Spotify" media
