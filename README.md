@@ -83,7 +83,7 @@ git config --global user.name "Name Lastname"
 **Grant permissions**
 
 - Grant Accessibility permissions to skhd, yabai, and borders if macOS prompts.
-- Start/restart services after changing configs: `yabai --restart-service`, `skhd --restart-service`, `sketchybar --reload`.
+- Run `reload` after changing tmux, SketchyBar, borders, skhd, or yabai configuration.
 
 **Finder**
 

@@ -33,6 +33,17 @@ alias oo='open .'
 # Get updates, and update npm and its installed packages
 alias update="source $DOTFILES/scripts/update.zsh"
 
+# Reload desktop tools after updating their configuration.
+reload-desktop() {
+  _exists tmux && tmux source-file "$HOME/.tmux.conf"
+  _exists sketchybar && sketchybar --reload
+  _exists borders && brew services restart felixkratz/formulae/borders
+  _exists skhd && skhd --restart-service
+  _exists yabai && yabai --restart-service
+}
+
+alias reload='reload-desktop'
+
 # Quick jump to dotfiles
 alias dotfiles="cd $DOTFILES"
 
