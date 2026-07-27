@@ -2,13 +2,13 @@ palette = "catppuccin_macchiato"
 add_newline = true
 
 format = """
-$directory $git_branch$git_status$fill
+$directory[\uE0B4](fg:blue bg:yellow)$git_branch$git_status[\uE0B4](fg:yellow bg:green)$python$nodejs$rust$golang$java$scala$kotlin$swift$dart$php$ruby$elixir$deno$zig$haxe$julia$lua$maven$helm$kubernetes[\uE0B4](fg:green bg:peach)$aws[\uE0B4 ](fg:peach)$fill
 $line_break$status$character"""
 
 right_format = """$cmd_duration$time"""
 
 [directory]
-format = "[\uE0B6](fg:blue)[ \uF07B $path ](bold fg:base bg:blue)[\uE0B0](fg:blue)"
+format = "[\uE0B6](fg:blue)[ \uF07B $path ](bold fg:crust bg:blue)"
 truncation_length = 3
 truncation_symbol = ".../"
 home_symbol = "~"
@@ -18,10 +18,12 @@ home_symbol = "~"
 "Projects" = "Projects"
 
 [git_branch]
-format = "[\uE0B6](fg:surface0)[ \uE0A0 $branch ](fg:text bg:surface0)[\uE0B0](fg:surface0)"
+style = "bg:yellow"
+format = "[ \uE0A0 $branch ](fg:crust bg:yellow)"
 
 [git_status]
-format = " [$all_status$ahead_behind](yellow)"
+style = "bg:yellow"
+format = "[ $all_status$ahead_behind ](fg:crust bg:yellow)"
 ahead = "↑${count}"
 behind = "↓${count}"
 diverged = "↑${ahead_count}↓${behind_count}"
@@ -30,6 +32,94 @@ modified = "!${count}"
 staged = "+${count}"
 deleted = "x${count}"
 stashed = "*${count}"
+
+[python]
+style = "bg:green"
+format = "[ $symbol$version $virtualenv ](fg:crust bg:green)"
+symbol = "\uE73C "
+
+[nodejs]
+style = "bg:green"
+format = "[ $symbol $version ](fg:crust bg:green)"
+
+[rust]
+style = "bg:green"
+format = "[ $symbol $version ](fg:crust bg:green)"
+
+[golang]
+style = "bg:green"
+format = "[ $symbol $version ](fg:crust bg:green)"
+
+[java]
+style = "bg:green"
+format = "[ $symbol $version ](fg:crust bg:green)"
+
+[scala]
+style = "bg:green"
+format = "[ $symbol $version ](fg:crust bg:green)"
+
+[kotlin]
+style = "bg:green"
+format = "[ $symbol $version ](fg:crust bg:green)"
+
+[swift]
+style = "bg:green"
+format = "[ $symbol $version ](fg:crust bg:green)"
+
+[dart]
+style = "bg:green"
+format = "[ $symbol $version ](fg:crust bg:green)"
+
+[php]
+style = "bg:green"
+format = "[ $symbol $version ](fg:crust bg:green)"
+
+[ruby]
+style = "bg:green"
+format = "[ $symbol $version ](fg:crust bg:green)"
+
+[elixir]
+style = "bg:green"
+format = "[ $symbol $version ](fg:crust bg:green)"
+
+[deno]
+style = "bg:green"
+format = "[ $symbol $version ](fg:crust bg:green)"
+
+[zig]
+style = "bg:green"
+format = "[ $symbol $version ](fg:crust bg:green)"
+
+[haxe]
+style = "bg:green"
+format = "[ $symbol $version ](fg:crust bg:green)"
+
+[julia]
+style = "bg:green"
+format = "[ $symbol $version ](fg:crust bg:green)"
+
+[lua]
+style = "bg:green"
+format = "[ $symbol $version ](fg:crust bg:green)"
+
+[maven]
+style = "bg:green"
+format = "[ $symbol $version ](fg:crust bg:green)"
+
+[helm]
+style = "bg:green"
+format = "[ $symbol $version ](fg:crust bg:green)"
+
+[kubernetes]
+disabled = false
+detect_files = ["Chart.yaml", "kustomization.yaml", "kustomization.yml"]
+detect_folders = ["k8s", "kubernetes", "manifests"]
+style = "bg:green"
+format = "[ $symbol$context/$namespace ](fg:crust bg:green)"
+
+[aws]
+format = "[ $symbol$profile ](bold fg:crust bg:peach)"
+symbol = "☁️ "
 
 [fill]
 symbol = " "
