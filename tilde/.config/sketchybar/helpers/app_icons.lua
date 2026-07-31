@@ -39,6 +39,7 @@ local app_icons = {
   ["WhatsApp"] = ":whats_app:",
   ["Xcode"] = ":xcode:",
   ["Zen"] = ":zen_browser:",
+  ["zen"] = ":zen_browser:",
   ["Zed"] = ":zed:",
   ["Zen Browser"] = ":zen_browser:",
   ["neovim"] = ":neovim:",
