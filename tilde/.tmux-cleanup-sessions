@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+session=$1
+[[ "$session" == terminal-* ]] || exit 0
+
+# A later detach replaces this token, preventing an older timer from removing
+# a session that was reattached during its grace period.
+token=$$
+tmux set-option -t "=$session" @cleanup_detached_token "$token" 2>/dev/null || exit 0
+
+sleep 300
+
+attached=$(tmux display-message -p -t "=$session" '#{session_attached}' 2>/dev/null)
+current_token=$(tmux show-option -qv -t "=$session" @cleanup_detached_token 2>/dev/null)
+
+if [[ "$attached" == "0" && "$current_token" == "$token" ]]; then
+  tmux kill-session -t "=$session"
+fi
