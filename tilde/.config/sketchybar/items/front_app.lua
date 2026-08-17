@@ -7,15 +7,21 @@ local front_app = sbar.add("item", "front_app", {
   icon = {
     font = { family = settings.font.app, style = "Regular", size = 14.0 },
     color = colors.item,
+    padding_left = 8,
+    padding_right = 5,
   },
   label = {
     font = { family = settings.font.text, style = "Medium", size = 12.0 },
     color = colors.item,
+    padding_left = 2,
+    padding_right = 9,
   },
   background = {
     color = colors.accent,
-    corner_radius = 10,
-    height = 25,
+    border_color = colors.border,
+    border_width = 1,
+    corner_radius = settings.bracket.corner_radius,
+    height = settings.bracket.height,
     drawing = true,
   },
   click_script = "open -a 'Mission Control'",

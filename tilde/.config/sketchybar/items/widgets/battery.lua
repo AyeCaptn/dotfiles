@@ -7,12 +7,12 @@ local battery = sbar.add("item", "battery", {
   y_offset = settings.item.right_y_offset,
   update_freq = 180,
   icon = {
-    padding_left = 5,
-    padding_right = 4,
+    padding_left = 6,
+    padding_right = 5,
   },
   label = {
     font = { family = settings.font.text_mono, style = "Regular", size = 11.0 },
-    padding_right = 5,
+    padding_right = 6,
   },
   padding_left = 0,
   padding_right = 0,

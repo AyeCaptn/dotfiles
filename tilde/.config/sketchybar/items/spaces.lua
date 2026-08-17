@@ -3,7 +3,7 @@ local settings = require("settings")
 local app_icons = require("helpers.app_icons")
 
 local spaces = {}
-local SPACE_COUNT = 9
+local SPACE_COUNT = settings.space.count
 
 -- Register custom events
 sbar.add("event", "space_change")
@@ -15,39 +15,79 @@ for i = 1, SPACE_COUNT do
     associated_space = i,
     icon = {
       string = tostring(i),
-      font = { family = settings.font.text_mono, style = "Bold", size = 13.0 },
+      font = { family = settings.font.text_mono, style = "Bold", size = 12.0 },
       color = colors.space.inactive_fg,
-      padding_left = 9,
+      padding_left = 8,
       padding_right = 4,
     },
     label = {
-      font = { family = settings.font.app, style = "Regular", size = 14.0 },
+      font = { family = settings.font.app, style = "Regular", size = 13.0 },
       color = colors.space.inactive_fg,
-      padding_left = 0,
-      padding_right = 9,
+      padding_left = 1,
+      padding_right = 8,
       y_offset = -1,
     },
     background = {
       color = colors.transparent,
-      corner_radius = 10,
-      height = 25,
+      corner_radius = 8,
+      height = 24,
       drawing = false,
     },
+    padding_left = 2,
+    padding_right = 2,
     click_script = "yabai -m space --focus " .. i,
   })
 
   spaces[i] = space
 end
 
--- Track which space is focused
 local focused_space = nil
+local space_labels = {}
+local occupied_spaces = {}
 
--- Update the visual state of all spaces using current focus + window data
-local function refresh_spaces()
+for sid = 1, SPACE_COUNT do
+  space_labels[sid] = ""
+  occupied_spaces[sid] = false
+end
+
+local function render_space(sid)
+  if not sid or sid < 1 or sid > SPACE_COUNT then return end
+
+  local color = colors.space.colors[sid] or colors.highlight
+  local selected = sid == focused_space
+
+  spaces[sid]:set({
+    icon = { color = selected and colors.space.active_fg or color },
+    label = {
+      string = space_labels[sid],
+      color = selected and colors.space.active_fg or colors.space.inactive_fg,
+    },
+    background = {
+      drawing = selected,
+      color = selected and color or colors.transparent,
+    },
+    drawing = selected or occupied_spaces[sid],
+  })
+end
+
+local function refresh_focus()
+  sbar.exec("yabai -m query --spaces --space", function(focused)
+    if type(focused) ~= "table" or not focused.index then return end
+
+    local previous_space = focused_space
+    focused_space = focused.index
+
+    if previous_space ~= focused_space then
+      render_space(previous_space)
+      render_space(focused_space)
+    end
+  end)
+end
+
+local function refresh_apps()
   sbar.exec("yabai -m query --windows", function(windows_json)
     if type(windows_json) ~= "table" then return end
 
-    -- Build per-space app lists
     local space_apps = {}
     for sid = 1, SPACE_COUNT do space_apps[sid] = {} end
 
@@ -59,59 +99,34 @@ local function refresh_spaces()
     end
 
     for sid = 1, SPACE_COUNT do
-      local color = colors.space.colors[sid] or colors.highlight
-      local apps = space_apps[sid]
-      local has_apps = next(apps) ~= nil
+      local app_names = {}
+      for app_name in pairs(space_apps[sid]) do
+        table.insert(app_names, app_name)
+      end
+      table.sort(app_names)
 
-      -- Build icon strip
-      local icon_strip = ""
-      if has_apps then
-        for app_name, _ in pairs(apps) do
-          icon_strip = icon_strip .. " " .. app_icons(app_name)
-        end
+      local icon_strip = {}
+      for _, app_name in ipairs(app_names) do
+        table.insert(icon_strip, app_icons(app_name))
       end
 
-      if sid == focused_space then
-        sbar.animate("tanh", 10, function()
-          spaces[sid]:set({
-            icon = { color = colors.space.active_fg },
-            label = { string = icon_strip, color = colors.space.active_fg },
-            background = { drawing = true, color = color },
-            drawing = true,
-          })
-        end)
-      elseif has_apps then
-        sbar.animate("tanh", 10, function()
-          spaces[sid]:set({
-            icon = { color = color },
-            label = { string = icon_strip, color = colors.space.inactive_fg },
-            background = { drawing = false },
-            drawing = true,
-          })
-        end)
-      else
-        spaces[sid]:set({
-          background = { drawing = false },
-          drawing = false,
-        })
-      end
+      space_labels[sid] = table.concat(icon_strip, " ")
+      occupied_spaces[sid] = #app_names > 0
+      render_space(sid)
     end
   end)
 end
 
--- Each space item handles its own selection state via SELECTED env var
-for i = 1, SPACE_COUNT do
-  spaces[i]:subscribe("space_change", function(env)
-    local selected = env.SELECTED == "true"
-    if selected then
-      focused_space = i
-    end
-    refresh_spaces()
-  end)
+local observer = sbar.add("item", "space_observer", {
+  drawing = false,
+  updates = true,
+})
 
-  spaces[i]:subscribe({
-    "window_focus",
-    "windows_on_spaces",
-    "front_app_switched",
-  }, refresh_spaces)
-end
+observer:subscribe("space_change", refresh_focus)
+observer:subscribe({ "windows_on_spaces", "forced" }, function()
+  refresh_focus()
+  refresh_apps()
+end)
+
+refresh_focus()
+refresh_apps()
