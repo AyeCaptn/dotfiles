@@ -6,8 +6,6 @@ local spaces = {}
 local SPACE_COUNT = settings.space.count
 
 -- Register custom events
-sbar.add("event", "space_change")
-sbar.add("event", "window_focus")
 sbar.add("event", "windows_on_spaces")
 
 for i = 1, SPACE_COUNT do
@@ -50,11 +48,11 @@ for sid = 1, SPACE_COUNT do
   occupied_spaces[sid] = false
 end
 
-local function render_space(sid)
+local function render_space(sid, selected)
   if not sid or sid < 1 or sid > SPACE_COUNT then return end
 
   local color = colors.space.colors[sid] or colors.highlight
-  local selected = sid == focused_space
+  if selected == nil then selected = sid == focused_space end
 
   spaces[sid]:set({
     icon = { color = selected and colors.space.active_fg or color },
@@ -70,17 +68,22 @@ local function render_space(sid)
   })
 end
 
+local function set_focused_space(sid)
+  if not sid or sid < 1 or sid > SPACE_COUNT then return end
+
+  local previous_space = focused_space
+  focused_space = sid
+
+  if previous_space ~= focused_space then
+    render_space(previous_space)
+    render_space(focused_space)
+  end
+end
+
 local function refresh_focus()
   sbar.exec("yabai -m query --spaces --space", function(focused)
     if type(focused) ~= "table" or not focused.index then return end
-
-    local previous_space = focused_space
-    focused_space = focused.index
-
-    if previous_space ~= focused_space then
-      render_space(previous_space)
-      render_space(focused_space)
-    end
+    set_focused_space(focused.index)
   end)
 end
 
@@ -117,12 +120,19 @@ local function refresh_apps()
   end)
 end
 
+for sid, space in ipairs(spaces) do
+  space:subscribe("space_change", function(env)
+    local selected = env.SELECTED == "true"
+    if selected then focused_space = sid end
+    render_space(sid, selected)
+  end)
+end
+
 local observer = sbar.add("item", "space_observer", {
   drawing = false,
   updates = true,
 })
 
-observer:subscribe("space_change", refresh_focus)
 observer:subscribe({ "windows_on_spaces", "forced" }, function()
   refresh_focus()
   refresh_apps()
