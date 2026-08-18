@@ -23,7 +23,7 @@ local cpu = sbar.add("graph", "cpu", 30, {
     padding_left = 3,
     padding_right = 6,
   },
-  width = 90,
+  width = 84,
   padding_left = 0,
   padding_right = 0,
   background = {

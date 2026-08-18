@@ -1,10 +1,11 @@
 return {
   transparent = 0x00000000,
 
-  bar = { bg = 0xcc1e1e2e },
+  bar = { bg = 0x00000000 },
   item = 0xffcad3f5,
   accent = 0xff363a4f,
   bracket = 0xff24273a,
+  border = 0x66494d64,
 
   highlight = 0xff8aadf4,
   success = 0xffa6da95,

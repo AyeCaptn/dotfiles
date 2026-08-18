@@ -8,15 +8,15 @@ local bluetooth = sbar.add("item", "bluetooth", {
   icon = {
     string = icons.bluetooth.connected,
     font = { family = "Symbols Nerd Font", style = "Regular", size = 14.0 },
-    padding_left = 6,
-    padding_right = 4,
+    padding_left = 7,
+    padding_right = 5,
   },
   label = {
     string = "0",
-    padding_right = 5,
+    padding_right = 6,
   },
   padding_left = 0,
-  padding_right = 6,
+  padding_right = 0,
   click_script = "open x-apple.systempreferences:com.apple.BluetoothSettings",
 })
 

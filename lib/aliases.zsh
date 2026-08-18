@@ -77,8 +77,25 @@ fi
 alias git-root='cd $(git rev-parse --show-toplevel)'
 
 # Docker
-alias dstop='docker stop $(docker ps -a -q)'
-alias dstart='docker restart $(docker ps -q -f "status=exited" -f "name=$1")'
+alias d='docker'
+
+dstop() {
+  local containers
+  containers="$(docker ps -q)"
+  [[ -n "$containers" ]] && docker stop ${(f)containers}
+}
+
+dstart() {
+  local containers
+  containers="$(docker ps -aq --filter status=exited)"
+  [[ -n "$containers" ]] && docker start ${(f)containers}
+}
+
+drestart() {
+  local containers
+  containers="$(docker ps -q)"
+  [[ -n "$containers" ]] && docker restart ${(f)containers}
+}
 
 # Shortcuts
 alias lg=lazygit

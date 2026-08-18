@@ -23,9 +23,9 @@ local memory = sbar.add("graph", "memory", 30, {
     padding_left = 3,
     padding_right = 6,
   },
-  width = 90,
+  width = 84,
   padding_left = 0,
-  padding_right = 12,
+  padding_right = 8,
   background = {
     color = 0x00000000,
     height = settings.bracket.height,

@@ -6,12 +6,12 @@ local volume = sbar.add("item", "volume", {
   position = "right",
   y_offset = settings.item.right_y_offset,
   icon = {
-    padding_left = 5,
-    padding_right = 4,
+    padding_left = 6,
+    padding_right = 5,
   },
   label = {
     font = { family = settings.font.text_mono, style = "Regular", size = 11.0 },
-    padding_right = 6,
+    padding_right = 7,
   },
   padding_left = 0,
   padding_right = 0,
