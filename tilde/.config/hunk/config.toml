@@ -7,4 +7,4 @@ line_numbers = true
 wrap_lines = false
 menu_bar = false
 agent_notes = true
-transparent_background = false
+transparent_background = true
