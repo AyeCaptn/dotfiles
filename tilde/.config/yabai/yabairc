@@ -10,4 +10,3 @@ YABAI_CONFIG_DIR="$HOME/.config/yabai"
 . "$YABAI_CONFIG_DIR/signals.sh"
 
 "$YABAI_CONFIG_DIR/startup_apps.sh"
-"$YABAI_CONFIG_DIR/display_setup.sh"

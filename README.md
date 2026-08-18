@@ -29,13 +29,32 @@ Window/app navigation is handled by skhd:
 | Key | Action |
 | --- | --- |
 | `cmd + shift + return` | Focus Ghostty with tmux session `main` |
-| `cmd + shift + b/m/w/s/o` | Open Zen, Mail, WhatsApp, Spotify, Obsidian |
+| `cmd + shift + b/m/w/s/o/k` | Focus browser, mail, chat, Spotify, Obsidian, Calendar |
 | `alt + h/j/k/l` | Focus yabai windows |
 | `alt + shift + h/j/k/l` | Swap yabai windows |
+| `alt + s` | Toggle the focused window's split direction |
 | `alt + 1-9` | Focus spaces |
 | `alt + shift + 1-9` | Move window to space and follow |
-| `alt + shift + d` | Move window to its app's default space and follow |
+| `alt + d` | Move the focused window to its app's home space |
+| `alt + shift + d` | Organize controllable app windows into their home spaces |
 | `alt + shift + ;` | Enter skhd service mode |
+
+The nine fixed spaces are `terminal`, `web`, `comms`, `notes`, `media`,
+`calendar`, `development`, `creative`, and `office`. The first window of an
+assigned app opens on its home space; additional windows remain where they are
+opened. Utilities such as Finder, Preview, 1Password, and System Settings stay
+on the current space.
+
+Create exactly nine Spaces in Mission Control. Keep their numeric meaning stable
+by disabling **Automatically rearrange Spaces based on most recent use**, or run:
+
+```sh
+defaults write com.apple.dock mru-spaces -bool false
+killall Dock
+```
+
+The mail launcher prefers Microsoft Outlook and falls back to Mail. The chat
+launcher similarly prefers Microsoft Teams and falls back to WhatsApp.
 
 ## SketchyBar
 
