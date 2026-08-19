@@ -14,6 +14,7 @@ alias oo='open .'
 [[ -d "$HOME/Projects/Repos" ]] && alias pjr='cd "$HOME/Projects/Repos"'
 
 alias g='git'
+alias lg='lazygit'
 alias gs='git status --short --branch'
 alias gcl='git clone'
 

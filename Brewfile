@@ -15,6 +15,7 @@ brew "ripgrep"
 brew "starship"
 brew "tmux"
 brew "tree-sitter-cli"
+brew "lazygit"
 
 # Family and travel applications
 cask "1password"

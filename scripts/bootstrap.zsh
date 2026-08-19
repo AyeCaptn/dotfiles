@@ -42,6 +42,7 @@ if command -v tmux >/dev/null 2>&1; then
   fi
 
   info "Installing tmux plugins"
+  tmux start-server \; set-environment -g TMUX_PLUGIN_MANAGER_PATH "$HOME/.tmux/plugins"
   "$HOME/.tmux/plugins/tpm/bin/install_plugins"
 fi
 
