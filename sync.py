@@ -1,79 +1,109 @@
 #!/usr/bin/env python3
 
-"""
-Dotfiles syncronization.
-Makes symlinks for all files: ./tilde/.zshrc will by available as ~/.zshrc.
-Based on: https://github.com/denysdovhan/dotfiles/blob/master/sync.py
-"""
+"""Link the minimal profile into the home directory without replacing ~/.config."""
 
+from pathlib import Path
 import os
-import sys
 import shutil
-
-# Get first, second an third arguments
-arg1 = sys.argv[1] if 1 < len(sys.argv) else None  # Source
-arg2 = sys.argv[2] if 2 < len(sys.argv) else None  # Dest
-arg3 = sys.argv[3] if 3 < len(sys.argv) else None  # Backup
-
-DOTFILES_DIR = os.path.dirname(os.path.abspath(__file__))
-SOURCE_DIR = os.path.join(DOTFILES_DIR, arg1 or "tilde")
-DEST_DIR = arg2 or os.path.expanduser("~")
-BACKUP_DIR = os.path.join(DOTFILES_DIR, arg3 or "backup")
-EXCLUDE = []
+import sys
 
 
-def forse_remove(path: str):
-    """Force remove the given path"""
-    if os.path.isdir(path) and not os.path.islink(path):
-        shutil.rmtree(path, False)
+DOTFILES_DIR = Path(__file__).resolve().parent
+SOURCE_DIR = DOTFILES_DIR / (sys.argv[1] if len(sys.argv) > 1 else "tilde")
+DEST_DIR = Path(sys.argv[2]).expanduser() if len(sys.argv) > 2 else Path.home()
+BACKUP_DIR = DOTFILES_DIR / (sys.argv[3] if len(sys.argv) > 3 else "backup")
+
+HOME_ITEMS = (".gitignore", ".tmux.conf", ".zshrc")
+CONFIG_ITEMS = ("ghostty", "mise", "nvim", "opencode", "starship.toml")
+
+
+def exists(path: Path) -> bool:
+    return os.path.lexists(path)
+
+
+def points_to(link: Path, source: Path) -> bool:
+    if not link.is_symlink():
+        return False
+
+    try:
+        return os.path.samefile(link, source)
+    except FileNotFoundError:
+        return os.path.realpath(link) == os.path.realpath(source)
+
+
+def remove(path: Path) -> None:
+    if path.is_dir() and not path.is_symlink():
+        shutil.rmtree(path)
     else:
-        os.unlink(path)
+        path.unlink()
 
 
-def is_link_to(link: str, dest: str) -> bool:
-    """Return True if the given link links to the destination"""
-    return os.path.islink(link) and os.readlink(link).rstrip("/") == dest.rstrip("/")
+def back_up(path: Path, relative_path: Path) -> None:
+    backup = BACKUP_DIR / relative_path
+    backup.parent.mkdir(parents=True, exist_ok=True)
+    if exists(backup):
+        remove(backup)
 
-
-def copy(path: str, dest: str):
-    """Copy folders and/or files"""
-    if os.path.isdir(path):
-        shutil.copytree(path, dest)
+    if path.is_dir() and not path.is_symlink():
+        shutil.copytree(path, backup, symlinks=True)
     else:
-        shutil.copy(path, dest)
+        shutil.copy2(path, backup, follow_symlinks=False)
 
 
-def symlink_all():
-    """Symlink all files"""
-    os.chdir(SOURCE_DIR)
-    for filename in [file for file in os.listdir(".") if file not in EXCLUDE]:
-        dotfile = os.path.join(DEST_DIR, filename)
-        source = os.path.relpath(filename, os.path.dirname(dotfile))
+def link(source: Path, destination: Path, relative_path: Path) -> None:
+    if points_to(destination, source):
+        return
 
-        # check that we aren't overwriting anything
-        if os.path.exists(dotfile):
-            if is_link_to(dotfile, source):
-                continue
+    if exists(destination):
+        answer = input(f"Overwrite '{destination}'? [y/N] ")
+        if not answer.lower().startswith("y"):
+            print(f"Skipping '{destination}'")
+            return
 
-            res = input(f"Overwrite file `{dotfile}'? [y/N] ")
-            if not res.lower().startswith("y"):
-                print(f"Skipping `{dotfile}'...")
-                continue
-            else:
-                # Made backup copy if we're overwriting this file
-                res = input(f"Make a backup of `{dotfile}'? [y/N] ")
-                if res.lower().startswith("y"):
-                    if not os.path.exists(BACKUP_DIR):
-                        os.mkdir(BACKUP_DIR)
-                    backup = os.path.join(BACKUP_DIR, os.path.basename(dotfile))
-                    copy(dotfile, backup)
-                    print(f"Made a backup `{dotfile}'")
+        answer = input(f"Back up '{destination}' first? [y/N] ")
+        if answer.lower().startswith("y"):
+            back_up(destination, relative_path)
+        remove(destination)
 
-            forse_remove(dotfile)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    target = os.path.relpath(source.resolve(), destination.parent.resolve())
+    destination.symlink_to(target, target_is_directory=source.is_dir())
+    print(f"{destination} => {target}")
 
-        os.symlink(source, dotfile)
-        print(f"{dotfile} => {source}")
+
+def prepare_config_directory(source: Path, destination: Path) -> None:
+    # Migrate the old whole-directory link without touching its target.
+    if points_to(destination, source):
+        destination.unlink()
+    elif destination.is_symlink():
+        raise SystemExit(
+            f"Refusing to modify '{destination}': it links to another dotfiles tree"
+        )
+
+    if exists(destination) and not destination.is_dir():
+        answer = input(f"Replace '{destination}' with a directory? [y/N] ")
+        if not answer.lower().startswith("y"):
+            raise SystemExit("Cannot link application configuration")
+        remove(destination)
+
+    destination.mkdir(parents=True, exist_ok=True)
+
+
+def sync() -> None:
+    config_source = SOURCE_DIR / ".config"
+    config_destination = DEST_DIR / ".config"
+    prepare_config_directory(config_source, config_destination)
+
+    for name in HOME_ITEMS:
+        link(SOURCE_DIR / name, DEST_DIR / name, Path(name))
+
+    for name in CONFIG_ITEMS:
+        link(
+            config_source / name,
+            config_destination / name,
+            Path(".config") / name,
+        )
 
 
 if __name__ == "__main__":
-    symlink_all()
+    sync()

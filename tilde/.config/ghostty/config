@@ -1,6 +1,6 @@
 # Font
 font-family = "JetBrainsMono Nerd Font Mono"
-font-size = 12.0
+font-size = 13
 
 # Theme
 theme = "Catppuccin Macchiato"
@@ -9,7 +9,7 @@ theme = "Catppuccin Macchiato"
 window-decoration = client
 macos-titlebar-style = transparent
 window-padding-x = 8
-window-padding-y = 4
+window-padding-y = 6
 window-padding-balance = true
 unfocused-split-opacity = 0.9
 
@@ -28,8 +28,5 @@ cursor-style-blink = true
 bold-is-bright = false
 adjust-cell-height = 0
 
-# Notifications
-desktop-notifications = true
-
-# Performance
-gtk-single-instance = true
+# Keep low-contrast application colors readable on unfamiliar displays.
+minimum-contrast = 1.1

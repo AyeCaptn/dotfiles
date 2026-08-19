@@ -1,134 +1,48 @@
 #!/usr/bin/env zsh
 
-# Bootstrap script for installing applications, tools, fonts and applying application config
-# Source: https://raw.githubusercontent.com/denysdovhan/dotfiles/master/scripts/bootstrap.zsh
+set -euo pipefail
 
-# Ask for the administrator password upfront
-sudo -v
+export DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
 
-e='\033'
-RESET="${e}[0m"
-CYAN="${e}[0;96m"
-
-_exists() {
-  command -v $1 >/dev/null 2>&1
-}
-
-# Success reporter
 info() {
-  echo -e "${CYAN}${*}${RESET}"
+  print -P "%F{cyan}$*%f"
 }
 
-export DOTFILES=${DOTFILES:="$HOME/.dotfiles"}
-
-# Go to dotfiles directory
-cd $DOTFILES
-
-# Homebrew Bundle
-if _exists brew; then
-  info "running brew bundle"
-  brew bundle
-else
-  info "brew not installed"
+if ! command -v brew >/dev/null 2>&1; then
+  print -u2 "Homebrew is required before bootstrap."
+  exit 1
 fi
 
-# Accept xcode license
-sudo xcodebuild -license accept
+info "Installing the minimal Homebrew bundle"
+brew bundle --file "$DOTFILES/Brewfile"
 
-# Python global packages
-if _exists uv; then
-  info "installing python packages"
-  cat python-packages.txt | xargs -I % uv tool install % --force
-else
-  info "uv not installed"
+info "Creating project folders"
+mkdir -p \
+  "$HOME/Projects/Forks" \
+  "$HOME/Projects/Job" \
+  "$HOME/Projects/Personal" \
+  "$HOME/Projects/Playground" \
+  "$HOME/Projects/Repos"
+touch "$HOME/.hushlogin"
+if ! git config --global --get core.excludesfile >/dev/null; then
+  git config --global core.excludesfile "$HOME/.gitignore"
 fi
 
-# NPM global packages
-if _exists pnpm; then
-  info "installing pnpm packages"
-  cat pnpm-packages.txt | xargs -n1 pnpm add -g
-else
-  info "pnpm not installed"
-fi
-
-# Restic restore
-if _exists restic; then
-  if _exists op; then
-    #TODO: Ask me to sign in using 1password app and enable cli integration
-    info "restoring the restic password from 1password"
-    op read "op://Private/Restic Password/password" > ~/.restic-password
-    op item get "Restic AWS ENV" --format json | jq -r '.details.notesPlain // (.fields[]? | select(.id=="notesPlain" or .label=="notesPlain") | .value)' > ~/.restic-env
-    chmod 600 ~/.restic-password
-
-    #TODO: list all available tags and ask the user what tags to restore
-    info "restoring all files from restic backup"
-    awk -F\" '/^tag = /{print $2}' ~/.resticprofiles.conf \
-    | tr , '\n' | awk '{$1=$1}1' | sort -u \
-    | while IFS= read -r TAG; do
-      resticprofile -c ~/.resticprofiles.conf --name full-backup restore latest --tag "$TAG" --overwrite if-changed --target /
-    done
-
-    info "set up schedule for restic backups"
-    #resticprofile --config ~/.resticprofiles.conf schedule --all
-  else
-    info "1Password CLI not installed"
+if command -v tmux >/dev/null 2>&1; then
+  if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
+    info "Installing tmux plugin manager"
+    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
   fi
-else
-  info "restic not installed"
-fi
 
-info "setting desktop background"
-osascript -e "tell application \"System Events\" to set picture of every desktop to POSIX file \"$DOTFILES/wallpapers/midnight-reflections-moonlit-sea.jpg\""
-
-info "setting screensaver"
-osascript -e 'tell application "System Events" to set current screen saver to screen saver "Drift"'
-
-# Install tmux plugins
-if _exists tmux; then
-  info "installing tmux plugins"
-  
-  # Clone TPM if it doesn't exist
-  if [ ! -d ~/.tmux/plugins/tpm ]; then
-    info "cloning TPM (Tmux Plugin Manager)"
-    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+  catppuccin_tmux="$HOME/.config/tmux/plugins/catppuccin/tmux"
+  if [[ ! -d "$catppuccin_tmux" ]]; then
+    info "Installing Catppuccin for tmux"
+    mkdir -p "${catppuccin_tmux:h}"
+    git clone --branch v2.3.0 --depth 1 https://github.com/catppuccin/tmux.git "$catppuccin_tmux"
   fi
-  
-  # Source tmux config and install plugins
-  tmux source-file ~/.tmux.conf 2>/dev/null || true
-  ~/.tmux/plugins/tpm/bin/install_plugins
-else
-  info "tmux not installed"
+
+  info "Installing tmux plugins"
+  "$HOME/.tmux/plugins/tpm/bin/install_plugins"
 fi
 
-# Install SbarLua for SketchyBar Lua config
-if _exists sketchybar && _exists git && _exists make; then
-  if [ ! -f "$HOME/.local/share/sketchybar_lua/sketchybar.so" ]; then
-    info "installing SbarLua"
-    rm -rf /tmp/SbarLua
-    git clone https://github.com/FelixKratz/SbarLua.git /tmp/SbarLua
-    make -C /tmp/SbarLua -f makefile install
-    rm -rf /tmp/SbarLua
-  fi
-fi
-
-# Remove terminal last login text
-touch ~/.hushlogin
-
-# Folders
-info "creating project folders"
-mkdir -p ~/Projects/Forks
-mkdir -p ~/Projects/Job
-mkdir -p ~/Projects/Playground
-mkdir -p ~/Projects/Repos
-mkdir -p ~/Projects/Personal
-
-# Dock
-info "configuring dock"
-defaults write com.apple.dock autohide-delay -float 0
-defaults delete com.apple.dock autohide-delay
-defaults write com.apple.dock orientation -string right
-defaults write com.apple.dock tilesize -int 32
-killall Dock
-
-# Get back to previous directory
-cd -
+info "Bootstrap complete"

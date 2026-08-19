@@ -1,54 +1,27 @@
-# Vim
-vim/vim/plugged
+# Local backups and generated files
+backup/
+.DS_Store
+tilde/.DS_Store
+tilde/.config/.DS_Store
 
-# Backup folder
-backup
-
+# Only the minimal profile's application configuration is versioned.
 tilde/.config/*
-!tilde/.config/sheldon/
-!tilde/.config/sheldon/plugins.toml
-!tilde/.config/nvim/
 !tilde/.config/ghostty/
-!tilde/.config/herdr/
-tilde/.config/herdr/*
-!tilde/.config/herdr/config.toml
-!tilde/.config/opencode/
-!tilde/.config/opencode/config.json
-!tilde/.config/k9s/
-!tilde/.config/k9s/skins/
-!tilde/.config/k9s/config.yaml
-!tilde/.config/lazygit/
-!tilde/.config/lazygit/config.yml
-!tilde/.config/pi/
-!tilde/.config/pi/**
-!tilde/.config/television/
-!tilde/.config/television/**
-!tilde/.config/sketchybar/
-!tilde/.config/sketchybar/**
-!tilde/.config/starship.toml
-!tilde/.config/borders/
-!tilde/.config/borders/**
-!tilde/.config/hunk/
-!tilde/.config/hunk/**
+!tilde/.config/ghostty/**
 !tilde/.config/mise/
 !tilde/.config/mise/**
-!tilde/.config/ripgrep/
-!tilde/.config/ripgrep/**
-!tilde/.config/rift/
-!tilde/.config/rift/**
-!tilde/.config/skhd/
-!tilde/.config/skhd/**
-!tilde/.config/vicinae/
-!tilde/.config/vicinae/**
-!tilde/.config/yabai/
-!tilde/.config/yabai/**
+!tilde/.config/nvim/
+!tilde/.config/nvim/**
+!tilde/.config/opencode/
+!tilde/.config/opencode/**
+!tilde/.config/starship.toml
 
-# Pi local state should never be tracked
-/~
-tilde/.local/state/pi/
+# Application state and dependencies
+tilde/.config/opencode/node_modules/
+tilde/.config/opencode/.gitignore
+tilde/.config/opencode/bun.lock
+tilde/.config/opencode/package*.json
+tilde/.local/
 
-# macOS
-.DS_Store
+# macOS and git-secret state
 .gitsecret/keys/random_seed
-!*.secret
-bin/py-lsp

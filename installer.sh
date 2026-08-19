@@ -1,214 +1,77 @@
 #!/usr/bin/env bash
 
-# Dotfiles and bootstrap installer
-# Installs git, clones repository and symlinks dotfiles to your home directory
+set -euo pipefail
 
-# Source: https://raw.githubusercontent.com/denysdovhan/dotfiles/master/installer.sh
+DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
+DOTFILES_BRANCH="minimal"
+DOTFILES_REPO="https://github.com/AyeCaptn/dotfiles.git"
+HOMEBREW_INSTALLER="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
 
-set -e
-trap on_error SIGTERM
-
-e='\033'
-RESET="${e}[0m"
-BOLD="${e}[1m"
-CYAN="${e}[0;96m"
-RED="${e}[0;91m"
-YELLOW="${e}[0;93m"
-GREEN="${e}[0;92m"
-
-_exists() {
-  command -v "$1" >/dev/null 2>&1
-}
-
-# Success reporter
 info() {
-  echo -e "${CYAN}${*}${RESET}"
+  printf '\033[0;96m%s\033[0m\n' "$*"
 }
 
-# Error reporter
-error() {
-  echo -e "${RED}${*}${RESET}"
-}
+if [[ ! -t 0 ]]; then
+  printf 'Run this installer from an interactive terminal.\n' >&2
+  exit 1
+fi
 
-# Success reporter
-success() {
-  echo -e "${GREEN}${*}${RESET}"
-}
+read -r -p "Install the minimal family travel laptop setup? [y/N] " answer
+if [[ "$answer" != "y" && "$answer" != "Y" ]]; then
+  exit 0
+fi
 
-# End section
-finish() {
-  success "Done!"
-  echo
-  sleep 1
-}
-
-# Set directory
-export DOTFILES=${1:-"$HOME/.dotfiles"}
-GITHUB_REPO_URL_BASE="https://github.com/AyeCaptn/dotfiles"
-HOMEBREW_INSTALLER_URL="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
-TPM_GITHUB_REPO=https://github.com/tmux-plugins/tpm
-TPM_INSTALLATION_PATH=~/.tmux/plugins/tpm
-
-on_start() {
-  info "           __        __   ____ _  __           "
-  info "      ____/ /____   / /_ / __/(_)/ /___   _____"
-  info "     / __  // __ \ / __// /_ / // // _ \ / ___/"
-  info "  _ / /_/ // /_/ // /_ / __// // //  __/(__  ) "
-  info " (_)\__,_/ \____/ \__//_/  /_//_/ \___//____/  "
-  info "                                               "
-
-  info "This script will guide you through installing git, zsh and dofiles itself."
-  echo "It will not install anything without your direct agreement!"
-  echo
-  read -p "Do you want to proceed with installation? [y/N] " -n 1 answer
-  echo
-  if [ "${answer}" != "y" ]; then
+dotfiles_exist=false
+if [[ -e "$DOTFILES" || -L "$DOTFILES" ]]; then
+  if ! git -C "$DOTFILES" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    printf 'Existing path %s is not a Git worktree; refusing to replace it.\n' "$DOTFILES" >&2
     exit 1
   fi
-}
 
-install_cli_tools() {
-  info "Trying to detect installed Command Line Tools..."
+  if [[ "$(git -C "$DOTFILES" branch --show-current)" != "$DOTFILES_BRANCH" ]]; then
+    printf 'Existing dotfiles at %s are not on branch %s; refusing to replace them.\n' "$DOTFILES" "$DOTFILES_BRANCH" >&2
+    exit 1
+  fi
 
-  if ! [ "$(xcode-select -p)" ]; then
-    echo "You don't have Command Line Tools installed!"
-    read -p "Do you agree to install Command Line Tools? [y/N] " -n 1 answer
-    echo
-    if [ "${answer}" != "y" ]; then
+  remote_url="$(git -C "$DOTFILES" remote get-url origin 2>/dev/null || true)"
+  case "$remote_url" in
+    https://github.com/AyeCaptn/dotfiles | https://github.com/AyeCaptn/dotfiles.git | git@github.com:AyeCaptn/dotfiles.git) ;;
+    *)
+      printf 'Existing dotfiles at %s do not use the expected origin; refusing to run them.\n' "$DOTFILES" >&2
       exit 1
-    fi
+      ;;
+  esac
 
-    info "Installing Command Line Tools..."
-    echo "Please, wait until Command Line Tools will be installed, before continue."
+  dotfiles_exist=true
+fi
 
-    xcode-select --install
-  else
-    success "Seems like you have installed Command Line Tools. Skipping..."
-  fi
+if ! xcode-select -p >/dev/null 2>&1; then
+  info "Opening the Apple Command Line Tools installer"
+  xcode-select --install
+  printf 'Finish that installation, then run this command again.\n'
+  exit 0
+fi
 
-  finish
-}
+if ! command -v brew >/dev/null 2>&1; then
+  info "Installing Homebrew"
+  /bin/bash -c "$(curl -fsSL "$HOMEBREW_INSTALLER")"
+fi
 
-install_homebrew() {
-  info "Trying to detect installed Homebrew..."
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -x /usr/local/bin/brew ]]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
 
-  if ! _exists brew; then
-    echo "Seems like you don't have Homebrew installed!"
-    read -p "Do you agree to proceed with Homebrew installation? [y/N] " -n 1 answer
-    echo
-    if [ "${answer}" != "y" ]; then
-      exit 1
-    fi
+if [[ "$dotfiles_exist" == false ]]; then
+  info "Cloning the $DOTFILES_BRANCH dotfiles branch"
+  git clone --branch "$DOTFILES_BRANCH" --single-branch "$DOTFILES_REPO" "$DOTFILES"
+fi
 
-    info "Installing Homebrew..."
-    /bin/bash -c "$(curl -fsSL ${HOMEBREW_INSTALLER_URL})"
+info "Linking dotfiles"
+"$DOTFILES/sync.py"
 
-    eval "$(/opt/homebrew/bin/brew shellenv)"
+info "Bootstrapping applications and terminal tools"
+"$DOTFILES/scripts/bootstrap.zsh"
 
-    brew update
-    brew upgrade
-    brew cleanup
-  else
-    success "You already have Homebrew installed. Skipping..."
-  fi
-
-  finish
-}
-
-install_git() {
-  info "Trying to detect installed Git..."
-
-  if ! _exists git; then
-    echo "Seems like you don't have Git installed!"
-    read -p "Do you agree to proceed with Git installation? [y/N] " -n 1 answer
-    echo
-    if [ "${answer}" != "y" ]; then
-      exit 1
-    fi
-
-    info "Installing Git..."
-
-    brew install git
-  else
-    success "You already have Git installed. Skipping..."
-  fi
-
-  finish
-}
-
-install_dotfiles() {
-  info "Trying to detect installed dotfiles in $DOTFILES..."
-
-  if [ ! -d $DOTFILES ]; then
-    echo "Seems like you don't have dotfiles installed!"
-    read -p "Do you agree to proceed with dotfiles installation? [y/N] " -n 1 answer
-    echo
-    if [ ${answer} != "y" ]; then
-      exit 1
-    fi
-
-    git clone --recursive "$GITHUB_REPO_URL_BASE.git" $DOTFILES
-    cd $DOTFILES && ./sync.py && cd -
-  else
-    success "You already have dotfiles installed. Skipping..."
-  fi
-
-  info "Linking dotfiles..."
-  cd $DOTFILES && ./sync.py && cd -
-
-  finish
-}
-
-install_tmux_plugin_manager() {
-  if [ ! -d $TPM_INSTALLATION_PATH ]; then
-    echo "Seems like you don't have the tmux plugin manager installed!"
-    read -p "Would you like to install the tmux plugin manager? [y/N]" -n 1 answer
-    echo
-    if [ ${answer} != "y" ]; then
-      return
-    fi
-    git clone $TPM_GITHUB_REPO $TPM_INSTALLATION_PATH
-  fi
-
-  finish
-}
-
-bootstrap() {
-  read -p "Would you like to bootstrap your environment? [y/N] " -n 1 answer
-  echo
-  if [ ${answer} != "y" ]; then
-    return
-  fi
-
-  $DOTFILES/scripts/bootstrap.zsh
-
-  finish
-}
-
-on_finish() {
-  echo
-  success "Setup was successfully done!"
-  info "P.S: Don't forget to restart a terminal :)"
-  echo
-}
-
-on_error() {
-  echo
-  error "Wow... Something serious happened!"
-  echo
-  exit 1
-}
-
-main() {
-  on_start "$*"
-  install_cli_tools "$*"
-  install_homebrew "$*"
-  install_git "$*"
-  install_dotfiles "$*"
-  install_tmux_plugin_manager "$*"
-  bootstrap "$*"
-  on_finish "$*"
-}
-
-main "$*"
-
+info "Setup complete. Restart the terminal or open Ghostty."

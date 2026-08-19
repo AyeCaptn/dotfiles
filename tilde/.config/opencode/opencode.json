@@ -1,0 +1,8 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "share": "disabled",
+  "autoupdate": "notify",
+  "plugin": [
+    "@prevalentware/opencode-goal-plugin"
+  ]
+}
