@@ -52,6 +52,12 @@ _extend_path() {
 [[ -d "/opt/homebrew/sbin" ]] && _extend_path "/opt/homebrew/sbin"
 [[ -d "$HOME/go/bin" ]] && _extend_path "$HOME/go/bin"
 
+# Let the dedicated Ghostty launcher enter Herdr without nesting tmux.
+if [[ "${DOTFILES_LAUNCH_HERDR:-}" == "1" ]]; then
+  unset DOTFILES_LAUNCH_HERDR
+  exec herdr
+fi
+
 # Extend $NODE_PATH
 if [ -d ~/.npm-global ]; then
   export NODE_PATH="$NODE_PATH:$HOME/.npm-global/lib/node_modules"
@@ -221,8 +227,8 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 export _ZO_DOCTOR=0
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh --cmd cd)"
 
-# Automatically enter tmux from interactive top-level shells.
-if [[ -o interactive && -z "$TMUX" && "$TERM" != "dumb" ]] &&
+# Automatically enter tmux from interactive top-level shells, except Herdr panes.
+if [[ -o interactive && -z "$TMUX" && -z "${HERDR_ENV:-}" && "$TERM" != "dumb" ]] &&
   command -v tmux >/dev/null 2>&1; then
   main_session="main"
 
@@ -249,4 +255,11 @@ if [[ -o interactive && -z "$TMUX" && "$TERM" != "dumb" ]] &&
 
     exec tmux new-session -s "$temporary_session" 'zsh; tmux detach-client'
   fi
+fi
+
+# Start OpenCode once in each new Herdr pane, then leave the shell available.
+if [[ -o interactive && "${HERDR_ENV:-}" == "1" && -z "${HERDR_OPENCODE_STARTED:-}" ]] &&
+  command -v opencode >/dev/null 2>&1; then
+  export HERDR_OPENCODE_STARTED=1
+  opencode
 fi

@@ -9,6 +9,9 @@ tilde/.config/*
 !tilde/.config/sheldon/plugins.toml
 !tilde/.config/nvim/
 !tilde/.config/ghostty/
+!tilde/.config/herdr/
+tilde/.config/herdr/*
+!tilde/.config/herdr/config.toml
 !tilde/.config/opencode/
 !tilde/.config/opencode/config.json
 !tilde/.config/k9s/
