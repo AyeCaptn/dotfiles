@@ -1,6 +1,7 @@
 return {
   apple = "􀣺",           -- SF Symbol: apple.logo
   calendar = "􀉉",        -- SF Symbol: calendar
+  clock = "􀐫",           -- SF Symbol: clock
   music = "\u{f001}",    -- nf-fa-music
   cpu   = "􀧓",           -- SF Symbol: cpu
   memory = "􀫦",        -- SF Symbol: memorychip
