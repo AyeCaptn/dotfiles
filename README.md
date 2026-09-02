@@ -1,7 +1,7 @@
 # Dotfiles
 
 Personal macOS dotfiles for a keyboard-driven desktop built around Ghostty,
-tmux, yabai/skhd, SketchyBar, zsh, Starship, and Neovim.
+tmux, yabai/skhd, SketchyBar, Raycast, zsh, Starship, and Neovim.
 
 ## Install
 
@@ -69,7 +69,12 @@ rm -rf /tmp/SbarLua
 ```
 
 The bar shows spaces, focused app, system widgets, connectivity indicators, and
-calendar. See `tilde/.config/sketchybar` for the current modules.
+the next calendar event. See `tilde/.config/sketchybar` for the current modules.
+
+## Raycast
+
+Raycast replaces Spotlight on `cmd + space` and is installed through the
+`Brewfile`. Its settings and backups are managed outside this repository.
 
 ## Shell
 

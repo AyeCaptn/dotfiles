@@ -36,7 +36,6 @@ local app_icons = {
   ["TextEdit"] = ":textedit:",
   ["UTM"] = ":utm:",
   ["VLC"] = ":vlc:",
-  ["Vicinae"] = ":spotlight:",
   ["Vim"] = ":vim:",
   ["WhatsApp"] = ":whats_app:",
   ["Xcode"] = ":xcode:",

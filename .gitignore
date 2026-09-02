@@ -38,8 +38,6 @@ tilde/.config/herdr/*
 !tilde/.config/rift/**
 !tilde/.config/skhd/
 !tilde/.config/skhd/**
-!tilde/.config/vicinae/
-!tilde/.config/vicinae/**
 !tilde/.config/yabai/
 !tilde/.config/yabai/**
 
