@@ -1,5 +1,6 @@
 local app_icons = {
   ["1Password"] = ":one_password:",
+  ["Affinity"] = ":affinity:",
   ["Affinity Designer"] = ":affinity_designer:",
   ["Affinity Photo"] = ":affinity_photo:",
   ["Affinity Affinity Store"] = ":affinity_designer:",
