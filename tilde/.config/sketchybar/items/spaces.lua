@@ -42,6 +42,7 @@ end
 local focused_space = nil
 local space_labels = {}
 local occupied_spaces = {}
+local apps_refresh_id = 0
 
 for sid = 1, SPACE_COUNT do
   space_labels[sid] = ""
@@ -88,8 +89,11 @@ local function refresh_focus()
 end
 
 local function refresh_apps()
+  apps_refresh_id = apps_refresh_id + 1
+  local refresh_id = apps_refresh_id
+
   sbar.exec("yabai -m query --windows", function(windows_json)
-    if type(windows_json) ~= "table" then return end
+    if refresh_id ~= apps_refresh_id or type(windows_json) ~= "table" then return end
 
     local space_apps = {}
     for sid = 1, SPACE_COUNT do space_apps[sid] = {} end
