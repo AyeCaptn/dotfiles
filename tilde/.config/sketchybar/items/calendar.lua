@@ -71,7 +71,7 @@ local weather = sbar.add("item", "weather", {
   background = { drawing = false },
   padding_left = 0,
   padding_right = 0,
-  click_script = "open 'https://wttr.in'",
+  click_script = "open 'https://www.windy.com/51.011/4.891?51.011,4.891,11'",
 })
 
 sbar.add("bracket", "date_time", { "weather", "calendar", "clock" }, {

@@ -9,8 +9,11 @@ for label in \
   focus_window_after_destroy \
   route_first_window \
   stack_preview_scans \
+  keep_created_quick_look_on_finder_space \
+  keep_focused_quick_look_on_finder_space \
   sketchybar_window_moved \
   center_cisco_anyconnect \
+  center_app_if_alone \
   display_added_setup \
   display_removed_setup \
   system_woke_display_setup; do
@@ -22,6 +25,7 @@ yabai -m signal --add label="sketchybar_window_destroyed" event=window_destroyed
 # macOS can leave a space unfocused after a close/quit; restore the last window only then.
 yabai -m signal --add label="focus_window_after_destroy" event=window_destroyed action='sleep 0.1; yabai -m query --windows --space | jq -e "any(.[]; .\"has-focus\")" >/dev/null || yabai -m window --focus first 2>/dev/null'
 yabai -m signal --add label="route_first_window" event=window_created action="$HOME/.config/yabai/route_first_window.sh"
-yabai -m signal --add label="stack_preview_scans" event=window_created app="^Preview$" action="$HOME/.config/yabai/stack_preview_scan.sh"
+yabai -m signal --add label="keep_created_quick_look_on_finder_space" event=window_created app="^Finder$" title="^Quick Look$" action="$HOME/.config/yabai/keep_quick_look_on_finder_space.sh"
+yabai -m signal --add label="keep_focused_quick_look_on_finder_space" event=window_focused app="^Finder$" title="^Quick Look$" action="$HOME/.config/yabai/keep_quick_look_on_finder_space.sh"
 yabai -m signal --add label="sketchybar_window_moved" event=window_moved action="sketchybar --trigger windows_on_spaces 2>/dev/null"
-yabai -m signal --add label="center_cisco_anyconnect" event=window_created app="^Cisco AnyConnect Secure Mobility Client$" action="$HOME/.config/yabai/center_cisco_anyconnect.sh"
+yabai -m signal --add label="center_app_if_alone" event=window_created app="^(Cisco AnyConnect Secure Mobility Client|Tailscale)$" action="$HOME/.config/yabai/center_app_if_alone.sh"

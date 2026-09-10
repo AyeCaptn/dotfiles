@@ -30,12 +30,14 @@ Window/app navigation is handled by skhd:
 | --- | --- |
 | `cmd + shift + return` | Focus Ghostty with tmux session `main` |
 | `cmd + shift + b/m/w/s/o/k` | Focus browser, mail, chat, Spotify, Obsidian, Calendar |
+| `cmd + shift + /` | Show the floating Finder window on the current space |
 | `alt + h/j/k/l` | Focus yabai windows |
 | `alt + shift + h/j/k/l` | Swap yabai windows |
 | `alt + s` | Toggle the focused window's split direction |
 | `alt + 1-9` | Focus spaces |
 | `alt + shift + 1-9` | Move window to space and follow |
 | `alt + d` | Move the focused window to its app's home space |
+| `alt + q` | Close the focused window, or hide Finder while preserving its tabs |
 | `alt + shift + d` | Organize controllable app windows into their home spaces |
 | `alt + shift + ;` | Enter skhd service mode |
 

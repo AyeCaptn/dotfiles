@@ -8,10 +8,14 @@ for label in \
   mail_utility_float \
   common_modal_float \
   common_utility_float \
+  preview_float \
   system_settings_float \
   system_information_float \
   activity_monitor_float \
+  archive_utility_float \
   calculator_float \
+  finder_window_float \
+  finder_quick_look_float \
   finder_utility_float \
   ghostty_main_terminal \
   onepassword_float \
@@ -28,12 +32,16 @@ yabai -m rule --add label="mail_utility_float" app="^Mail$" title="^(Preferences
 # Browser/application utility windows.
 yabai -m rule --add label="common_modal_float" title="^(Preferences|Settings|About|Open|Save|Print)$" manage=off
 yabai -m rule --add label="common_utility_float" title="^(Downloads|Developer Tools|Picture in Picture)$" manage=off
+yabai -m rule --add label="preview_float" app="^Preview$" manage=off grid=5:7:2:1:3:3
 
 # Keep system utility windows usable.
 yabai -m rule --add label="system_settings_float" app="^System Settings$" manage=off grid=5:7:2:1:3:3
 yabai -m rule --add label="system_information_float" app="^System Information$" manage=off
 yabai -m rule --add label="activity_monitor_float" app="^Activity Monitor$" manage=off
+yabai -m rule --add label="archive_utility_float" app="^Archive Utility$" manage=off grid=5:7:2:1:3:3
 yabai -m rule --add label="calculator_float" app="^Calculator$" manage=off
+yabai -m rule --add label="finder_window_float" app="^Finder$" subrole="^AXStandardWindow$" manage=off grid=5:14:3:1:8:3
+yabai -m rule --add label="finder_quick_look_float" app="^Finder$" title="^Quick Look$" manage=off
 yabai -m rule --add label="finder_utility_float" app="^Finder$" title="^(Copy|Move|Info|Preferences)" manage=off
 yabai -m rule --add label="onepassword_float" app="^1Password$" manage=off
 yabai -m rule --add label="tailscale_float" app="^Tailscale$" manage=off

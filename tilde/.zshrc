@@ -110,6 +110,22 @@ if [[ -f "$HOME/.zshlocal" ]]; then
   source "$HOME/.zshlocal"
 fi
 
+# UGREEN NAS management over Tailscale. The UGOS API uses HTTPS on 9443,
+# independently of the dashboard served on port 80.
+export UGOS_HOST="${UGOS_HOST:-ugreen-nas}"
+export UGOS_PORT="${UGOS_PORT:-9443}"
+export UGOS_USER="${UGOS_USER:-Sem}"
+
+ugos-password-set() {
+  security add-generic-password -a "$UGOS_USER" -s ugos-cli -U -w
+}
+
+ugos-cli() {
+  local password
+  password="$(security find-generic-password -a "$UGOS_USER" -s ugos-cli -w)" || return
+  UGOS_PASSWORD="$password" command ugos-cli "$@"
+}
+
 # pnpm
 export PNPM_HOME="$HOME/Library/pnpm"
 case ":$PATH:" in

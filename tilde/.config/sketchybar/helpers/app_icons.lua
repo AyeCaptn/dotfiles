@@ -33,6 +33,7 @@ local app_icons = {
   ["Safari"] = ":safari:",
   ["Spotify"] = ":spotify:",
   ["System Settings"] = ":gear:",
+  ["Tailscale"] = ":tailscale:",
   ["Terminal"] = ":terminal:",
   ["TextEdit"] = ":textedit:",
   ["UTM"] = ":utm:",

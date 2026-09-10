@@ -26,6 +26,12 @@ fi
 [ -d ~/Projects/Playground ] && alias pjp='cd ~/Projects/Playground'
 [ -d ~/Projects/Repos ] && alias pjr='cd ~/Projects/Repos'
 
+coach() {
+  cd /Users/sem/Projects/Repos/obsidian-vault/Sport/Training || return
+  OPENCODE_CONFIG_CONTENT='{"provider":{"opencode":{"models":{"gpt-5.6-terra":{"options":{"reasoningEffort":"low"}}}}}}' \
+    opencode --model opencode/gpt-5.6-terra
+}
+
 # Open aliases
 alias o='open'
 alias oo='open .'
