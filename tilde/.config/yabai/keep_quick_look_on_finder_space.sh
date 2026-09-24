@@ -29,5 +29,5 @@ fi
 
 current_space=$(yabai -m query --spaces index --space 2>/dev/null | jq -r '.index')
 if [ "$current_space" != "$finder_space" ]; then
-  yabai -m space --focus "$finder_space" 2>/dev/null
+  "$HOME/.config/yabai/focus_space.sh" "$finder_space" 2>/dev/null
 fi

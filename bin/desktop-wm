@@ -1,0 +1,50 @@
+#!/usr/bin/env sh
+
+set -eu
+
+usage() {
+  printf 'usage: desktop-wm {yabai|status}\n' >&2
+  exit 2
+}
+
+refresh_bar() {
+  command -v sketchybar >/dev/null 2>&1 || return 0
+  sketchybar --reload
+  sketchybar --trigger workspace_update
+}
+
+start_jankyborders() {
+  command -v borders >/dev/null 2>&1 || return 0
+  # Undo disabled overrides left by older versions of this switcher.
+  launchctl enable "gui/$(id -u)/homebrew.mxcl.borders" >/dev/null 2>&1 || true
+  launchctl enable "gui/$(id -u)/sh.brew.borders" >/dev/null 2>&1 || true
+  if command -v brew >/dev/null 2>&1; then
+    brew services start borders >/dev/null
+  else
+    borders >/dev/null 2>&1 &
+  fi
+}
+
+start_yabai() {
+  "$HOME/.config/yabai/configure_mission_control_shortcuts.sh"
+  "$HOME/.config/yabai/build_space_switcher.sh"
+  command -v yabai >/dev/null 2>&1 && yabai --start-service
+  command -v skhd >/dev/null 2>&1 && skhd --start-service
+  start_jankyborders
+}
+
+case "${1:-}" in
+  yabai)
+    start_yabai
+    refresh_bar
+    ;;
+  status)
+    printf 'yabai: '
+    pgrep -x yabai >/dev/null && printf 'running\n' || printf 'stopped\n'
+    printf 'skhd: '
+    pgrep -x skhd >/dev/null && printf 'running\n' || printf 'stopped\n'
+    printf 'JankyBorders: '
+    pgrep -x borders >/dev/null && printf 'running\n' || printf 'stopped\n'
+    ;;
+  *) usage ;;
+esac

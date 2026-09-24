@@ -3,8 +3,9 @@
 
 # Taps
 tap "creativeprojects/tap"  # Tap for resticprofile
-tap "FelixKratz/formulae"  # SketchyBar and borders
+tap "FelixKratz/formulae"  # SketchyBar and JankyBorders
 tap "koekeishiya/formulae"  # yabai and skhd
+tap "metaneutrons/tap"  # UGREEN NAS CLI and MCP server
 
 # CLI Tools
 brew "awscli"
@@ -52,6 +53,7 @@ brew "zsh-completions"
 brew "zsh"
 brew "neovim"
 brew "opencode"
+brew "metaneutrons/tap/ugos-cli"
 brew "television"
 brew "bat"
 brew "fd"

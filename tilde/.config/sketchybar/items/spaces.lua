@@ -5,7 +5,7 @@ local app_icons = require("helpers.app_icons")
 local spaces = {}
 local SPACE_COUNT = settings.space.count
 
--- Register custom events
+sbar.add("event", "workspace_update")
 sbar.add("event", "windows_on_spaces")
 
 for i = 1, SPACE_COUNT do
@@ -23,17 +23,17 @@ for i = 1, SPACE_COUNT do
       color = colors.space.inactive_fg,
       padding_left = 1,
       padding_right = 8,
-      y_offset = -1,
+      y_offset = settings.item.app_icon_y_offset,
     },
     background = {
       color = colors.transparent,
-      corner_radius = 8,
-      height = 24,
+      corner_radius = settings.space.corner_radius,
+      height = settings.space.height,
       drawing = false,
     },
     padding_left = 2,
     padding_right = 2,
-    click_script = "yabai -m space --focus " .. i,
+    click_script = "$HOME/.config/yabai/focus_space.sh " .. i,
   })
 
   spaces[i] = space
@@ -43,6 +43,7 @@ local focused_space = nil
 local space_labels = {}
 local occupied_spaces = {}
 local apps_refresh_id = 0
+local has_data = false
 
 for sid = 1, SPACE_COUNT do
   space_labels[sid] = ""
@@ -81,14 +82,14 @@ local function set_focused_space(sid)
   end
 end
 
-local function refresh_focus()
+local function refresh_yabai_focus()
   sbar.exec("yabai -m query --spaces --space", function(focused)
     if type(focused) ~= "table" or not focused.index then return end
     set_focused_space(focused.index)
   end)
 end
 
-local function refresh_apps()
+local function refresh_yabai_apps()
   apps_refresh_id = apps_refresh_id + 1
   local refresh_id = apps_refresh_id
 
@@ -124,6 +125,8 @@ local function refresh_apps()
   end)
 end
 
+-- SketchyBar's native space event arrives with the macOS workspace change and
+-- avoids waiting for yabai's delayed space_changed signal on this machine.
 for sid, space in ipairs(spaces) do
   space:subscribe("space_change", function(env)
     local selected = env.SELECTED == "true"
@@ -137,10 +140,27 @@ local observer = sbar.add("item", "space_observer", {
   updates = true,
 })
 
-observer:subscribe({ "windows_on_spaces", "forced" }, function()
-  refresh_focus()
-  refresh_apps()
+local function refresh()
+  refresh_yabai_focus()
+  refresh_yabai_apps()
+  has_data = true
+end
+
+observer:subscribe({ "workspace_update", "windows_on_spaces", "forced" }, function()
+  refresh()
 end)
 
-refresh_focus()
-refresh_apps()
+-- Heal the launch-order race, then stop polling once yabai answers.
+local watchdog = sbar.add("item", "workspace_watchdog", {
+  drawing = false,
+  update_freq = 2,
+})
+watchdog:subscribe("routine", function()
+  if has_data then
+    watchdog:set({ update_freq = 0 })
+  else
+    refresh()
+  end
+end)
+
+refresh()

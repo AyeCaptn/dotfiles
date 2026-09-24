@@ -14,3 +14,12 @@ sbar.bar({
 	shadow = false,
 	display = "all",
 })
+
+local display_observer = sbar.add("item", "display_observer", {
+	drawing = false,
+	updates = true,
+})
+
+display_observer:subscribe("display_change", function()
+	sbar.exec("sleep 1; sketchybar --reload")
+end)

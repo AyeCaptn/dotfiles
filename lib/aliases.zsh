@@ -28,8 +28,14 @@ fi
 
 coach() {
   cd /Users/sem/Projects/Repos/obsidian-vault/Sport/Training || return
-  OPENCODE_CONFIG_CONTENT='{"provider":{"opencode":{"models":{"gpt-5.6-terra":{"options":{"reasoningEffort":"low"}}}}}}' \
-    opencode --model opencode/gpt-5.6-terra
+  OPENCODE_CONFIG_CONTENT='{"model":"openai/gpt-5.6-terra","providers":{"openai":{"models":{"gpt-5.6-terra":{"settings":{"reasoningEffort":"low"}}}}}}' \
+    opencode
+}
+
+cook() {
+  cd /Users/sem/Projects/Repos/obsidian-vault/Eten || return
+  OPENCODE_CONFIG_CONTENT='{"model":"openai/gpt-5.6-terra","providers":{"openai":{"models":{"gpt-5.6-terra":{"settings":{"reasoningEffort":"low"}}}}}}' \
+    opencode
 }
 
 # Open aliases
@@ -42,10 +48,12 @@ alias update="source $DOTFILES/scripts/update.zsh"
 # Reload desktop tools after updating their configuration.
 reload-desktop() {
   _exists tmux && tmux source-file "$HOME/.tmux.conf"
+  if _exists yabai && pgrep -x yabai >/dev/null; then
+    yabai --restart-service
+    _exists skhd && skhd --restart-service
+    _exists borders && brew services restart borders >/dev/null
+  fi
   _exists sketchybar && sketchybar --reload
-  _exists borders && brew services restart felixkratz/formulae/borders
-  _exists skhd && skhd --restart-service
-  _exists yabai && yabai --restart-service
 }
 
 alias reload='reload-desktop'

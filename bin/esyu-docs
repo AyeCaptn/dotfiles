@@ -1,0 +1,67 @@
+#!/bin/sh
+set -eu
+
+if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
+  echo "Usage: esyu-docs INPUT.md [OUTPUT.pdf]" >&2
+  exit 64
+fi
+
+input=$1
+document_name=$(basename "${input%.md}")
+vault_root="/Users/sem/Projects/Repos/obsidian-vault"
+
+if [ "$#" -eq 2 ]; then
+  output=$2
+else
+  temp_dir=$(mktemp -d "${TMPDIR:-/tmp}/esyu-docs.XXXXXX")
+  output="$temp_dir/$document_name.pdf"
+fi
+
+if [ ! -f "$input" ]; then
+  echo "esyu-docs: input file not found: $input" >&2
+  exit 66
+fi
+
+case "$input" in
+  "$vault_root"/*)
+    document_label=${input#"$vault_root"/}
+    document_label=${document_label%.md}
+    ;;
+  *) document_label=$document_name ;;
+esac
+
+modified_on=$(stat -f "%Sm" -t "%Y-%m-%d" "$input")
+script_path=$0
+while [ -L "$script_path" ]; do
+  link=$(readlink "$script_path")
+  case $link in
+    /*) script_path=$link ;;
+    *) script_path=$(dirname "$script_path")/$link ;;
+  esac
+done
+script_dir=$(CDPATH= cd -- "$(dirname -- "$script_path")" && pwd)
+
+command -v pandoc >/dev/null || {
+  echo "esyu-docs requires pandoc. Install it with: brew install pandoc typst" >&2
+  exit 69
+}
+command -v typst >/dev/null || {
+  echo "esyu-docs requires typst. Install it with: brew install pandoc typst" >&2
+  exit 69
+}
+command -v open >/dev/null || {
+  echo "esyu-docs requires the macOS open command" >&2
+  exit 69
+}
+
+pandoc "$input" \
+  --from markdown+yaml_metadata_block+wikilinks_title_after_pipe \
+  --to typst \
+  --template "$script_dir/esyu-docs.typ" \
+  --metadata "filename=$document_label" \
+  --metadata "modified=$modified_on" \
+  --pdf-engine typst \
+  --output "$output"
+
+echo "Created $output"
+open -a Preview "$output"

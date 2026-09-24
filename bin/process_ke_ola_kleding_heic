@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+ASSET_DIR="/Users/sem/Projects/Repos/obsidian-vault/Ke Ola/assets/Kleding"
+MD_FILE="/Users/sem/Projects/Repos/obsidian-vault/Ke Ola/Kleding.md"
+
+if ! command -v sips >/dev/null 2>&1; then
+  echo "Error: sips is required but was not found." >&2
+  exit 1
+fi
+
+if [[ ! -d "$ASSET_DIR" ]]; then
+  echo "Error: asset folder not found: $ASSET_DIR" >&2
+  exit 1
+fi
+
+if [[ ! -f "$MD_FILE" ]]; then
+  echo "Error: markdown file not found: $MD_FILE" >&2
+  exit 1
+fi
+
+shopt -s nullglob nocaseglob
+heic_files=("$ASSET_DIR"/*.heic)
+
+if (( ${#heic_files[@]} == 0 )); then
+  echo "No HEIC files found in $ASSET_DIR"
+else
+  echo "Converting ${#heic_files[@]} HEIC file(s) to web-sized JPEG..."
+  for file in "${heic_files[@]}"; do
+    out="${file%.*}.jpg"
+    sips -s format jpeg -s formatOptions 70 -Z 1600 "$file" --out "$out" >/dev/null
+    rm -- "$file"
+  done
+fi
+
+perl -0pi -e 's/\.heic\]\]/.jpg]]/gi' "$MD_FILE"
+
+remaining_heic=("$ASSET_DIR"/*.heic)
+if (( ${#remaining_heic[@]} > 0 )); then
+  echo "Error: HEIC files still remain in $ASSET_DIR" >&2
+  exit 1
+fi
+
+if grep -qi '\.heic' "$MD_FILE"; then
+  echo "Error: .heic links still remain in $MD_FILE" >&2
+  exit 1
+fi
+
+missing_count=0
+while IFS= read -r image; do
+  if [[ ! -f "$ASSET_DIR/$image" ]]; then
+    echo "Missing referenced image: $image" >&2
+    missing_count=$((missing_count + 1))
+  fi
+done < <(perl -ne 'while(/!\[\[([^\]]+\.jpg)\]\]/g){print "$1\n"}' "$MD_FILE" | sort -u)
+
+if (( missing_count > 0 )); then
+  echo "Error: $missing_count referenced JPEG file(s) are missing." >&2
+  exit 1
+fi
+
+jpg_files=("$ASSET_DIR"/*.jpg)
+jpg_count=${#jpg_files[@]}
+jpg_total=$(du -ch "${jpg_files[@]}" | tail -n 1 | awk '{print $1}')
+
+echo "Done. JPEG files: $jpg_count, total size: $jpg_total"

@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+days=30
+force=false
+
+usage() {
+	cat <<'EOF'
+Usage: opencode-cleanup-sessions [--days DAYS] [--force]
+
+Delete OpenCode sessions that have not been updated within DAYS (default: 30).
+Without --force, print a summary and the ten oldest matching sessions.
+
+This does not remove OpenCode's project snapshot cache.
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+	case "$1" in
+		--days)
+			[[ $# -ge 2 ]] || { echo "Missing value for --days" >&2; exit 2; }
+			days="$2"
+			shift 2
+			;;
+		--force)
+			force=true
+			shift
+			;;
+		-h|--help)
+			usage
+			exit 0
+			;;
+		*)
+			echo "Unknown argument: $1" >&2
+			usage >&2
+			exit 2
+			;;
+	esac
+done
+
+if ! [[ "$days" =~ ^[1-9][0-9]*$ ]]; then
+	echo "DAYS must be a positive integer" >&2
+	exit 2
+fi
+
+if ! command -v opencode >/dev/null 2>&1; then
+	echo "opencode is required" >&2
+	exit 1
+fi
+
+cutoff_seconds=$(( $(date +%s) - days * 86400 ))
+cutoff_ms=$(( cutoff_seconds * 1000 ))
+cutoff_date="$(date -r "$cutoff_seconds" '+%Y-%m-%d %H:%M:%S')"
+
+db() {
+	opencode db "$1" --format tsv --pure
+}
+
+count_sessions() {
+	local output
+	output="$(db "SELECT count(*) AS count FROM session WHERE time_updated < $cutoff_ms")"
+	printf '%s\n' "${output##*$'\n'}"
+}
+
+stale_count="$(count_sessions)"
+if [[ "$stale_count" -eq 0 ]]; then
+	echo "No OpenCode sessions older than $days days."
+	exit 0
+fi
+
+echo "Found $stale_count OpenCode sessions last updated before $cutoff_date."
+
+if [[ "$force" != true ]]; then
+	db "SELECT id, datetime(time_updated / 1000, 'unixepoch', 'localtime') AS updated, replace(replace(title, char(9), ' '), char(10), ' ') AS title FROM session WHERE time_updated < $cutoff_ms ORDER BY time_updated ASC LIMIT 10"
+	echo
+	echo "Run 'opencode-cleanup-sessions --days $days --force' to delete them."
+	echo "Note: project snapshot caches are not removed by session deletion."
+	exit 0
+fi
+
+deleted=0
+failed=0
+
+# Delete leaves first. Session deletion cascades to children, so this preserves a
+# stale parent whenever it still has a newer child session.
+while true; do
+	leaves="$(db "SELECT session.id FROM session WHERE time_updated < $cutoff_ms AND NOT EXISTS (SELECT 1 FROM session AS child WHERE child.parent_id = session.id) ORDER BY time_updated ASC")"
+	[[ "$leaves" != "id" ]] || break
+	leaves="${leaves#id$'\n'}"
+	[[ -n "$leaves" ]] || break
+
+	while IFS= read -r session_id; do
+		[[ -n "$session_id" ]] || continue
+		if opencode session delete "$session_id" --pure >/dev/null; then
+			deleted=$((deleted + 1))
+			if (( deleted % 25 == 0 )); then
+				echo "Deleted $deleted sessions..."
+			fi
+		else
+			failed=$((failed + 1))
+			echo "Failed to delete session $session_id" >&2
+		fi
+	done <<< "$leaves"
+
+	[[ "$failed" -eq 0 ]] || break
+done
+
+remaining="$(count_sessions)"
+echo "Deleted $deleted sessions; $remaining stale sessions remain."
+
+if [[ "$remaining" -gt 0 ]]; then
+	echo "Remaining stale sessions have newer child sessions and were preserved."
+fi
+
+if [[ "$failed" -gt 0 ]]; then
+	echo "$failed session deletions failed." >&2
+	exit 1
+fi
+
+echo "Project snapshot caches were not removed."

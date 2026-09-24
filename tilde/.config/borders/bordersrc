@@ -1,9 +1,11 @@
 #!/usr/bin/env sh
 
-# Catppuccin Macchiato jankyborder.
+# Catppuccin Macchiato. A 4-point border leaves clear separation inside
+# yabai's 8-point gaps; transparent inactive borders keep the desktop quiet.
 exec borders \
   active_color=0xffc6a0f6 \
-  inactive_color=0xff24273a \
-  width=7.0 \
+  inactive_color=0x00000000 \
+  width=4.0 \
   hidpi=on \
-  style=round
+  style=round \
+  ax_focus=on

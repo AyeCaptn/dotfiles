@@ -7,12 +7,14 @@ local front_app = sbar.add("item", "front_app", {
   icon = {
     font = { family = settings.font.app, style = "Regular", size = 14.0 },
     color = colors.item,
+    y_offset = settings.item.app_icon_y_offset,
     padding_left = 8,
     padding_right = 5,
   },
   label = {
     font = { family = settings.font.text, style = "Medium", size = 12.0 },
     color = colors.item,
+    y_offset = settings.item.front_app_label_y_offset,
     padding_left = 2,
     padding_right = 9,
   },

@@ -38,7 +38,7 @@ if [ -n "$window_id" ] && yabai -m window "$window_id" --space "$home_space" 2>/
   exit
 fi
 
-yabai -m space --focus "$home_space" 2>/dev/null
+"$HOME/.config/yabai/focus_space.sh" "$home_space" 2>/dev/null
 open -a "$app" || exit 1
 
 # Existing inaccessible windows can become controllable only after activation;

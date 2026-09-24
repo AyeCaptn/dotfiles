@@ -16,10 +16,10 @@ alt + shift - return : open -na "Ghostty"
 alt + shift - b : "$HOME/.config/yabai/open_zen_window.sh"
 
 # Focus windows
-alt - h : yabai -m window --focus west 2>/dev/null || yabai -m space --focus prev 2>/dev/null
+alt - h : yabai -m window --focus west 2>/dev/null || "$HOME/.config/yabai/focus_space.sh" prev
 alt - j : yabai -m window --focus south 2>/dev/null
 alt - k : yabai -m window --focus north 2>/dev/null
-alt - l : yabai -m window --focus east 2>/dev/null || yabai -m space --focus next 2>/dev/null
+alt - l : yabai -m window --focus east 2>/dev/null || "$HOME/.config/yabai/focus_space.sh" next
 
 # Swap windows
 alt + shift - h : yabai -m window --swap west 2>/dev/null
@@ -34,29 +34,29 @@ alt + ctrl - k : yabai -m window --resize top:0:-80 2>/dev/null || yabai -m wind
 alt + ctrl - l : yabai -m window --resize right:80:0 2>/dev/null || yabai -m window --resize left:80:0 2>/dev/null
 
 # Workspace navigation
-alt - 1 : yabai -m space --focus 1 2>/dev/null
-alt - 2 : yabai -m space --focus 2 2>/dev/null
-alt - 3 : yabai -m space --focus 3 2>/dev/null
-alt - 4 : yabai -m space --focus 4 2>/dev/null
-alt - 5 : yabai -m space --focus 5 2>/dev/null
-alt - 6 : yabai -m space --focus 6 2>/dev/null
-alt - 7 : yabai -m space --focus 7 2>/dev/null
-alt - 8 : yabai -m space --focus 8 2>/dev/null
-alt - 9 : yabai -m space --focus 9 2>/dev/null
-alt - tab : yabai -m space --focus recent 2>/dev/null
+alt - 1 : "$HOME/.config/yabai/focus_space.sh" 1
+alt - 2 : "$HOME/.config/yabai/focus_space.sh" 2
+alt - 3 : "$HOME/.config/yabai/focus_space.sh" 3
+alt - 4 : "$HOME/.config/yabai/focus_space.sh" 4
+alt - 5 : "$HOME/.config/yabai/focus_space.sh" 5
+alt - 6 : "$HOME/.config/yabai/focus_space.sh" 6
+alt - 7 : "$HOME/.config/yabai/focus_space.sh" 7
+alt - 8 : "$HOME/.config/yabai/focus_space.sh" 8
+alt - 9 : "$HOME/.config/yabai/focus_space.sh" 9
+alt - tab : "$HOME/.config/yabai/focus_space.sh" recent
 
 # Move all managed windows to their default workspaces.
 alt + shift - d : "$HOME/.config/yabai/move_windows_to_default_spaces.sh"
 alt - d : "$HOME/.config/yabai/move_to_default_space.sh"
-alt + shift - 1 : yabai -m window --space 1 2>/dev/null; yabai -m space --focus 1 2>/dev/null
-alt + shift - 2 : yabai -m window --space 2 2>/dev/null; yabai -m space --focus 2 2>/dev/null
-alt + shift - 3 : yabai -m window --space 3 2>/dev/null; yabai -m space --focus 3 2>/dev/null
-alt + shift - 4 : yabai -m window --space 4 2>/dev/null; yabai -m space --focus 4 2>/dev/null
-alt + shift - 5 : yabai -m window --space 5 2>/dev/null; yabai -m space --focus 5 2>/dev/null
-alt + shift - 6 : yabai -m window --space 6 2>/dev/null; yabai -m space --focus 6 2>/dev/null
-alt + shift - 7 : yabai -m window --space 7 2>/dev/null; yabai -m space --focus 7 2>/dev/null
-alt + shift - 8 : yabai -m window --space 8 2>/dev/null; yabai -m space --focus 8 2>/dev/null
-alt + shift - 9 : yabai -m window --space 9 2>/dev/null; yabai -m space --focus 9 2>/dev/null
+alt + shift - 1 : "$HOME/.config/yabai/move_window_to_space.sh" 1
+alt + shift - 2 : "$HOME/.config/yabai/move_window_to_space.sh" 2
+alt + shift - 3 : "$HOME/.config/yabai/move_window_to_space.sh" 3
+alt + shift - 4 : "$HOME/.config/yabai/move_window_to_space.sh" 4
+alt + shift - 5 : "$HOME/.config/yabai/move_window_to_space.sh" 5
+alt + shift - 6 : "$HOME/.config/yabai/move_window_to_space.sh" 6
+alt + shift - 7 : "$HOME/.config/yabai/move_window_to_space.sh" 7
+alt + shift - 8 : "$HOME/.config/yabai/move_window_to_space.sh" 8
+alt + shift - 9 : "$HOME/.config/yabai/move_window_to_space.sh" 9
 
 # Window/layout controls
 alt - q : "$HOME/.config/yabai/close_or_hide_window.sh"

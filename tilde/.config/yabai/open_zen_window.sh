@@ -23,7 +23,7 @@ while [ "$attempt" -lt 50 ]; do
 
   if [ -n "$new_window" ]; then
     yabai -m window "$new_window" --space "$target_space"
-    yabai -m space --focus "$target_space"
+    "$HOME/.config/yabai/focus_space.sh" "$target_space" "$new_window"
     yabai -m window "$new_window" --focus
     exit 0
   fi
