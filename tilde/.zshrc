@@ -279,3 +279,6 @@ if [[ -o interactive && "${HERDR_ENV:-}" == "1" && -z "${HERDR_OPENCODE_STARTED:
   export HERDR_OPENCODE_STARTED=1
   opencode
 fi
+
+# opencode
+export PATH=/Users/sem/.opencode/bin:$PATH
