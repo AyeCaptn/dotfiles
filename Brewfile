@@ -91,6 +91,13 @@ brew "koekeishiya/formulae/yabai"
 # Monitoring
 brew "btop"
 
+# Media and image tooling
+brew "bento4"
+brew "exiftool"
+brew "ffmpeg-full", link: true, conflicts_with: ["ffmpeg"]
+brew "media-info"
+brew "vips"
+
 # Development environment manager
 brew "mise"
 
@@ -101,13 +108,17 @@ brew "anomalyco/tap/opencode-v2"
 cask "1password"
 cask "1password-cli"
 cask "alcove"
+cask "crystalfetch"
 cask "docker-desktop"
 cask "ghostty"
 cask "handbrake-app"
+cask "helium-browser"
 cask "obsidian"
 cask "omniwm"
 cask "poedit"
 cask "powerphotos"
+cask "tailscale-app"
+cask "utm"
 cask "sf-symbols"
 cask "session-manager-plugin"
 cask "spotify"
@@ -120,6 +131,7 @@ cask "whatsapp"
 
 # Fonts
 cask "font-atkinson-hyperlegible-mono"
+cask "font-geist"
 cask "font-hack-nerd-font"
 cask "font-inter"
 cask "font-jetbrains-mono-nerd-font"

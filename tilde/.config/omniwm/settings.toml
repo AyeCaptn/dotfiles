@@ -273,12 +273,6 @@ minWidth = 660.0
 
 [[appRules]]
 bundleId = ""
-appNameSubstring = "Brave Browser Nightly"
-assignToWorkspace = "2"
-id = "8E00B7BE-9D97-5D81-B870-B277409D53DA"
-
-[[appRules]]
-bundleId = ""
 appNameSubstring = "Helium"
 assignToWorkspace = "2"
 id = "B89425D2-EE97-5A88-B572-10ECC9A2B29D"
@@ -312,12 +306,6 @@ bundleId = ""
 appNameSubstring = "FaceTime"
 assignToWorkspace = "3"
 id = "A0AF2B38-A54A-556B-A8FC-2B19FFDD6013"
-
-[[appRules]]
-bundleId = ""
-appNameSubstring = "MeetingBar"
-assignToWorkspace = "3"
-id = "AD22DF7A-8D52-5F57-9D55-83F27504D103"
 
 [[appRules]]
 bundleId = ""
@@ -405,12 +393,6 @@ id = "EC5D0AD4-8598-5453-902E-4C919C152CC8"
 
 [[appRules]]
 bundleId = ""
-appNameSubstring = "Plex Media Server"
-assignToWorkspace = "5"
-id = "E1805627-73E9-5822-80E8-DD7067D58247"
-
-[[appRules]]
-bundleId = ""
 appNameSubstring = "Chess"
 assignToWorkspace = "5"
 id = "A252598F-D5B2-5337-A7B6-1E04EE66AFF1"
@@ -459,18 +441,6 @@ id = "A17C066E-BD93-5248-BC9F-91373244668A"
 
 [[appRules]]
 bundleId = ""
-appNameSubstring = "T3 Code"
-assignToWorkspace = "7"
-id = "C3D08453-2CCC-517E-B090-5020D8BD8381"
-
-[[appRules]]
-bundleId = ""
-appNameSubstring = "Bruno"
-assignToWorkspace = "7"
-id = "CFBE3274-7824-5E38-A8AD-D3F2681A62E9"
-
-[[appRules]]
-bundleId = ""
 appNameSubstring = "Docker"
 assignToWorkspace = "7"
 id = "6C842662-3CC3-5C32-AA19-4E989EDEC462"
@@ -516,12 +486,6 @@ bundleId = ""
 appNameSubstring = "Canva"
 assignToWorkspace = "8"
 id = "6F4B37BB-49AD-59A6-825B-749B61632598"
-
-[[appRules]]
-bundleId = ""
-appNameSubstring = "CapCut"
-assignToWorkspace = "8"
-id = "4F81E641-2BA0-5D53-9655-046AFDFCD128"
 
 [[appRules]]
 bundleId = ""
