@@ -42,12 +42,56 @@ finish() {
   sleep 1
 }
 
-# Set directory
-export DOTFILES=${1:-"$HOME/.dotfiles"}
+# Machine-local options. A positional path remains accepted for compatibility.
+export DOTFILES="$HOME/.dotfiles"
+DOTFILES_PROFILE="${DOTFILES_PROFILE:-personal}"
 GITHUB_REPO_URL_BASE="https://github.com/AyeCaptn/dotfiles"
 HOMEBREW_INSTALLER_URL="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
 TPM_GITHUB_REPO=https://github.com/tmux-plugins/tpm
 TPM_INSTALLATION_PATH=~/.tmux/plugins/tpm
+
+usage() {
+  cat <<'EOF'
+Usage: installer.sh [--profile personal|work] [--dotfiles PATH]
+EOF
+}
+
+parse_args() {
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --profile)
+        [ "$#" -ge 2 ] || { error "--profile requires a value"; exit 64; }
+        DOTFILES_PROFILE="$2"
+        shift 2
+        ;;
+      --dotfiles)
+        [ "$#" -ge 2 ] || { error "--dotfiles requires a path"; exit 64; }
+        DOTFILES="$2"
+        shift 2
+        ;;
+      -h | --help)
+        usage
+        exit 0
+        ;;
+      *)
+        if [ "$DOTFILES" = "$HOME/.dotfiles" ]; then
+          DOTFILES="$1"
+          shift
+        else
+          error "Unknown argument: $1"
+          usage >&2
+          exit 64
+        fi
+        ;;
+    esac
+  done
+
+  case "$DOTFILES_PROFILE" in
+    personal | work) ;;
+    *) error "Invalid profile: $DOTFILES_PROFILE (expected personal or work)"; exit 64 ;;
+  esac
+  export DOTFILES DOTFILES_PROFILE
+}
 
 on_start() {
   info "           __        __   ____ _  __           "
@@ -139,22 +183,26 @@ install_git() {
 install_dotfiles() {
   info "Trying to detect installed dotfiles in $DOTFILES..."
 
-  if [ ! -d $DOTFILES ]; then
+  if [ ! -d "$DOTFILES" ]; then
     echo "Seems like you don't have dotfiles installed!"
     read -p "Do you agree to proceed with dotfiles installation? [y/N] " -n 1 answer
     echo
-    if [ ${answer} != "y" ]; then
+    if [ "${answer}" != "y" ]; then
       exit 1
     fi
 
-    git clone --recursive "$GITHUB_REPO_URL_BASE.git" $DOTFILES
-    cd $DOTFILES && ./sync.py && cd -
+    git clone --recursive "$GITHUB_REPO_URL_BASE.git" "$DOTFILES"
   else
     success "You already have dotfiles installed. Skipping..."
   fi
 
+  info "Selecting the $DOTFILES_PROFILE machine profile..."
+  profile_file="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/profile"
+  mkdir -p "$(dirname "$profile_file")"
+  printf '%s\n' "$DOTFILES_PROFILE" > "$profile_file"
+
   info "Linking dotfiles..."
-  cd $DOTFILES && ./sync.py && cd -
+  "$DOTFILES/sync.py" --profile "$DOTFILES_PROFILE"
 
   finish
 }
@@ -180,7 +228,7 @@ bootstrap() {
     return
   fi
 
-  $DOTFILES/scripts/bootstrap.zsh
+  DOTFILES_PROFILE="$DOTFILES_PROFILE" "$DOTFILES/scripts/bootstrap.zsh"
 
   finish
 }
@@ -200,6 +248,7 @@ on_error() {
 }
 
 main() {
+  parse_args "$@"
   on_start "$*"
   install_cli_tools "$*"
   install_homebrew "$*"
@@ -210,4 +259,4 @@ main() {
   on_finish "$*"
 }
 
-main "$*"
+main "$@"

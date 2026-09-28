@@ -20,14 +20,54 @@ info() {
 }
 
 export DOTFILES=${DOTFILES:="$HOME/.dotfiles"}
+source "$DOTFILES/lib/profile.sh"
+export DOTFILES_PROFILE="$(dotfiles_profile)" || exit
+desktop_services_suspended=0
+desktop_wm_before_bootstrap="none"
+skhd_before_bootstrap=0
+
+restore_desktop_services() {
+  (( desktop_services_suspended )) || return 0
+  case "$desktop_wm_before_bootstrap" in
+    omniwm|yabai) "$DOTFILES/bin/desktop-wm" "$desktop_wm_before_bootstrap" ;;
+    *) (( skhd_before_bootstrap )) && _exists skhd && skhd --start-service ;;
+  esac
+  desktop_services_suspended=0
+}
 
 # Go to dotfiles directory
 cd $DOTFILES
 
-# Homebrew Bundle
+info "syncing $DOTFILES_PROFILE profile configuration"
+"$DOTFILES/sync.py"
+
+# Homebrew Bundle. Stop global input hooks before Homebrew replaces any of
+# their executables, then restore the active desktop mode.
 if _exists brew; then
-  info "running brew bundle"
-  brew bundle --file "$DOTFILES/Brewfile"
+  trap 'restore_desktop_services' EXIT
+  trap 'restore_desktop_services; exit 130' HUP INT TERM
+  if [[ -x "$DOTFILES/bin/desktop-wm" ]]; then
+    if pgrep -x OmniWM >/dev/null; then
+      desktop_wm_before_bootstrap="omniwm"
+    elif pgrep -x yabai >/dev/null; then
+      desktop_wm_before_bootstrap="yabai"
+    fi
+    pgrep -x skhd >/dev/null && skhd_before_bootstrap=1
+    if [[ "$desktop_wm_before_bootstrap" != "none" ]] || pgrep -x skhd >/dev/null; then
+      info "temporarily stopping desktop input hooks"
+      desktop_services_suspended=1
+      "$DOTFILES/bin/desktop-wm" stop
+    fi
+  fi
+
+  brew_bundle_status=0
+  for brewfile in "${(@f)$(dotfiles_brewfiles "$DOTFILES" "$DOTFILES_PROFILE")}"; do
+    info "running brew bundle: ${brewfile:t}"
+    brew bundle --file "$brewfile" || brew_bundle_status=$?
+  done
+  restore_desktop_services
+  trap - EXIT HUP INT TERM
+  (( brew_bundle_status == 0 )) || exit "$brew_bundle_status"
 else
   info "brew not installed"
 fi
@@ -64,9 +104,13 @@ fi
 
 if _exists uv; then
   info "installing Python CLI applications"
-  while IFS= read -r package; do
-    [[ -n "$package" ]] && uv tool install "$package" --force
-  done < "$DOTFILES/python-packages.txt"
+  for package_file in \
+    "$DOTFILES/python-packages.txt" \
+    "$DOTFILES/python-packages.$DOTFILES_PROFILE.txt"; do
+    while IFS= read -r package; do
+      [[ -n "$package" && "$package" != \#* ]] && uv tool install "$package" --force
+    done < "$package_file"
+  done
 fi
 
 # pnpm owns globally installed JavaScript CLIs; application dependencies remain
@@ -87,7 +131,7 @@ if _exists brew; then
   resticprofile_bin="$(brew --prefix)/bin/resticprofile"
 fi
 
-if _exists restic && [[ -x "$resticprofile_bin" ]]; then
+if [[ "$DOTFILES_PROFILE" == "personal" ]] && _exists restic && [[ -x "$resticprofile_bin" ]]; then
   if _exists op; then
     #TODO: Ask me to sign in using 1password app and enable cli integration
     info "restoring the restic password from 1password"
@@ -153,7 +197,8 @@ desktop_wm_agent="$DOTFILES/tilde/Library/LaunchAgents/com.sem.desktop-wm.plist"
 if [[ -f "$desktop_wm_agent" ]]; then
   info "installing OmniWM login agent"
   mkdir -p "$HOME/Library/LaunchAgents"
-  cp "$desktop_wm_agent" "$HOME/Library/LaunchAgents/com.sem.desktop-wm.plist"
+  desktop_wm_agent_target="$HOME/Library/LaunchAgents/com.sem.desktop-wm.plist"
+  [[ "$desktop_wm_agent" -ef "$desktop_wm_agent_target" ]] || cp "$desktop_wm_agent" "$desktop_wm_agent_target"
   launchctl bootout "gui/$(id -u)/com.sem.desktop-wm" >/dev/null 2>&1 || true
   launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.sem.desktop-wm.plist"
   launchctl enable "gui/$(id -u)/com.sem.desktop-wm"
@@ -162,7 +207,7 @@ fi
 # Keep the authenticated OpenCode web server local and expose its fixed port only
 # through Tailscale. The login agent restarts OpenCode if it exits.
 opencode_tailnet_agent="$DOTFILES/tilde/Library/LaunchAgents/com.sem.opencode-tailnet.plist"
-if _exists opencode && [[ -f "$opencode_tailnet_agent" ]]; then
+if [[ "$DOTFILES_PROFILE" == "personal" ]] && _exists opencode && [[ -f "$opencode_tailnet_agent" ]]; then
   info "installing OpenCode Tailscale login agent"
   opencode service set hostname 127.0.0.1
   opencode service set port 49374
@@ -170,10 +215,13 @@ if _exists opencode && [[ -f "$opencode_tailnet_agent" ]]; then
     tailscale serve --bg --tcp=4096 tcp://127.0.0.1:49374
   fi
   mkdir -p "$HOME/Library/LaunchAgents"
-  cp "$opencode_tailnet_agent" "$HOME/Library/LaunchAgents/com.sem.opencode-tailnet.plist"
+  opencode_tailnet_agent_target="$HOME/Library/LaunchAgents/com.sem.opencode-tailnet.plist"
+  [[ "$opencode_tailnet_agent" -ef "$opencode_tailnet_agent_target" ]] || cp "$opencode_tailnet_agent" "$opencode_tailnet_agent_target"
   launchctl bootout "gui/$(id -u)/com.sem.opencode-tailnet" >/dev/null 2>&1 || true
   launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.sem.opencode-tailnet.plist"
   launchctl enable "gui/$(id -u)/com.sem.opencode-tailnet"
+elif [[ "$DOTFILES_PROFILE" == "work" ]]; then
+  launchctl bootout "gui/$(id -u)/com.sem.opencode-tailnet" >/dev/null 2>&1 || true
 fi
 
 # Remove terminal last login text
@@ -185,7 +233,7 @@ mkdir -p ~/Projects/Forks
 mkdir -p ~/Projects/Job
 mkdir -p ~/Projects/Playground
 mkdir -p ~/Projects/Repos
-mkdir -p ~/Projects/Personal
+[[ "$DOTFILES_PROFILE" == "personal" ]] && mkdir -p ~/Projects/Personal
 
 # Dock
 info "configuring dock"

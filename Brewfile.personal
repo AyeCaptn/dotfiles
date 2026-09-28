@@ -1,0 +1,43 @@
+# Homebrew Bundle: personal-only packages and applications
+
+tap "creativeprojects/tap", trusted: { formula: "resticprofile" }
+tap "metaneutrons/tap", trusted: { formula: "ugos-cli" }
+
+# Backups and personal infrastructure
+brew "rclone"
+brew "restic"
+brew "creativeprojects/tap/resticprofile"
+brew "metaneutrons/tap/ugos-cli"
+
+# Media and image tooling
+brew "bento4"
+brew "exiftool"
+brew "ffmpeg-full", link: true, conflicts_with: ["ffmpeg"]
+brew "media-info"
+brew "vips"
+
+# Personal desktop applications
+cask "alcove"
+cask "crystalfetch"
+cask "handbrake-app"
+cask "powerphotos"
+cask "tailscale-app"
+cask "spotify"
+cask "tldraw"
+cask "transmission"
+cask "vlc"
+cask "whatsapp"
+
+# cask "slack"
+# cask "messenger"
+# cask "microsoft-excel"
+# cask "microsoft-powerpoint"
+# cask "microsoft-teams"
+# cask "microsoft-word"
+
+# App store applications
+# mas "Logic Pro", id: 634148309
+# mas "Keynote", id: 409183694
+# mas "Numbers", id: 409203825
+# mas "Pages", id: 409201541
+# mas "XCode", id: 497799835

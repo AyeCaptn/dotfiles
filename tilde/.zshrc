@@ -14,6 +14,12 @@ fi
 
 # Export path to root of dotfiles repo
 export DOTFILES=${DOTFILES:="$HOME/.dotfiles"}
+if [[ -f "$DOTFILES/lib/profile.sh" ]]; then
+  source "$DOTFILES/lib/profile.sh"
+  DOTFILES_PROFILE="$(dotfiles_profile 2>/dev/null || print personal)"
+else
+  DOTFILES_PROFILE="${DOTFILES_PROFILE:-personal}"
+fi
 
 # Locale
 export LC_ALL=en_US.UTF-8
@@ -107,21 +113,23 @@ if [[ -f "$HOME/.zshlocal" ]]; then
   source "$HOME/.zshlocal"
 fi
 
-# UGREEN NAS management over Tailscale. The UGOS API uses HTTPS on 9443,
-# independently of the dashboard served on port 80.
-export UGOS_HOST="${UGOS_HOST:-ugreen-nas}"
-export UGOS_PORT="${UGOS_PORT:-9443}"
-export UGOS_USER="${UGOS_USER:-Sem}"
+if [[ "$DOTFILES_PROFILE" == "personal" ]]; then
+  # UGREEN NAS management over Tailscale. The UGOS API uses HTTPS on 9443,
+  # independently of the dashboard served on port 80.
+  export UGOS_HOST="${UGOS_HOST:-ugreen-nas}"
+  export UGOS_PORT="${UGOS_PORT:-9443}"
+  export UGOS_USER="${UGOS_USER:-Sem}"
 
-ugos-password-set() {
-  security add-generic-password -a "$UGOS_USER" -s ugos-cli -U -w
-}
+  ugos-password-set() {
+    security add-generic-password -a "$UGOS_USER" -s ugos-cli -U -w
+  }
 
-ugos-cli() {
-  local password
-  password="$(security find-generic-password -a "$UGOS_USER" -s ugos-cli -w)" || return
-  UGOS_PASSWORD="$password" command ugos-cli "$@"
-}
+  ugos-cli() {
+    local password
+    password="$(security find-generic-password -a "$UGOS_USER" -s ugos-cli -w)" || return
+    UGOS_PASSWORD="$password" command ugos-cli "$@"
+  }
+fi
 
 # Set k9s config directory
 export K9S_CONFIG_DIR="$HOME/.config/k9s"

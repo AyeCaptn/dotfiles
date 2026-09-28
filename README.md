@@ -13,6 +13,30 @@ Bootstrap the system by running the following command:
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/AyeCaptn/dotfiles/master/installer.sh)"
 ```
 
+The default `personal` profile installs the complete setup. On a work Mac, use
+the `work` profile instead:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/AyeCaptn/dotfiles/master/installer.sh \
+  | bash -s -- --profile work
+```
+
+The selected profile is stored locally in `~/.config/dotfiles/profile`; it is
+not linked into this repository. View or change it with `dot profile` and
+`dot profile personal|work`, then run `dot bootstrap` and start a new shell to
+apply it.
+
+Both profiles install the full keyboard-driven desktop and broad developer
+toolchain. The work profile keeps Ghostty, Docker Desktop, VS Code, Obsidian,
+Helium, Zen, 1Password, Raycast, cloud/Kubernetes tools, JVM/Scala, iOS/macOS
+tools, language runtimes, and the common CLI environment. It omits personal
+backup, Tailscale, NAS, Affinity, tldraw-vault, media/photo, and personal helper
+packages and configuration. Profile changes never uninstall packages.
+
+Homebrew packages shared by both machines live in `Brewfile`; additions live
+in `Brewfile.personal` and `Brewfile.work`. Python CLI packages follow the same
+pattern.
+
 `sync.py` links only Git-tracked files. It merges directory trees instead of
 replacing them, so broad home directories such as `~/Library` are never
 deleted. Preview changes with `./sync.py --dry-run`; replaced files are backed
@@ -29,8 +53,8 @@ dot update
 
 The `update` alias runs the same command. Updates are locked against concurrent
 runs and logged to `~/.local/state/dotfiles/update.log`. OpenCode is installed
-through Homebrew and its background service is restarted after an update. An
-authenticated login agent also keeps the web server available on the Tailscale-only
+through Homebrew. On the personal profile, an authenticated login agent also
+keeps the web server available on the Tailscale-only
 endpoint `http://100.86.28.24:4096`. Remote access uses the username `opencode`;
 its stable password is stored in the login Keychain as the Internet Password
 **OpenCode via Tailscale** for `sems-macbook-pro.tailbf6441.ts.net:4096`.
@@ -44,7 +68,7 @@ Check the managed system without changing it:
 dot doctor
 ```
 
-The doctor checks the Brewfile, mise runtimes, dotfile links, generated files,
+The doctor checks the active profile's Brewfiles, mise runtimes, dotfile links, generated files,
 common credential patterns, and unmanaged Homebrew installations. Unmanaged
 packages are reported for review but are never removed automatically.
 

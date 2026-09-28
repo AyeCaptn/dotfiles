@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "autoupdate": true,
+  "update": "auto",
   "permissions": [
     {
       "action": "*",
@@ -41,7 +41,7 @@
       "shadcn": {
         "type": "local",
         "command": [
-          "/Users/sem/.local/share/mise/shims/npx",
+          "npx",
           "-y",
           "shadcn@latest",
           "mcp"
@@ -50,18 +50,18 @@
       "tldraw": {
         "type": "local",
         "command": [
-          "/Users/sem/.local/share/mise/shims/npx",
+          "npx",
           "-y",
           "@talhaorak/tldraw-mcp@0.1.1"
         ],
         "environment": {
-          "TLDRAW_DIR": "/Users/sem/Projects/Repos/obsidian-vault/Drawings"
+          "TLDRAW_DIR": "{env:HOME}/Projects/Repos/obsidian-vault/Drawings"
         }
       },
       "affinity": {
         "type": "local",
         "command": [
-          "/Users/sem/.local/bin/uvx",
+          "uvx",
           "--with",
           "mcp==1.25.0",
           "--from",

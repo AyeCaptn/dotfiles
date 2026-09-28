@@ -9,7 +9,6 @@ k9s:
     noIcons: false
     defaultsToFullScreen: false
   liveViewAutoRefresh: false
-  screenDumpDir: /Users/sem/.config/k9s/screen-dumps
   refreshRate: 2
   maxConnRetry: 5
   readOnly: false

@@ -6,7 +6,9 @@
   <string>com.sem.opencode-tailnet</string>
   <key>ProgramArguments</key>
   <array>
-    <string>/Users/sem/.dotfiles/bin/opencode-tailnet-service</string>
+    <string>/bin/sh</string>
+    <string>-c</string>
+    <string>exec "$HOME/.dotfiles/bin/opencode-tailnet-service"</string>
   </array>
   <key>RunAtLoad</key>
   <true/>

@@ -26,17 +26,19 @@ fi
 [ -d ~/Projects/Playground ] && alias pjp='cd ~/Projects/Playground'
 [ -d ~/Projects/Repos ] && alias pjr='cd ~/Projects/Repos'
 
-coach() {
-  cd /Users/sem/Projects/Repos/obsidian-vault/Sport/Training || return
-  OPENCODE_CONFIG_CONTENT='{"model":"openai/gpt-5.6-terra","providers":{"openai":{"models":{"gpt-5.6-terra":{"settings":{"reasoningEffort":"low"}}}}}}' \
-    opencode
-}
+if [[ "${DOTFILES_PROFILE:-personal}" == "personal" ]]; then
+  coach() {
+    cd "$HOME/Projects/Repos/obsidian-vault/Sport/Training" || return
+    OPENCODE_CONFIG_CONTENT='{"model":"openai/gpt-5.6-terra","providers":{"openai":{"models":{"gpt-5.6-terra":{"settings":{"reasoningEffort":"low"}}}}}}' \
+      opencode
+  }
 
-cook() {
-  cd /Users/sem/Projects/Repos/obsidian-vault/Eten || return
-  OPENCODE_CONFIG_CONTENT='{"model":"openai/gpt-5.6-terra","providers":{"openai":{"models":{"gpt-5.6-terra":{"settings":{"reasoningEffort":"low"}}}}}}' \
-    opencode
-}
+  cook() {
+    cd "$HOME/Projects/Repos/obsidian-vault/Eten" || return
+    OPENCODE_CONFIG_CONTENT='{"model":"openai/gpt-5.6-terra","providers":{"openai":{"models":{"gpt-5.6-terra":{"settings":{"reasoningEffort":"low"}}}}}}' \
+      opencode
+  }
+fi
 
 # Open aliases
 alias o='open'
@@ -132,8 +134,9 @@ if _exists yazi; then
   }
 fi
 
-# Backup all files
-alias backup="resticprofile -c ~/.resticprofiles.conf --name full-backup backup"
+if [[ "${DOTFILES_PROFILE:-personal}" == "personal" ]]; then
+  alias backup="resticprofile -c ~/.resticprofiles.conf --name full-backup backup"
+fi
 
 # Disable press and hold in VSCode
 alias vscode-press-and-hold-off="defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false"

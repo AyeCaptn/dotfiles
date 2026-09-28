@@ -1,0 +1,4 @@
+# Work-specific Homebrew packages belong here.
+#
+# The shared Brewfile is intentionally the complete work developer baseline.
+# Personal packages and applications live in Brewfile.personal.

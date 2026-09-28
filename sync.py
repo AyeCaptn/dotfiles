@@ -14,10 +14,34 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Iterable, List
+from typing import Dict, Iterable, List, Tuple
 
 
 DOTFILES_DIR = Path(__file__).resolve().parent
+PROFILES = ("personal", "work")
+WORK_EXCLUDES = (
+    Path(".resticprofiles.conf"),
+    Path("Library/LaunchAgents/com.sem.opencode-tailnet.plist"),
+    Path(".config/opencode/skills/obsidian-tldraw"),
+    Path(".config/opencode/skills/ugreen-nas-docker-deploy"),
+)
+
+
+def configured_profile() -> str:
+    """Return the environment override or machine-local profile."""
+    profile = os.environ.get("DOTFILES_PROFILE", "")
+    if not profile:
+        config_home = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
+        profile_file = config_home / "dotfiles" / "profile"
+        try:
+            profile = profile_file.read_text(encoding="utf-8").splitlines()[0].strip()
+        except (FileNotFoundError, IndexError, OSError):
+            profile = "personal"
+    if profile not in PROFILES:
+        raise ValueError(
+            f"invalid dotfiles profile {profile!r}; expected one of {', '.join(PROFILES)}"
+        )
+    return profile
 
 
 def parse_args() -> argparse.Namespace:
@@ -49,6 +73,11 @@ def parse_args() -> argparse.Namespace:
         "--yes",
         action="store_true",
         help="replace conflicting files without prompting (backups are still made)",
+    )
+    parser.add_argument(
+        "--profile",
+        choices=PROFILES,
+        help="machine profile (default: configured profile, then personal)",
     )
     return parser.parse_args()
 
@@ -129,17 +158,32 @@ def ensure_parent(path: Path, dry_run: bool) -> bool:
     return True
 
 
+def remove_inactive_links(
+    files: Iterable[Path], destination_root: Path, dry_run: bool
+) -> None:
+    """Remove only stale symlinks that point back into this repository."""
+    for relative in files:
+        destination = destination_root / relative
+        if not destination.is_symlink():
+            continue
+        try:
+            destination.resolve(strict=False).relative_to(DOTFILES_DIR)
+        except (OSError, ValueError):
+            continue
+        print(f"unlink  {destination} (not used by active profile)")
+        if not dry_run:
+            destination.unlink()
+
+
 def link_files(
-    files: Iterable[Path],
-    source_root: Path,
+    files: Iterable[Tuple[Path, Path]],
     destination_root: Path,
     backup_root: Path,
     dry_run: bool,
     assume_yes: bool,
 ) -> int:
     failures = 0
-    for relative in files:
-        source = source_root / relative
+    for relative, source in files:
         destination = destination_root / relative
 
         if not source.exists() and not source.is_symlink():
@@ -180,6 +224,11 @@ def link_files(
 
 def main() -> int:
     args = parse_args()
+    try:
+        profile = args.profile or configured_profile()
+    except ValueError as error:
+        print(error, file=sys.stderr)
+        return 2
     source_root = (DOTFILES_DIR / args.source).resolve()
     destination_root = Path(args.destination).expanduser().resolve()
     backup_base = Path(args.backup).expanduser()
@@ -200,9 +249,29 @@ def main() -> int:
         print(f"cannot list tracked files: {error}", file=sys.stderr)
         return 2
 
+    sources: Dict[Path, Path] = {}
+    for relative in files:
+        if profile == "work" and any(
+            relative == excluded or excluded in relative.parents
+            for excluded in WORK_EXCLUDES
+        ):
+            continue
+        sources[relative] = source_root / relative
+
+    source_relative = source_root.relative_to(DOTFILES_DIR)
+    profile_root = DOTFILES_DIR / "profiles" / profile / source_relative
+    if profile_root.is_dir():
+        try:
+            for relative in tracked_files(profile_root):
+                sources[relative] = profile_root / relative
+        except (ValueError, subprocess.CalledProcessError) as error:
+            print(f"cannot list profile files: {error}", file=sys.stderr)
+            return 2
+
+    remove_inactive_links(sorted(set(files) - set(sources)), destination_root, args.dry_run)
+
     failures = link_files(
-        files,
-        source_root,
+        sorted(sources.items()),
         destination_root,
         backup_root,
         args.dry_run,

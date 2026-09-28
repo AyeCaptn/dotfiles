@@ -3,7 +3,9 @@
 set -uo pipefail
 
 DOTFILES="${DOTFILES:-$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)}"
-BREWFILE="$DOTFILES/Brewfile"
+source "$DOTFILES/lib/profile.sh"
+DOTFILES_PROFILE="$(dotfiles_profile)" || exit
+export DOTFILES_PROFILE
 
 if [[ -t 1 ]]; then
   green=$'\033[0;32m'
@@ -26,6 +28,7 @@ Commands:
   update     Run the complete managed update
   sync       Link tracked dotfiles into the home directory
   doctor     Check package, runtime, and dotfile health
+  profile    Show or set this Mac's personal/work profile
 EOF
 }
 
@@ -43,7 +46,7 @@ doctor() {
     failures=$((failures + 1))
   }
 
-  printf 'Dotfiles doctor: %s\n\n' "$DOTFILES"
+  printf 'Dotfiles doctor: %s\nProfile: %s\n\n' "$DOTFILES" "$DOTFILES_PROFILE"
 
   if [[ $(uname -s) == Darwin ]]; then
     pass "running on macOS"
@@ -67,19 +70,26 @@ doctor() {
   done
 
   if command -v brew >/dev/null 2>&1; then
-    if HOMEBREW_BUNDLE_NO_UPGRADE=1 brew bundle check --file "$BREWFILE" >/dev/null 2>&1; then
-      pass "Brewfile dependencies are installed"
-    else
-      fail "Brewfile has missing dependencies (run: brew bundle --file $BREWFILE)"
-    fi
+    local brewfile brewfiles_ok=1
+    while IFS= read -r brewfile; do
+      if ! HOMEBREW_BUNDLE_NO_UPGRADE=1 brew bundle check --file "$brewfile" >/dev/null 2>&1; then
+        fail "$(basename "$brewfile") has missing dependencies (run: dot bootstrap)"
+        brewfiles_ok=0
+      fi
+    done < <(dotfiles_brewfiles "$DOTFILES" "$DOTFILES_PROFILE")
+    ((brewfiles_ok)) && pass "profile Homebrew dependencies are installed"
 
     local unmanaged_formulae unmanaged_casks
     unmanaged_formulae="$(comm -23 \
       <(brew leaves | sed 's#.*/##' | sort -u) \
-      <(brew bundle list --formula --file "$BREWFILE" | sed 's#.*/##' | sort -u))"
+      <(while IFS= read -r brewfile; do
+          brew bundle list --formula --file "$brewfile"
+        done < <(dotfiles_brewfiles "$DOTFILES" "$DOTFILES_PROFILE") | sed 's#.*/##' | sort -u))"
     unmanaged_casks="$(comm -23 \
       <(brew list --cask -1 | sort -u) \
-      <(brew bundle list --cask --file "$BREWFILE" | sort -u))"
+      <(while IFS= read -r brewfile; do
+          brew bundle list --cask --file "$brewfile"
+        done < <(dotfiles_brewfiles "$DOTFILES" "$DOTFILES_PROFILE") | sort -u))"
 
     if [[ -n $unmanaged_formulae ]]; then
       warn "unmanaged Homebrew formulae: $(tr '\n' ' ' <<<"$unmanaged_formulae" | sed 's/ $//')"
@@ -156,6 +166,18 @@ case "${1:-}" in
   doctor)
     shift
     doctor "$@"
+    ;;
+  profile)
+    shift
+    if [[ $# -eq 0 ]]; then
+      printf '%s\n' "$DOTFILES_PROFILE"
+    elif [[ $# -eq 1 ]]; then
+      dotfiles_profile_set "$1" || exit
+      printf 'Dotfiles profile set to %s. Run `dot bootstrap`, then start a new shell.\n' "$1"
+    else
+      printf 'Usage: dot profile [personal|work]\n' >&2
+      exit 64
+    fi
     ;;
   help | --help | -h | "")
     usage

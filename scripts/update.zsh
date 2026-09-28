@@ -7,6 +7,8 @@ set -eu
 setopt pipefail
 
 export DOTFILES=${1:-"$HOME/.dotfiles"}
+source "$DOTFILES/lib/profile.sh"
+export DOTFILES_PROFILE="$(dotfiles_profile)" || exit
 state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles"
 lock_dir="${TMPDIR:-/tmp}/dotfiles-update-${UID}.lock"
 log_file="$state_dir/update.log"
@@ -130,7 +132,10 @@ update_homebrew() {
   # state. Stop both before Homebrew mutates them and restore the previous mode
   # afterward. The EXIT trap also restores them when an update fails.
   suspend_desktop_services
-  brew bundle --file "$DOTFILES/Brewfile"
+  local brewfile
+  for brewfile in "${(@f)$(dotfiles_brewfiles "$DOTFILES" "$DOTFILES_PROFILE")}"; do
+    brew bundle --file "$brewfile"
+  done
   # Also update intentionally installed packages that have not yet been added
   # to the Brewfile. `dot doctor` reports that drift for later review.
   brew upgrade
@@ -180,23 +185,27 @@ refresh_services() {
     resticprofile_bin="$(brew --prefix)/bin/resticprofile"
   fi
 
-  if [[ -x "$resticprofile_bin" && -f "$HOME/.resticprofiles.conf" ]]; then
+  if [[ "$DOTFILES_PROFILE" == "personal" && -x "$resticprofile_bin" && -f "$HOME/.resticprofiles.conf" ]]; then
     env PATH="$(dirname "$resticprofile_bin"):/usr/bin:/bin:/usr/sbin:/sbin" \
       "$resticprofile_bin" --config "$HOME/.resticprofiles.conf" schedule --all --start
   fi
 
   local opencode_tailnet_agent="$DOTFILES/tilde/Library/LaunchAgents/com.sem.opencode-tailnet.plist"
-  if _exists opencode && [[ -f "$opencode_tailnet_agent" ]]; then
+  if [[ "$DOTFILES_PROFILE" == "personal" ]] && _exists opencode && [[ -f "$opencode_tailnet_agent" ]]; then
     opencode service set hostname 127.0.0.1
     opencode service set port 49374
     if _exists tailscale; then
       tailscale serve --bg --tcp=4096 tcp://127.0.0.1:49374
     fi
     mkdir -p "$HOME/Library/LaunchAgents"
-    cp "$opencode_tailnet_agent" "$HOME/Library/LaunchAgents/com.sem.opencode-tailnet.plist"
+    local opencode_tailnet_agent_target="$HOME/Library/LaunchAgents/com.sem.opencode-tailnet.plist"
+    [[ "$opencode_tailnet_agent" -ef "$opencode_tailnet_agent_target" ]] || \
+      cp "$opencode_tailnet_agent" "$opencode_tailnet_agent_target"
     launchctl bootout "gui/$(id -u)/com.sem.opencode-tailnet" >/dev/null 2>&1 || true
     launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.sem.opencode-tailnet.plist"
     launchctl enable "gui/$(id -u)/com.sem.opencode-tailnet"
+  elif [[ "$DOTFILES_PROFILE" == "work" ]]; then
+    launchctl bootout "gui/$(id -u)/com.sem.opencode-tailnet" >/dev/null 2>&1 || true
   fi
 
   if [[ -x "$DOTFILES/bin/desktop-wm" ]]; then
@@ -206,6 +215,7 @@ refresh_services() {
 
 main() {
   info "Starting managed system update"
+  info "Profile: $DOTFILES_PROFILE"
   info "Log: $log_file"
 
   update_dotfiles
