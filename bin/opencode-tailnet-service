@@ -1,0 +1,18 @@
+#!/bin/zsh
+
+set -u
+
+state_file="$HOME/.local/state/opencode/service.json"
+
+# A client may have started the managed server before this login agent loaded.
+# Wait for that process rather than racing it or repeatedly exiting under
+# launchd. Once it is gone, become the managed server process ourselves.
+while [[ -f "$state_file" ]]; do
+  incumbent_pid=$(/usr/bin/plutil -extract pid raw "$state_file" 2>/dev/null || true)
+  if [[ "$incumbent_pid" != <-> ]] || ! kill -0 "$incumbent_pid" 2>/dev/null; then
+    break
+  fi
+  sleep 5
+done
+
+exec /opt/homebrew/bin/opencode serve --service

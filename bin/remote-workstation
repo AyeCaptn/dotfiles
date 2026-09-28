@@ -1,0 +1,90 @@
+#!/bin/zsh
+
+set -eu
+
+label="com.sem.remote-workstation-awake"
+domain="gui/$(id -u)"
+agent="$HOME/Library/LaunchAgents/$label.plist"
+
+usage() {
+  cat <<'EOF'
+Usage: remote-workstation <on|off|status>
+
+  on      Keep macOS awake while connected to AC power
+  off     Return to the configured macOS sleep schedule
+  status  Show whether the keep-awake profile is active
+EOF
+}
+
+is_loaded() {
+  launchctl print "$domain/$label" >/dev/null 2>&1
+}
+
+show_status() {
+  if is_loaded; then
+    echo "Remote workstation profile: on"
+    if ! pmset -g batt | grep -q "AC Power"; then
+      echo "Warning: the native prevent-system-sleep assertion only applies on AC power."
+    fi
+  else
+    echo "Remote workstation profile: off"
+  fi
+  pmset -g custom | awk '
+    /^Battery Power:/ { source="battery" }
+    /^AC Power:/ { source="ac" }
+    /^[[:space:]]*sleep[[:space:]]/ { print source " sleep timer: " $2 " minute(s)" }
+  '
+}
+
+case "${1:-}" in
+  on)
+    mkdir -p "$HOME/Library/LaunchAgents"
+    tmp="$(mktemp "${TMPDIR:-/tmp}/$label.XXXXXX")"
+    trap 'rm -f "$tmp"' EXIT
+    cat > "$tmp" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>$label</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/caffeinate</string>
+    <string>-s</string>
+  </array>
+  <key>KeepAlive</key>
+  <true/>
+  <key>ProcessType</key>
+  <string>Background</string>
+  <key>StandardOutPath</key>
+  <string>/dev/null</string>
+  <key>StandardErrorPath</key>
+  <string>/dev/null</string>
+</dict>
+</plist>
+EOF
+    plutil -lint "$tmp" >/dev/null
+    launchctl bootout "$domain/$label" >/dev/null 2>&1 || true
+    mv "$tmp" "$agent"
+    chmod 644 "$agent"
+    trap - EXIT
+    launchctl bootstrap "$domain" "$agent"
+    show_status
+    ;;
+  off)
+    launchctl bootout "$domain/$label" >/dev/null 2>&1 || true
+    rm -f "$agent"
+    show_status
+    ;;
+  status)
+    show_status
+    ;;
+  help | --help | -h)
+    usage
+    ;;
+  *)
+    usage >&2
+    exit 64
+    ;;
+esac

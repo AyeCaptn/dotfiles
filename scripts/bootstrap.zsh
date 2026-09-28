@@ -82,7 +82,12 @@ if _exists pnpm; then
 fi
 
 # Restic restore
-if _exists restic; then
+resticprofile_bin="/opt/homebrew/bin/resticprofile"
+if _exists brew; then
+  resticprofile_bin="$(brew --prefix)/bin/resticprofile"
+fi
+
+if _exists restic && [[ -x "$resticprofile_bin" ]]; then
   if _exists op; then
     #TODO: Ask me to sign in using 1password app and enable cli integration
     info "restoring the restic password from 1password"
@@ -95,11 +100,12 @@ if _exists restic; then
     awk -F\" '/^tag = /{print $2}' ~/.resticprofiles.conf \
     | tr , '\n' | awk '{$1=$1}1' | sort -u \
     | while IFS= read -r TAG; do
-      resticprofile -c ~/.resticprofiles.conf --name full-backup restore latest --tag "$TAG" --overwrite if-changed --target /
+      "$resticprofile_bin" -c ~/.resticprofiles.conf --name full-backup restore latest --tag "$TAG" --overwrite if-changed --target /
     done
 
     info "setting up restic backup schedules"
-    resticprofile --config ~/.resticprofiles.conf schedule --all --start
+    env PATH="$(dirname "$resticprofile_bin"):/usr/bin:/bin:/usr/sbin:/sbin" \
+      "$resticprofile_bin" --config ~/.resticprofiles.conf schedule --all --start
   else
     info "1Password CLI not installed"
   fi
@@ -151,6 +157,23 @@ if [[ -f "$desktop_wm_agent" ]]; then
   launchctl bootout "gui/$(id -u)/com.sem.desktop-wm" >/dev/null 2>&1 || true
   launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.sem.desktop-wm.plist"
   launchctl enable "gui/$(id -u)/com.sem.desktop-wm"
+fi
+
+# Keep the authenticated OpenCode web server local and expose its fixed port only
+# through Tailscale. The login agent restarts OpenCode if it exits.
+opencode_tailnet_agent="$DOTFILES/tilde/Library/LaunchAgents/com.sem.opencode-tailnet.plist"
+if _exists opencode && [[ -f "$opencode_tailnet_agent" ]]; then
+  info "installing OpenCode Tailscale login agent"
+  opencode service set hostname 127.0.0.1
+  opencode service set port 49374
+  if _exists tailscale; then
+    tailscale serve --bg --tcp=4096 tcp://127.0.0.1:49374
+  fi
+  mkdir -p "$HOME/Library/LaunchAgents"
+  cp "$opencode_tailnet_agent" "$HOME/Library/LaunchAgents/com.sem.opencode-tailnet.plist"
+  launchctl bootout "gui/$(id -u)/com.sem.opencode-tailnet" >/dev/null 2>&1 || true
+  launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.sem.opencode-tailnet.plist"
+  launchctl enable "gui/$(id -u)/com.sem.opencode-tailnet"
 fi
 
 # Remove terminal last login text

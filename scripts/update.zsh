@@ -10,6 +10,9 @@ export DOTFILES=${1:-"$HOME/.dotfiles"}
 state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles"
 lock_dir="${TMPDIR:-/tmp}/dotfiles-update-${UID}.lock"
 log_file="$state_dir/update.log"
+desktop_services_suspended=0
+desktop_wm_before_update="none"
+skhd_before_update=0
 
 e='\033'
 RESET="${e}[0m"
@@ -41,6 +44,7 @@ _exists() {
 cleanup() {
   local status=$?
   trap - EXIT
+  restore_desktop_services || true
   rm -rf -- "$lock_dir"
   if (( status != 0 )); then
     error "Update failed. Review $log_file"
@@ -82,16 +86,56 @@ update_dotfiles() {
   "$DOTFILES/sync.py" --yes
 }
 
+suspend_desktop_services() {
+  [[ -x "$DOTFILES/bin/desktop-wm" ]] || return
+
+  if pgrep -x OmniWM >/dev/null; then
+    desktop_wm_before_update="omniwm"
+  elif pgrep -x yabai >/dev/null; then
+    desktop_wm_before_update="yabai"
+  fi
+  pgrep -x skhd >/dev/null && skhd_before_update=1
+
+  info "Temporarily stopping desktop input hooks"
+  desktop_services_suspended=1
+  "$DOTFILES/bin/desktop-wm" stop
+}
+
+restore_desktop_services() {
+  (( desktop_services_suspended )) || return 0
+
+  case "$desktop_wm_before_update" in
+    omniwm|yabai)
+      info "Restoring $desktop_wm_before_update desktop services"
+      "$DOTFILES/bin/desktop-wm" "$desktop_wm_before_update"
+      ;;
+    *)
+      if (( skhd_before_update )) && _exists skhd; then
+        info "Restoring skhd"
+        skhd --start-service
+      fi
+      ;;
+  esac
+
+  desktop_services_suspended=0
+}
+
 update_homebrew() {
   _exists brew || return
   section "Updating Homebrew packages and applications"
 
   brew update
+  # skhd and OmniWM own global event taps. Replacing either executable while
+  # its old process is alive can wedge local input or invalidate macOS TCC
+  # state. Stop both before Homebrew mutates them and restore the previous mode
+  # afterward. The EXIT trap also restores them when an update fails.
+  suspend_desktop_services
   brew bundle --file "$DOTFILES/Brewfile"
   # Also update intentionally installed packages that have not yet been added
   # to the Brewfile. `dot doctor` reports that drift for later review.
   brew upgrade
   brew cleanup
+  restore_desktop_services
 }
 
 update_mise() {
@@ -131,12 +175,28 @@ update_shell_plugins() {
 refresh_services() {
   section "Refreshing managed services"
 
-  if _exists resticprofile && [[ -f "$HOME/.resticprofiles.conf" ]]; then
-    resticprofile --config "$HOME/.resticprofiles.conf" schedule --all --start
+  local resticprofile_bin="/opt/homebrew/bin/resticprofile"
+  if _exists brew; then
+    resticprofile_bin="$(brew --prefix)/bin/resticprofile"
   fi
 
-  if _exists opencode && opencode service status >/dev/null 2>&1; then
-    opencode service restart
+  if [[ -x "$resticprofile_bin" && -f "$HOME/.resticprofiles.conf" ]]; then
+    env PATH="$(dirname "$resticprofile_bin"):/usr/bin:/bin:/usr/sbin:/sbin" \
+      "$resticprofile_bin" --config "$HOME/.resticprofiles.conf" schedule --all --start
+  fi
+
+  local opencode_tailnet_agent="$DOTFILES/tilde/Library/LaunchAgents/com.sem.opencode-tailnet.plist"
+  if _exists opencode && [[ -f "$opencode_tailnet_agent" ]]; then
+    opencode service set hostname 127.0.0.1
+    opencode service set port 49374
+    if _exists tailscale; then
+      tailscale serve --bg --tcp=4096 tcp://127.0.0.1:49374
+    fi
+    mkdir -p "$HOME/Library/LaunchAgents"
+    cp "$opencode_tailnet_agent" "$HOME/Library/LaunchAgents/com.sem.opencode-tailnet.plist"
+    launchctl bootout "gui/$(id -u)/com.sem.opencode-tailnet" >/dev/null 2>&1 || true
+    launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.sem.opencode-tailnet.plist"
+    launchctl enable "gui/$(id -u)/com.sem.opencode-tailnet"
   fi
 
   if [[ -x "$DOTFILES/bin/desktop-wm" ]]; then
@@ -156,6 +216,10 @@ main() {
   update_uv
   update_shell_plugins
   refresh_services
+
+  # Defer the interactive shell reminder for another week after a successful
+  # complete update.
+  touch "$state_dir/update-reminder"
 
   print
   success "Managed system update complete."

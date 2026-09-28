@@ -29,7 +29,14 @@ dot update
 
 The `update` alias runs the same command. Updates are locked against concurrent
 runs and logged to `~/.local/state/dotfiles/update.log`. OpenCode is installed
-through Homebrew and its background service is restarted after an update.
+through Homebrew and its background service is restarted after an update. An
+authenticated login agent also keeps the web server available on the Tailscale-only
+endpoint `http://100.86.28.24:4096`. Remote access uses the username `opencode`;
+its stable password is stored in the login Keychain as the Internet Password
+**OpenCode via Tailscale** for `sems-macbook-pro.tailbf6441.ts.net:4096`.
+
+An interactive shell shows a `dot update` reminder at most once every seven
+days. Completing the update successfully resets the reminder timer.
 
 Check the managed system without changing it:
 
@@ -40,6 +47,21 @@ dot doctor
 The doctor checks the Brewfile, mise runtimes, dotfile links, generated files,
 common credential patterns, and unmanaged Homebrew installations. Unmanaged
 packages are reported for review but are never removed automatically.
+
+## Remote workstation power profile
+
+Normal macOS sleep remains enabled. To temporarily keep the Mac awake as a
+remote workstation while it is connected to AC power, use the native
+`caffeinate`-backed profile:
+
+```sh
+remote-workstation on
+remote-workstation status
+remote-workstation off
+```
+
+The enabled profile persists across logins until it is turned off. It allows
+the display to sleep and does not override the MacBook's lid-close behavior.
 
 ## Desktop
 
@@ -114,6 +136,21 @@ desktop-wm status
 The switch also selects the matching skhd profile and reloads SketchyBar. A
 user LaunchAgent runs `desktop-wm omniwm` at login. No yabai file is rewritten
 or removed.
+
+`dot update` temporarily stops OmniWM and skhd before Homebrew changes their
+binaries, then restores the active desktop mode. This avoids leaving stale
+global input event taps alive across an application or formula replacement.
+If local keyboard or pointer input ever becomes unresponsive, use a remote
+shell to release all desktop input hooks without rebooting:
+
+```sh
+desktop-wm stop
+desktop-wm omniwm
+```
+
+If the second command reports that skhd lacks Accessibility access, re-enable
+skhd in **System Settings → Privacy & Security → Accessibility**, then run
+`desktop-wm reload`.
 
 ### yabai fallback
 

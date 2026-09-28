@@ -4,7 +4,7 @@
 # Taps
 tap "creativeprojects/tap", trusted: { formula: "resticprofile" }
 tap "FelixKratz/formulae", trusted: { formulae: ["borders", "sketchybar"] }
-tap "koekeishiya/formulae", trusted: { formulae: ["skhd", "yabai"] }
+tap "asmvik/formulae", trusted: { formulae: ["skhd", "yabai"] }
 tap "metaneutrons/tap", trusted: { formula: "ugos-cli" }
 tap "anomalyco/tap", trusted: { formula: "opencode-v2" }
 tap "tursodatabase/tap", trusted: { formula: "turso" }
@@ -59,7 +59,7 @@ brew "sqlite"
 brew "starship"
 brew "step"
 brew "stripe-cli"
-brew "tldr"
+brew "tlrc"
 brew "television"
 brew "tmux"
 brew "tree"
@@ -85,8 +85,8 @@ brew "cocoapods"
 brew "metaneutrons/tap/ugos-cli"
 brew "borders"
 brew "sketchybar"
-brew "koekeishiya/formulae/skhd"
-brew "koekeishiya/formulae/yabai"
+brew "asmvik/formulae/skhd"
+brew "asmvik/formulae/yabai"
 
 # Monitoring
 brew "btop"
@@ -143,8 +143,6 @@ cask "font-sketchybar-app-font"
 cask "font-symbols-only-nerd-font"
 
 # QuickLook plugins
-cask "qlcolorcode"
-cask "qlstephen"
 cask "syntax-highlight"
 
 # cask "slack"

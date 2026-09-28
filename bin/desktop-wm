@@ -8,7 +8,7 @@ PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/.dotf
 export PATH
 
 usage() {
-  printf 'usage: desktop-wm {omniwm|yabai|reload|status}\n' >&2
+  printf 'usage: desktop-wm {omniwm|yabai|stop|reload|status}\n' >&2
   exit 2
 }
 
@@ -55,6 +55,21 @@ restart_skhd() {
   else
     skhd --start-service
   fi
+
+  # Homebrew replacements can invalidate macOS Accessibility approval. Do not
+  # turn that expected denial into a failed desktop startup; skhd logs the
+  # actionable reason and exits without leaving an event tap behind.
+  sleep 1
+  if ! pgrep -x skhd >/dev/null; then
+    printf '%s\n' 'desktop-wm: skhd did not start; re-grant Accessibility access' >&2
+  fi
+}
+
+stop_skhd() {
+  if command -v skhd >/dev/null 2>&1; then
+    skhd --stop-service >/dev/null 2>&1 || true
+  fi
+  pkill -TERM -x skhd >/dev/null 2>&1 || true
 }
 
 stop_omniwm_watcher() {
@@ -136,6 +151,15 @@ start_yabai() {
   start_jankyborders
 }
 
+stop_all() {
+  # Release every process that owns a global input or window-management event
+  # tap. This is also the remote recovery command if local input becomes stuck.
+  stop_skhd
+  stop_omniwm
+  stop_yabai
+  stop_jankyborders
+}
+
 reload_active() {
   if pgrep -x OmniWM >/dev/null; then
     select_skhd_profile omniwm
@@ -158,6 +182,9 @@ case "${1:-}" in
   yabai)
     start_yabai
     refresh_bar
+    ;;
+  stop)
+    stop_all
     ;;
   reload)
     reload_active

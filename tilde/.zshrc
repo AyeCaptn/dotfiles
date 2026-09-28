@@ -88,7 +88,7 @@ export LESS="${less_opts[*]}"
 # Default editor for local and remote sessions
 if [[ -n "$SSH_CONNECTION" ]]; then
   # on the server
-  if [ command -v vim ] >/dev/null 2>&1; then
+  if command -v vim >/dev/null 2>&1; then
     export EDITOR='vim'
   else
     export EDITOR='vi'
@@ -149,10 +149,11 @@ zstyle ':completion:*' special-dirs true
 zstyle ':completion:*' use-cache true
 zstyle ':completion:*' cache-path "$HOME/.cache/zsh/zcompcache"
 
-# mise owns language runtimes and project development environments.
-command -v mise >/dev/null 2>&1 && eval "$(mise activate zsh)"
-
 eval "$(sheldon source)"
+
+# mise owns language runtimes and project development environments. Activate it
+# after plugins and local configuration so its managed tools remain first.
+command -v mise >/dev/null 2>&1 && eval "$(mise activate zsh)"
 
 _dotfiles_zprof_finish() {
   if [[ -n "${_dotfiles_zprof_enabled:-}" ]]; then
@@ -196,6 +197,31 @@ fi
 # zoxide should be initialized late so it can hook directory changes reliably.
 export _ZO_DOCTOR=0
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh --cmd cd)"
+
+# Show one update reminder per week. A successful `dot update` resets the timer.
+_dotfiles_update_reminder() {
+  emulate -L zsh
+
+  local state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles"
+  local reminder_stamp="$state_dir/update-reminder"
+  local now last_reminder=0
+
+  mkdir -p "$state_dir" 2>/dev/null || return
+  now="$(date +%s)"
+  if [[ -f "$reminder_stamp" ]]; then
+    last_reminder="$(/usr/bin/stat -f %m "$reminder_stamp" 2>/dev/null || print 0)"
+  fi
+
+  if (( now - last_reminder >= 7 * 24 * 60 * 60 )); then
+    print -P "%F{yellow}Weekly update reminder:%f run %Bdot update%b"
+    touch "$reminder_stamp"
+  fi
+}
+
+if [[ -o interactive ]]; then
+  _dotfiles_update_reminder
+fi
+unset -f _dotfiles_update_reminder
 
 # Automatically enter tmux from interactive top-level shells, except Herdr panes.
 if [[ -o interactive && -z "$TMUX" && -z "${HERDR_ENV:-}" && "$TERM" != "dumb" ]] &&
