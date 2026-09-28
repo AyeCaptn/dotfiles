@@ -12,7 +12,8 @@ Usage: opencode-cleanup-sessions [--days DAYS] [--force]
 Delete OpenCode sessions that have not been updated within DAYS (default: 30).
 Without --force, print a summary and the ten oldest matching sessions.
 
-This does not remove OpenCode's project snapshot cache.
+Active sessions are always preserved. A stale parent is also preserved while
+it has any newer child session. Project snapshot caches are not removed.
 EOF
 }
 
@@ -44,56 +45,104 @@ if ! [[ "$days" =~ ^[1-9][0-9]*$ ]]; then
 	exit 2
 fi
 
-if ! command -v opencode >/dev/null 2>&1; then
-	echo "opencode is required" >&2
-	exit 1
-fi
+for command in opencode jq; do
+	if ! command -v "$command" >/dev/null 2>&1; then
+		echo "$command is required" >&2
+		exit 1
+	fi
+done
 
 cutoff_seconds=$(( $(date +%s) - days * 86400 ))
 cutoff_ms=$(( cutoff_seconds * 1000 ))
 cutoff_date="$(date -r "$cutoff_seconds" '+%Y-%m-%d %H:%M:%S')"
+temporary_dir="$(mktemp -d "${TMPDIR:-/tmp}/opencode-cleanup.XXXXXX")"
+trap 'rm -rf "$temporary_dir"' EXIT
 
-db() {
-	opencode db "$1" --format tsv --pure
-}
+all_jsonl="$temporary_dir/all.jsonl"
+active_json="$temporary_dir/active.json"
+remaining_json="$temporary_dir/remaining.json"
+stale_json="$temporary_dir/stale.json"
+: > "$all_jsonl"
 
-count_sessions() {
-	local output
-	output="$(db "SELECT count(*) AS count FROM session WHERE time_updated < $cutoff_ms")"
-	printf '%s\n' "${output##*$'\n'}"
-}
+cursor=""
+while true; do
+	request=(opencode api session.list --param limit=200 --param order=asc)
+	if [[ -n "$cursor" ]]; then
+		request+=(--param "cursor=$cursor")
+	fi
+	response="$("${request[@]}")"
+	jq -c '.data[]' <<< "$response" >> "$all_jsonl"
+	next_cursor="$(jq -r '.cursor.next // empty' <<< "$response")"
+	if [[ -z "$next_cursor" || "$next_cursor" == "$cursor" ]]; then
+		break
+	fi
+	cursor="$next_cursor"
+done
 
-stale_count="$(count_sessions)"
+opencode api session.active | jq '.data | keys' > "$active_json"
+jq -s '.' "$all_jsonl" > "$remaining_json"
+jq \
+	--argjson cutoff "$cutoff_ms" \
+	--slurpfile active "$active_json" \
+	'[
+		.[]
+		| select(.time.updated < $cutoff)
+		| select(.id as $id | ($active[0] | index($id) | not))
+	]' "$remaining_json" > "$stale_json"
+
+stale_count="$(jq 'length' "$stale_json")"
 if [[ "$stale_count" -eq 0 ]]; then
-	echo "No OpenCode sessions older than $days days."
+	echo "No inactive OpenCode sessions older than $days days."
 	exit 0
 fi
 
-echo "Found $stale_count OpenCode sessions last updated before $cutoff_date."
+echo "Found $stale_count inactive OpenCode sessions last updated before $cutoff_date."
 
 if [[ "$force" != true ]]; then
-	db "SELECT id, datetime(time_updated / 1000, 'unixepoch', 'localtime') AS updated, replace(replace(title, char(9), ' '), char(10), ' ') AS title FROM session WHERE time_updated < $cutoff_ms ORDER BY time_updated ASC LIMIT 10"
+	jq -r '
+		.[:10][]
+		| [
+			.id,
+			(.time.updated / 1000 | strflocaltime("%Y-%m-%d %H:%M:%S")),
+			((.title // "(untitled)") | gsub("[\\t\\r\\n]"; " "))
+		]
+		| @tsv
+	' "$stale_json"
 	echo
-	echo "Run 'opencode-cleanup-sessions --days $days --force' to delete them."
-	echo "Note: project snapshot caches are not removed by session deletion."
+	echo "Run 'opencode-cleanup-sessions --days $days --force' to delete eligible sessions."
+	echo "Note: active sessions, protected parents, and project snapshot caches are preserved."
 	exit 0
 fi
 
 deleted=0
 failed=0
+leaves_file="$temporary_dir/leaves"
+next_remaining="$temporary_dir/remaining.next.json"
 
-# Delete leaves first. Session deletion cascades to children, so this preserves a
-# stale parent whenever it still has a newer child session.
+# Delete stale leaves first. Once a stale child is gone, its stale parent can
+# become a leaf on the next pass. Parents with newer children never become
+# eligible, so OpenCode's cascading session deletion cannot remove fresh work.
 while true; do
-	leaves="$(db "SELECT session.id FROM session WHERE time_updated < $cutoff_ms AND NOT EXISTS (SELECT 1 FROM session AS child WHERE child.parent_id = session.id) ORDER BY time_updated ASC")"
-	[[ "$leaves" != "id" ]] || break
-	leaves="${leaves#id$'\n'}"
-	[[ -n "$leaves" ]] || break
+	jq -r \
+		--argjson cutoff "$cutoff_ms" \
+		--slurpfile active "$active_json" '
+		. as $all
+		| .[]
+		| select(.time.updated < $cutoff)
+		| select(.id as $id | ($active[0] | index($id) | not))
+		| .id as $id
+		| select(any($all[]; .parentID == $id) | not)
+		| .id
+	' "$remaining_json" > "$leaves_file"
 
+	[[ -s "$leaves_file" ]] || break
 	while IFS= read -r session_id; do
 		[[ -n "$session_id" ]] || continue
-		if opencode session delete "$session_id" --pure >/dev/null; then
+		if opencode api session.remove --param "sessionID=$session_id" >/dev/null; then
 			deleted=$((deleted + 1))
+			jq --arg id "$session_id" 'map(select(.id != $id))' \
+				"$remaining_json" > "$next_remaining"
+			mv "$next_remaining" "$remaining_json"
 			if (( deleted % 25 == 0 )); then
 				echo "Deleted $deleted sessions..."
 			fi
@@ -101,21 +150,27 @@ while true; do
 			failed=$((failed + 1))
 			echo "Failed to delete session $session_id" >&2
 		fi
-	done <<< "$leaves"
+	done < "$leaves_file"
 
 	[[ "$failed" -eq 0 ]] || break
 done
 
-remaining="$(count_sessions)"
-echo "Deleted $deleted sessions; $remaining stale sessions remain."
+remaining="$(jq \
+	--argjson cutoff "$cutoff_ms" \
+	--slurpfile active "$active_json" \
+	'[
+		.[]
+		| select(.time.updated < $cutoff)
+		| select(.id as $id | ($active[0] | index($id) | not))
+	] | length' "$remaining_json")"
 
+echo "Deleted $deleted sessions; $remaining stale sessions remain."
 if [[ "$remaining" -gt 0 ]]; then
 	echo "Remaining stale sessions have newer child sessions and were preserved."
 fi
-
 if [[ "$failed" -gt 0 ]]; then
 	echo "$failed session deletions failed." >&2
 	exit 1
 fi
 
-echo "Project snapshot caches were not removed."
+echo "Active sessions and project snapshot caches were not removed."

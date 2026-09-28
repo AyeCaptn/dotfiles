@@ -2,8 +2,13 @@
 
 set -eu
 
+# launchd supplies a minimal PATH. Keep the switcher usable both at login and
+# from an interactive shell without depending on shell initialization.
+PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/.dotfiles/bin"
+export PATH
+
 usage() {
-  printf 'usage: desktop-wm {yabai|status}\n' >&2
+  printf 'usage: desktop-wm {omniwm|yabai|reload|status}\n' >&2
   exit 2
 }
 
@@ -25,26 +30,157 @@ start_jankyborders() {
   fi
 }
 
+stop_jankyborders() {
+  if command -v brew >/dev/null 2>&1; then
+    brew services stop borders >/dev/null 2>&1 || true
+  fi
+  pkill -x borders >/dev/null 2>&1 || true
+}
+
+select_skhd_profile() {
+  profile="$1"
+  config_dir="$HOME/.config/skhd"
+  profile_file="skhdrc.$profile"
+  [ -f "$config_dir/$profile_file" ] || {
+    printf 'desktop-wm: missing %s\n' "$config_dir/$profile_file" >&2
+    exit 1
+  }
+  ln -sfn "$profile_file" "$config_dir/skhdrc"
+}
+
+restart_skhd() {
+  command -v skhd >/dev/null 2>&1 || return 0
+  if pgrep -x skhd >/dev/null; then
+    skhd --restart-service
+  else
+    skhd --start-service
+  fi
+}
+
+stop_omniwm_watcher() {
+  pid_file="$HOME/Library/Caches/com.sem.desktop-wm/omniwm-sketchybar.pid"
+  [ -f "$pid_file" ] || return 0
+  pid=$(cat "$pid_file" 2>/dev/null || true)
+  case "$pid" in
+    ''|*[!0-9]*) ;;
+    *) kill "$pid" >/dev/null 2>&1 || true ;;
+  esac
+  rm -f "$pid_file"
+}
+
+start_omniwm_watcher() {
+  stop_omniwm_watcher
+  command -v omniwmctl >/dev/null 2>&1 || return 0
+  command -v sketchybar >/dev/null 2>&1 || return 0
+
+  cache_dir="$HOME/Library/Caches/com.sem.desktop-wm"
+  log_dir="$HOME/Library/Logs"
+  mkdir -p "$cache_dir" "$log_dir"
+  nohup "$HOME/.config/omniwm/watch_sketchybar.sh" \
+    >>"$log_dir/omniwm-sketchybar.log" 2>&1 &
+  printf '%s\n' "$!" >"$cache_dir/omniwm-sketchybar.pid"
+}
+
+stop_yabai() {
+  command -v yabai >/dev/null 2>&1 && yabai --stop-service >/dev/null 2>&1 || true
+  launchctl disable "gui/$(id -u)/com.asmvik.yabai" >/dev/null 2>&1 || true
+  attempts=0
+  while pgrep -x yabai >/dev/null && [ "$attempts" -lt 30 ]; do
+    sleep 0.1
+    attempts=$((attempts + 1))
+  done
+}
+
+stop_omniwm() {
+  stop_omniwm_watcher
+  pkill -TERM -x OmniWM >/dev/null 2>&1 || true
+  attempts=0
+  while pgrep -x OmniWM >/dev/null && [ "$attempts" -lt 50 ]; do
+    sleep 0.1
+    attempts=$((attempts + 1))
+  done
+}
+
+start_omniwm() {
+  stop_yabai
+  stop_jankyborders
+  select_skhd_profile omniwm
+  "$HOME/.config/omniwm/build_set_window_frame.sh"
+  restart_skhd
+
+  # OmniWM requires separate Spaces. A value of 0 means displays are not
+  # spanned into one Space; the current machine already uses this setting.
+  defaults write com.apple.spaces spans-displays -bool false
+  open -gja OmniWM
+  start_omniwm_watcher
+}
+
 start_yabai() {
+  stop_omniwm
+  select_skhd_profile yabai
+  launchctl enable "gui/$(id -u)/com.asmvik.yabai" >/dev/null 2>&1 || true
   "$HOME/.config/yabai/configure_mission_control_shortcuts.sh"
   "$HOME/.config/yabai/build_space_switcher.sh"
-  command -v yabai >/dev/null 2>&1 && yabai --start-service
-  command -v skhd >/dev/null 2>&1 && skhd --start-service
+  if command -v yabai >/dev/null 2>&1; then
+    yabai --start-service
+    attempts=0
+    while ! yabai -m query --spaces >/dev/null 2>&1 && [ "$attempts" -lt 100 ]; do
+      sleep 0.1
+      attempts=$((attempts + 1))
+    done
+    # launchd starts yabai asynchronously. Explicitly applying the preserved
+    # configuration after the socket is ready makes fallback deterministic.
+    "$HOME/.config/yabai/yabairc"
+  fi
+  restart_skhd
   start_jankyborders
 }
 
+reload_active() {
+  if pgrep -x OmniWM >/dev/null; then
+    select_skhd_profile omniwm
+    restart_skhd
+    start_omniwm_watcher
+  elif pgrep -x yabai >/dev/null; then
+    select_skhd_profile yabai
+    yabai --restart-service
+    restart_skhd
+    start_jankyborders
+  fi
+  refresh_bar
+}
+
 case "${1:-}" in
+  omniwm)
+    start_omniwm
+    refresh_bar
+    ;;
   yabai)
     start_yabai
     refresh_bar
     ;;
+  reload)
+    reload_active
+    ;;
   status)
+    printf 'active: '
+    if pgrep -x OmniWM >/dev/null; then
+      printf 'omniwm\n'
+    elif pgrep -x yabai >/dev/null; then
+      printf 'yabai\n'
+    else
+      printf 'none\n'
+    fi
+    printf 'OmniWM: '
+    pgrep -x OmniWM >/dev/null && printf 'running\n' || printf 'stopped\n'
     printf 'yabai: '
     pgrep -x yabai >/dev/null && printf 'running\n' || printf 'stopped\n'
     printf 'skhd: '
     pgrep -x skhd >/dev/null && printf 'running\n' || printf 'stopped\n'
     printf 'JankyBorders: '
     pgrep -x borders >/dev/null && printf 'running\n' || printf 'stopped\n'
+    printf 'skhd profile: '
+    readlink "$HOME/.config/skhd/skhdrc" 2>/dev/null | sed 's/^skhdrc\.//' || printf 'unknown\n'
     ;;
   *) usage ;;
 esac

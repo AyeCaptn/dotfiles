@@ -2,94 +2,100 @@
 # https://github.com/Homebrew/homebrew-bundle
 
 # Taps
-tap "creativeprojects/tap"  # Tap for resticprofile
-tap "FelixKratz/formulae"  # SketchyBar and JankyBorders
-tap "koekeishiya/formulae"  # yabai and skhd
-tap "metaneutrons/tap"  # UGREEN NAS CLI and MCP server
+tap "creativeprojects/tap", trusted: { formula: "resticprofile" }
+tap "FelixKratz/formulae", trusted: { formulae: ["borders", "sketchybar"] }
+tap "koekeishiya/formulae", trusted: { formulae: ["skhd", "yabai"] }
+tap "metaneutrons/tap", trusted: { formula: "ugos-cli" }
+tap "anomalyco/tap", trusted: { formula: "opencode-v2" }
+tap "tursodatabase/tap", trusted: { formula: "turso" }
 
-# CLI Tools
+# CLI tools
+brew "ast-grep"
+brew "aws-vault"
 brew "awscli"
+brew "bat"
 brew "coreutils"
 brew "ctags"
 brew "curl"
+brew "docker-compose"
 brew "duckdb"
+brew "eksctl"
+brew "eza"
+brew "fastfetch"
+brew "fd"
 brew "fzf"
+brew "gh"
+brew "git"
+brew "git-delta"
 brew "git-secret"
-brew "go"
-brew "gpg"
+brew "glow"
+brew "gnupg"
 brew "grep"
-brew "ical-buddy"
+brew "gum"
 brew "helm"
+brew "herdr"
+brew "ical-buddy"
 brew "jq"
+brew "just"
 brew "k9s"
 brew "kubernetes-cli"
-brew "eksctl"
 brew "lazygit"
-brew "lua"
 brew "mas"
 brew "maven"
+brew "neovim"
+brew "pandoc"
 brew "parquet-cli"
-brew "uv"
-brew "npm"
 brew "pnpm"
-brew "python"
+brew "rclone"
 brew "restic"
-brew "resticprofile"
+brew "creativeprojects/tap/resticprofile"
 brew "ripgrep"
-brew "fnm"
 brew "sbt"
-brew "scala"
+brew "scc"
+brew "sd"
 brew "sheldon"
 brew "sops"
 brew "sqlite"
+brew "starship"
+brew "step"
+brew "stripe-cli"
 brew "tldr"
+brew "television"
 brew "tmux"
-brew "herdr"
 brew "tree"
+brew "tree-sitter-cli"
+brew "tursodatabase/tap/turso"
+brew "typst"
 brew "wget"
-brew "yt-dlp"
+brew "xcodegen"
+brew "yazi"
 brew "yq"
 brew "zsh-completions"
 brew "zsh"
-brew "neovim"
-brew "opencode"
+brew "zoxide"
+
+# Rust ecosystem CLIs distributed as Homebrew formulae
+brew "bacon"
+brew "cargo-edit"
+brew "difftastic"
+brew "tailspin"
+
+# macOS-integrated tools
+brew "cocoapods"
 brew "metaneutrons/tap/ugos-cli"
-brew "television"
-brew "bat"
-brew "fd"
 brew "borders"
 brew "sketchybar"
 brew "koekeishiya/formulae/skhd"
 brew "koekeishiya/formulae/yabai"
 
-# Shell and prompt
-brew "starship"
-brew "zoxide"
-brew "eza"
-
-# Terminal UI and file tools
+# Monitoring
 brew "btop"
-brew "fastfetch"
-brew "yazi"
-brew "glow"
-brew "tailspin"
 
-# Git and code intelligence
-brew "gh"
-brew "git-delta"
-brew "difftastic"
-brew "ast-grep"
-brew "scc"
-brew "sd"
-
-# Runtime and development tooling
+# Development environment manager
 brew "mise"
-brew "rust"
-brew "cocoapods"
-brew "docker-compose"
 
-# Dotfile management experiments
-brew "stow"
+# OpenCode V2 (the unversioned core formula is V1)
+brew "anomalyco/tap/opencode-v2"
 
 # Desktop applications
 cask "1password"
@@ -99,6 +105,7 @@ cask "docker-desktop"
 cask "ghostty"
 cask "handbrake-app"
 cask "obsidian"
+cask "omniwm"
 cask "poedit"
 cask "powerphotos"
 cask "sf-symbols"
@@ -113,7 +120,6 @@ cask "whatsapp"
 
 # Fonts
 cask "font-atkinson-hyperlegible-mono"
-cask "font-geist"
 cask "font-hack-nerd-font"
 cask "font-inter"
 cask "font-jetbrains-mono-nerd-font"

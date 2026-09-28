@@ -1,0 +1,55 @@
+# App launchers and yabai-compatible shell actions for OmniWM.
+# Native window/layout hotkeys live in ~/.config/omniwm/settings.toml so they
+# follow OmniWM's animation and focus paths without an extra process hop.
+
+# Launch/focus apps
+cmd + shift - return : "$HOME/.config/omniwm/focus_or_open_app.sh" terminal "Ghostty"
+cmd + shift - b : "$HOME/.config/omniwm/focus_or_open_app.sh" web "Zen"
+cmd + shift - m : "$HOME/.config/omniwm/focus_or_open_app.sh" comms "Microsoft Outlook" "Mail"
+cmd + shift - w : "$HOME/.config/omniwm/focus_or_open_app.sh" comms "Microsoft Teams" "WhatsApp"
+cmd + shift - s : "$HOME/.config/omniwm/focus_or_open_app.sh" media "Spotify"
+cmd + shift - o : "$HOME/.config/omniwm/focus_or_open_app.sh" notes "Obsidian"
+cmd + shift - k : "$HOME/.config/omniwm/focus_or_open_app.sh" calendar "Calendar"
+cmd + shift - 0x2C : "$HOME/.config/omniwm/summon_finder.sh"
+
+# New app windows
+alt + shift - return : open -na "Ghostty"
+alt + shift - b : open -na "Zen"
+
+# Focus horizontally; at the layout edge, enter the adjacent workspace only
+# when that workspace contains at least one managed window.
+alt - h : "$HOME/.config/omniwm/focus_or_workspace.sh" left
+alt - l : "$HOME/.config/omniwm/focus_or_workspace.sh" right
+
+# Move to a workspace and follow, matching the yabai profile.
+alt + shift - 1 : "$HOME/.config/omniwm/move_window_to_workspace.sh" 1
+alt + shift - 2 : "$HOME/.config/omniwm/move_window_to_workspace.sh" 2
+alt + shift - 3 : "$HOME/.config/omniwm/move_window_to_workspace.sh" 3
+alt + shift - 4 : "$HOME/.config/omniwm/move_window_to_workspace.sh" 4
+alt + shift - 5 : "$HOME/.config/omniwm/move_window_to_workspace.sh" 5
+alt + shift - 6 : "$HOME/.config/omniwm/move_window_to_workspace.sh" 6
+alt + shift - 7 : "$HOME/.config/omniwm/move_window_to_workspace.sh" 7
+alt + shift - 8 : "$HOME/.config/omniwm/move_window_to_workspace.sh" 8
+alt + shift - 9 : "$HOME/.config/omniwm/move_window_to_workspace.sh" 9
+
+# Home-workspace routing and custom overlays.
+alt - d : "$HOME/.config/omniwm/move_to_default_workspace.sh"
+alt + shift - d : "$HOME/.config/omniwm/apply_rules_to_all_windows.sh"
+alt - q : "$HOME/.config/omniwm/close_or_hide_window.sh"
+alt - f : "$HOME/.config/omniwm/toggle_bordered_fullscreen.sh"
+alt + shift - f : "$HOME/.config/omniwm/toggle_centered_overlay.sh" 0.50
+alt - c : "$HOME/.config/omniwm/toggle_centered_overlay.sh" 0.60
+alt + shift - r : "$HOME/.dotfiles/bin/desktop-wm" reload
+
+# Service mode: enter with alt + shift + ;, leave with escape.
+:: service
+alt + shift - 0x29 ; service
+service < escape ; default
+service < r : omniwmctl command balance-sizes; skhd -k "escape"
+service < f : "$HOME/.config/omniwm/toggle_centered_overlay.sh" 0.50; skhd -k "escape"
+service < c : "$HOME/.config/omniwm/resize_focused_window.sh" 0.50; skhd -k "escape"
+service < backspace : "$HOME/.config/omniwm/close_other_windows.sh"; skhd -k "escape"
+service < h : omniwmctl command move-column left; skhd -k "escape"
+service < j : omniwmctl command move-column down; skhd -k "escape"
+service < k : omniwmctl command move-column up; skhd -k "escape"
+service < l : omniwmctl command move-column right; skhd -k "escape"

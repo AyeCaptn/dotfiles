@@ -1,2 +1,29 @@
 [settings]
-idiomatic_version_file_enable_tools = ["node"]
+idiomatic_version_file_enable_tools = [
+  "bun",
+  "deno",
+  "go",
+  "java",
+  "node",
+  "opentofu",
+  "python",
+  "ruby",
+  "terraform",
+  "zig",
+]
+lockfile = true
+
+[settings.upgrade]
+# Do not remove an old runtime while a terminal or service is still using it.
+auto_prune = false
+
+[tools]
+bun = "1.3"
+go = "1.27"
+java = "openjdk-26"
+lua = "5.5"
+node = "26"
+python = "3.14"
+ruby = "3.4"
+scala = "latest"
+zig = "0.16"

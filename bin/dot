@@ -1,0 +1,168 @@
+#!/usr/bin/env bash
+
+set -uo pipefail
+
+DOTFILES="${DOTFILES:-$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)}"
+BREWFILE="$DOTFILES/Brewfile"
+
+if [[ -t 1 ]]; then
+  green=$'\033[0;32m'
+  yellow=$'\033[0;33m'
+  red=$'\033[0;31m'
+  reset=$'\033[0m'
+else
+  green=""
+  yellow=""
+  red=""
+  reset=""
+fi
+
+usage() {
+  cat <<'EOF'
+Usage: dot <command>
+
+Commands:
+  bootstrap  Install and configure the managed system
+  update     Run the complete managed update
+  sync       Link tracked dotfiles into the home directory
+  doctor     Check package, runtime, and dotfile health
+EOF
+}
+
+doctor() {
+  local failures=0
+  local warnings=0
+
+  pass() { printf '%s[ok]%s %s\n' "$green" "$reset" "$*"; }
+  warn() {
+    printf '%s[warn]%s %s\n' "$yellow" "$reset" "$*"
+    warnings=$((warnings + 1))
+  }
+  fail() {
+    printf '%s[fail]%s %s\n' "$red" "$reset" "$*"
+    failures=$((failures + 1))
+  }
+
+  printf 'Dotfiles doctor: %s\n\n' "$DOTFILES"
+
+  if [[ $(uname -s) == Darwin ]]; then
+    pass "running on macOS"
+  else
+    fail "this bootstrap targets macOS"
+  fi
+
+  if xcode-select -p >/dev/null 2>&1; then
+    pass "Xcode Command Line Tools are selected"
+  else
+    fail "Xcode Command Line Tools are not selected"
+  fi
+
+  local command
+  for command in git brew mise zsh; do
+    if command -v "$command" >/dev/null 2>&1; then
+      pass "$command is available"
+    else
+      fail "$command is missing"
+    fi
+  done
+
+  if command -v brew >/dev/null 2>&1; then
+    if HOMEBREW_BUNDLE_NO_UPGRADE=1 brew bundle check --file "$BREWFILE" >/dev/null 2>&1; then
+      pass "Brewfile dependencies are installed"
+    else
+      fail "Brewfile has missing dependencies (run: brew bundle --file $BREWFILE)"
+    fi
+
+    local unmanaged_formulae unmanaged_casks
+    unmanaged_formulae="$(comm -23 \
+      <(brew leaves | sed 's#.*/##' | sort -u) \
+      <(brew bundle list --formula --file "$BREWFILE" | sed 's#.*/##' | sort -u))"
+    unmanaged_casks="$(comm -23 \
+      <(brew list --cask -1 | sort -u) \
+      <(brew bundle list --cask --file "$BREWFILE" | sort -u))"
+
+    if [[ -n $unmanaged_formulae ]]; then
+      warn "unmanaged Homebrew formulae: $(tr '\n' ' ' <<<"$unmanaged_formulae" | sed 's/ $//')"
+    else
+      pass "no unmanaged Homebrew formulae"
+    fi
+    if [[ -n $unmanaged_casks ]]; then
+      warn "unmanaged Homebrew casks: $(tr '\n' ' ' <<<"$unmanaged_casks" | sed 's/ $//')"
+    else
+      pass "no unmanaged Homebrew casks"
+    fi
+  fi
+
+  if command -v mise >/dev/null 2>&1; then
+    local missing_tools
+    missing_tools="$(mise ls --missing --no-header 2>/dev/null || true)"
+    if [[ -n $missing_tools ]]; then
+      fail "mise tools are missing: $(tr '\n' ' ' <<<"$missing_tools" | sed 's/ $//')"
+    else
+      pass "all configured mise tools are installed"
+    fi
+  fi
+
+  local sync_output
+  sync_output="$("$DOTFILES/sync.py" --dry-run 2>&1 || true)"
+  if [[ -n $sync_output ]]; then
+    warn "dotfiles are not fully synchronized (run: dot sync)"
+  else
+    pass "tracked dotfiles are synchronized"
+  fi
+
+  local generated
+  generated="$(git -C "$DOTFILES" ls-files | grep -E \
+    '(^|/)(backups?|.*\.bak|.*\.backup|.*\.log|.*\.mdb|state\.json|session\.json|.*receipt.*\.json)$' || true)"
+  if [[ -n $generated ]]; then
+    warn "generated or backup files are tracked: $(tr '\n' ' ' <<<"$generated" | sed 's/ $//')"
+  else
+    pass "no generated state or backups are tracked"
+  fi
+
+  local credential_matches
+  credential_matches="$(git -C "$DOTFILES" grep -IlE \
+    '(AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9_]{20,}|-----BEGIN (RSA |OPENSSH |EC )?PRIVATE KEY-----)' \
+    -- . ':(exclude).gitsecret/**' 2>/dev/null || true)"
+  if [[ -n $credential_matches ]]; then
+    fail "possible credentials found in tracked files: $(tr '\n' ' ' <<<"$credential_matches" | sed 's/ $//')"
+  else
+    pass "no common credential patterns found in tracked files"
+  fi
+
+  if [[ -n $(git -C "$DOTFILES" status --porcelain) ]]; then
+    warn "dotfiles repository has uncommitted changes"
+  else
+    pass "dotfiles repository is clean"
+  fi
+
+  printf '\nDoctor finished with %d failure(s) and %d warning(s).\n' "$failures" "$warnings"
+  ((failures == 0))
+}
+
+case "${1:-}" in
+  bootstrap)
+    shift
+    exec "$DOTFILES/scripts/bootstrap.zsh" "$@"
+    ;;
+  update)
+    shift
+    exec "$DOTFILES/scripts/update.zsh" "$DOTFILES" "$@"
+    ;;
+  sync)
+    shift
+    exec "$DOTFILES/sync.py" "$@"
+    ;;
+  doctor)
+    shift
+    doctor "$@"
+    ;;
+  help | --help | -h | "")
+    usage
+    ;;
+  *)
+    printf 'Unknown command: %s\n\n' "$1" >&2
+    usage >&2
+    exit 64
+    ;;
+esac

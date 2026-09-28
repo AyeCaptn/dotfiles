@@ -1,7 +1,9 @@
 # Dotfiles
 
 Personal macOS dotfiles for a keyboard-driven desktop built around Ghostty,
-tmux, yabai, skhd, JankyBorders, SketchyBar, Raycast, zsh, Starship, and Neovim.
+tmux, OmniWM, skhd, SketchyBar, Raycast, zsh, Starship, and Neovim. The former
+yabai and JankyBorders desktop remains installed and fully configured as a
+fallback.
 
 ## Install
 
@@ -11,44 +13,113 @@ Bootstrap the system by running the following command:
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/AyeCaptn/dotfiles/master/installer.sh)"
 ```
 
+`sync.py` links only Git-tracked files. It merges directory trees instead of
+replacing them, so broad home directories such as `~/Library` are never
+deleted. Preview changes with `./sync.py --dry-run`; replaced files are backed
+up under `backup/<timestamp>/`.
+
 ## Update
 
-Run the following command do update the dotfiles, brew, global npm dependencies and global python packages
+Run the blessed update path to update dotfiles, Homebrew packages and apps,
+mise development environments, Rust, and ecosystem CLI tools:
 
+```sh
+dot update
 ```
-update
+
+The `update` alias runs the same command. Updates are locked against concurrent
+runs and logged to `~/.local/state/dotfiles/update.log`. OpenCode is installed
+through Homebrew and its background service is restarted after an update.
+
+Check the managed system without changing it:
+
+```sh
+dot doctor
 ```
+
+The doctor checks the Brewfile, mise runtimes, dotfile links, generated files,
+common credential patterns, and unmanaged Homebrew installations. Unmanaged
+packages are reported for review but are never removed automatically.
 
 ## Desktop
 
-The desktop setup is configured through yabai, skhd, and SketchyBar under
-`tilde/.config`.
+The primary desktop uses OmniWM's Dwindle (BSP) layout, built-in OmniWM hotkeys
+and synchronized borders, skhd for scripted overlays and app launchers, and SketchyBar. Its
+configuration is under `tilde/.config/omniwm`; the complete yabai setup remains
+under `tilde/.config/yabai` and `tilde/.config/skhd/skhdrc.yabai`.
 
-Window/app navigation is handled by skhd and yabai:
+Window/app navigation keeps the established keymap:
 
 | Key | Action |
 | --- | --- |
 | `cmd + shift + return` | Focus Ghostty with tmux session `main` |
 | `cmd + shift + b/m/w/s/o/k` | Focus browser, mail, chat, Spotify, Obsidian, Calendar |
-| `cmd + shift + /` | Show the sticky Finder window on the current Desktop |
-| `alt + h/j/k/l` | Focus tiled windows |
+| `cmd + shift + /` | Show the persistent Finder overlay on the current workspace |
+| `alt + h/j/k/l` | Focus tiled windows; `h/l` enter an occupied adjacent workspace at the layout edge |
 | `alt + shift + h/j/k/l` | Swap tiled windows |
 | `alt + s` | Toggle the focused window's split direction |
-| `alt + 1-9` | Focus native macOS Desktops |
-| `alt + shift + 1-9` | Move window to a native Desktop and follow |
-| `alt + d` | Move the focused window to its app's home Desktop |
+| `alt + 1-9` | Focus a numbered workspace |
+| `alt + shift + 1-9` | Move a window to a workspace and follow |
+| `alt + d` | Move the focused window to its app's home workspace |
 | `alt + q` | Close the focused window, or hide Finder while preserving its tabs |
-| `alt + f` | Toggle layout fullscreen |
+| `alt + f` | Toggle border-preserving fullscreen |
 | `alt + shift + f` | Toggle a centered 50% floating window |
 | `alt + c` | Toggle a centered 60% floating window |
-| `alt + e/r/y` | Balance, rotate, or mirror the current layout |
+| `alt + e/r/y` | Balance or transform the current BSP layout |
 | `alt + shift + ;` | Enter the skhd service layer |
 
-The nine native Mission Control Desktops are semantic: `terminal`, `web`,
-`comms`, `notes`, `media`, `calendar`, `development`, `creative`, and `office`.
-The first standard window of an assigned app opens on its home Desktop;
-additional windows remain where they are opened. Utilities such as Finder,
-Preview, 1Password, and System Settings stay on the current Desktop.
+Under OmniWM, `alt + r` swaps the focused Dwindle split and `alt + y` moves the
+focused tile to the root. These are the closest available equivalents to
+yabai's whole-tree rotate and mirror operations. The exact original operations
+remain available in the yabai fallback.
+
+The nine OmniWM workspaces are semantic: `terminal`, `web`, `comms`, `notes`,
+`media`, `calendar`, `development`, `creative`, and `office`. The first standard
+window of an assigned app opens on its home workspace; additional windows
+remain where they are opened. Utilities such as Finder, Preview, 1Password, and
+System Settings float on the current workspace. `alt + c` toggles a centered
+60% floating overlay, while `cmd + shift + /` summons and sizes the persistent
+Finder overlay on the current workspace.
+
+Centered floating windows use OmniWM's native floating mode plus the
+`omniwm-set-frame` Accessibility helper. Direct AX sizing keeps OmniWM's native
+focus border synchronized; using System Events/AppleScript here would suppress
+the floating border until the window returned to tiling.
+
+OmniWM intentionally hides borders for true layout fullscreen. The `alt + f`
+binding therefore uses a reversible bordered-fullscreen overlay sized to the
+display's configured outer gaps. A second press restores the previous tiled or
+floating mode and geometry. Native borderless fullscreen remains available from
+OmniWM's command palette.
+
+OmniWM uses its synchronized 4-point Catppuccin Macchiato focus border, 8-point
+inner gaps, small enabled animations, and a 0.1-second Quake terminal animation.
+SketchyBar continues to show workspace occupancy and app icons, now through
+OmniWM IPC. Its built-in workspace bar stays disabled to avoid drawing a second
+bar.
+
+OmniWM uses one native macOS Space and requires **Displays have separate
+Spaces**. Its virtual workspaces replace the nine native Desktops while it is
+active. The original native-Space behavior below applies when using the yabai
+fallback.
+
+Switch window managers with:
+
+```sh
+desktop-wm omniwm  # primary; stops yabai and JankyBorders
+desktop-wm yabai   # fallback; quits OmniWM and restores both services
+desktop-wm status
+```
+
+The switch also selects the matching skhd profile and reloads SketchyBar. A
+user LaunchAgent runs `desktop-wm omniwm` at login. No yabai file is rewritten
+or removed.
+
+### yabai fallback
+
+The nine native Mission Control Desktops are semantic in the same order. The
+first standard window of an assigned app opens on its home Desktop; additional
+windows remain where they are opened.
 
 Create exactly nine Desktops in Mission Control and disable **Automatically
 rearrange Spaces based on most recent use** so their numeric meaning remains
@@ -66,8 +137,8 @@ The app launch shortcuts find existing windows even when they are on another
 Desktop. For a first launch they switch to the app's home Desktop before opening
 it; a guarded event hook provides the same routing for apps opened elsewhere.
 
-JankyBorders marks the focused window. yabai frame animations stay disabled
-because this setup keeps full SIP enabled; current yabai and JankyBorders
+JankyBorders marks the focused window in fallback mode. yabai frame animations
+stay disabled because this setup keeps full SIP enabled; current yabai and JankyBorders
 releases support synchronized borders if scripting additions are enabled later.
 
 The mail launcher prefers Microsoft Outlook and falls back to Mail. The chat
@@ -85,9 +156,9 @@ make -C /tmp/SbarLua -f makefile install
 rm -rf /tmp/SbarLua
 ```
 
-The bar shows native Desktops, focused app, system widgets, connectivity
-indicators, and the next calendar event. See `tilde/.config/sketchybar` for the
-current modules.
+The bar shows OmniWM workspaces (or native Desktops in fallback mode), focused
+app, system widgets, connectivity indicators, and the next calendar event. See
+`tilde/.config/sketchybar` for the current modules.
 
 ## Raycast
 
@@ -124,8 +195,12 @@ git config --global user.name "Name Lastname"
 
 **Grant permissions**
 
-- Grant Accessibility permission to yabai, skhd, and borders.
-- Run `reload` after changing tmux, yabai, skhd, borders, or SketchyBar configuration.
+- Grant Accessibility and Input Monitoring permission to OmniWM. Screen
+  Recording is optional but enables Overview thumbnails and previews.
+- Keep Accessibility permission for yabai, skhd, and borders so fallback mode
+  remains immediately usable.
+- Run `reload` after changing tmux, OmniWM, yabai, skhd, borders, or SketchyBar
+  configuration.
 
 **Finder**
 

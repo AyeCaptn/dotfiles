@@ -1,59 +1,19 @@
-local colors = require("colors")
 local icons = require("icons")
-local settings = require("settings")
+local bar_chart = require("items.widgets.bar_chart")
 
-local cpu = sbar.add("graph", "cpu", 30, {
-  position = "right",
-  y_offset = settings.item.right_y_offset,
-  graph = {
-    color = colors.highlight,
-    fill_color = colors.with_alpha(colors.highlight, 0.2),
-    line_width = 1.5,
-  },
-  icon = {
-    string = icons.cpu,
-    font = { family = settings.font.icon, style = "Semibold", size = 12.0 },
-    color = colors.item,
-    padding_left = 3,
-    padding_right = 3,
-  },
-  label = {
-    font = { family = settings.font.text_mono, style = "Regular", size = 11.0 },
-    color = colors.item,
-    padding_left = 3,
-    padding_right = 6,
-  },
-  width = 84,
-  padding_left = 0,
-  padding_right = 0,
-  background = {
-    color = 0x00000000,
-    height = settings.bracket.height,
-    drawing = true,
-  },
+local cpu_chart = bar_chart.new({
+  name = "cpu",
+  icon = icons.cpu,
   click_script = "open -na /Applications/Ghostty.app --args -e btop",
 })
+local cpu = cpu_chart.item
 
 local config_dir = os.getenv("CONFIG_DIR")
   or os.getenv("HOME") .. "/.config/sketchybar"
 local provider_bin = config_dir .. "/helpers/event_providers/cpu_load/bin/cpu_load"
 
 local function update_cpu(load)
-  local color = colors.highlight
-
-  if load > 80 then
-    color = colors.danger
-  elseif load > 50 then
-    color = colors.warning
-  end
-
-  sbar.animate("tanh", 20, function()
-    cpu:set({
-      graph = { color = color },
-      label = { string = string.format("%02d%%", math.floor(load)) },
-    })
-  end)
-  cpu:push({ load / 100 })
+  cpu_chart.push(load)
 end
 
 -- Check if provider binary exists synchronously
@@ -69,7 +29,7 @@ if f then
   cpu:subscribe("routine", function(env)
     -- Only launch once
     cpu:set({ update_freq = 0 })
-    sbar.exec("killall cpu_load 2>/dev/null; " .. provider_bin .. " cpu_update 2.0")
+    sbar.exec("killall cpu_load 2>/dev/null; exec " .. provider_bin .. " cpu_update 2.0")
   end)
   cpu:set({ update_freq = 1 })
 else

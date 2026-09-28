@@ -3,6 +3,7 @@ vim/vim/plugged
 
 # Backup folder
 backup
+__pycache__/
 
 tilde/.config/*
 !tilde/.config/sheldon/
@@ -26,6 +27,8 @@ tilde/.config/opencode/*
 !tilde/.config/k9s/
 !tilde/.config/k9s/skins/
 !tilde/.config/k9s/config.yaml
+tilde/.config/k9s/clusters/
+tilde/.config/k9s/screen-dumps/
 !tilde/.config/lazygit/
 !tilde/.config/lazygit/config.yml
 !tilde/.config/pi/
@@ -42,15 +45,27 @@ tilde/.config/sketchybar/helpers/event_providers/cpu_load/bin/
 !tilde/.config/hunk/**
 tilde/.config/hunk/state.json
 !tilde/.config/mise/
-!tilde/.config/mise/**
+tilde/.config/mise/*
+!tilde/.config/mise/config.toml
+!tilde/.config/mise/mise.lock
 !tilde/.config/ripgrep/
 !tilde/.config/ripgrep/**
-!tilde/.config/rift/
-!tilde/.config/rift/**
 !tilde/.config/skhd/
 !tilde/.config/skhd/**
 !tilde/.config/yabai/
 !tilde/.config/yabai/**
+!tilde/.config/omniwm/
+!tilde/.config/omniwm/**
+tilde/.config/omniwm/backups/
+tilde/.config/omniwm/*.backup
+tilde/.config/omniwm/*.bak
+
+# Generated application state must not enter the configuration mirror
+tilde/.config/**/*.log
+tilde/.config/**/*.mdb
+tilde/.config/**/*receipt*.json
+tilde/.config/**/state.json
+tilde/.config/**/session.json
 
 # Pi local state should never be tracked
 /~

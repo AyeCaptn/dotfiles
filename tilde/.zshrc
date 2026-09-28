@@ -38,29 +38,26 @@ set -o noclobber
 
 # Extend $PATH without duplicates
 _extend_path() {
-  if ! $(echo "$PATH" | tr ":" "\n" | grep -qx "$1"); then
-    export PATH="$1:$PATH"
-  fi
+  path=("$1" ${path:#"$1"})
 }
 
 # Add custom bin to $PATH
 [[ -d "$HOME/.bin" ]] && _extend_path "$HOME/.bin"
 [[ -d "$DOTFILES/bin" ]] && _extend_path "$DOTFILES/bin"
-[[ -d "$HOME/.npm-global" ]] && _extend_path "$HOME/.npm-global/bin"
 [[ -d "$HOME/.local/bin" ]] && _extend_path "$HOME/.local/bin"
+[[ -d "$HOME/.cargo/bin" ]] && _extend_path "$HOME/.cargo/bin"
 [[ -d "/opt/homebrew/bin" ]] && _extend_path "/opt/homebrew/bin"
 [[ -d "/opt/homebrew/sbin" ]] && _extend_path "/opt/homebrew/sbin"
 [[ -d "$HOME/go/bin" ]] && _extend_path "$HOME/go/bin"
+
+# pnpm owns globally installed JavaScript CLIs; project dependencies stay local.
+export PNPM_HOME="$HOME/Library/pnpm"
+[[ -d "$PNPM_HOME" ]] && _extend_path "$PNPM_HOME"
 
 # Let the dedicated Ghostty launcher enter Herdr without nesting tmux.
 if [[ "${DOTFILES_LAUNCH_HERDR:-}" == "1" ]]; then
   unset DOTFILES_LAUNCH_HERDR
   exec herdr
-fi
-
-# Extend $NODE_PATH
-if [ -d ~/.npm-global ]; then
-  export NODE_PATH="$NODE_PATH:$HOME/.npm-global/lib/node_modules"
 fi
 
 # Default pager
@@ -126,29 +123,15 @@ ugos-cli() {
   UGOS_PASSWORD="$password" command ugos-cli "$@"
 }
 
-# pnpm
-export PNPM_HOME="$HOME/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME/bin:"*) ;;
-  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
-esac
-
-# Setup java
-export JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home
-export PATH="$JAVA_HOME/bin:$PATH"
-
 # Set k9s config directory
 export K9S_CONFIG_DIR="$HOME/.config/k9s"
 
 # Set Lazygit config directory
 export LG_CONFIG_FILE="$HOME/.config/lazygit/config.yml"
 
-# Let pi use an XDG-style config directory
-export PI_CODING_AGENT_DIR="${PI_CODING_AGENT_DIR:-$HOME/.config/pi/agent}"
-
 # Engie specific
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
-export REQUESTS_CA_BUNDLE=~/.engie-full-ca.pem
+[[ -f "$HOME/.engie-full-ca.pem" ]] && export REQUESTS_CA_BUNDLE="$HOME/.engie-full-ca.pem"
 
 # ------------------------------------------------------------------------------
 # Dependencies
@@ -166,31 +149,10 @@ zstyle ':completion:*' special-dirs true
 zstyle ':completion:*' use-cache true
 zstyle ':completion:*' cache-path "$HOME/.cache/zsh/zcompcache"
 
+# mise owns language runtimes and project development environments.
+command -v mise >/dev/null 2>&1 && eval "$(mise activate zsh)"
+
 eval "$(sheldon source)"
-
-# Defer expensive setup until just before first prompt
-if command -v zsh-defer >/dev/null 2>&1; then
-  zsh-defer _dotfiles_pnpm_global_bin
-  zsh-defer _dotfiles_fnm_env
-else
-  _dotfiles_pnpm_global_bin
-  _dotfiles_fnm_env
-fi
-
-_dotfiles_pnpm_global_bin() {
-  if command -v pnpm >/dev/null 2>&1; then
-    local pnpm_bin
-    pnpm_bin="$(pnpm root -g)/bin"
-    [[ -d "$pnpm_bin" ]] && _extend_path "$pnpm_bin"
-  fi
-}
-
-_dotfiles_fnm_env() {
-  if ! command -v mise >/dev/null 2>&1 && command -v fnm >/dev/null 2>&1; then
-    eval "$(fnm env --use-on-cd --shell zsh)"
-  fi
-}
-
 
 _dotfiles_zprof_finish() {
   if [[ -n "${_dotfiles_zprof_enabled:-}" ]]; then
@@ -206,7 +168,6 @@ fi
 
 command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
 command -v fzf >/dev/null 2>&1 && source <(fzf --zsh)
-command -v mise >/dev/null 2>&1 && eval "$(mise activate zsh)"
 command -v tv >/dev/null 2>&1 && eval "$(tv init zsh)"
 
 # Search history by substring and retain Zsh's newest-first source order.
@@ -231,13 +192,6 @@ if (( $+functions[_tv_shell_history] )); then
     _enable_bracketed_paste
   }
 fi
-
-# bun completions
-[ -s "/Users/sem/.bun/_bun" ] && source "/Users/sem/.bun/_bun"
-
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
 
 # zoxide should be initialized late so it can hook directory changes reliably.
 export _ZO_DOCTOR=0
@@ -279,6 +233,3 @@ if [[ -o interactive && "${HERDR_ENV:-}" == "1" && -z "${HERDR_OPENCODE_STARTED:
   export HERDR_OPENCODE_STARTED=1
   opencode
 fi
-
-# opencode
-export PATH=/Users/sem/.opencode/bin:$PATH

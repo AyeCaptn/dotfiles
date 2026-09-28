@@ -1,4 +1,58 @@
-#!/usr/bin/env lua
+#!/bin/sh
 
-require("helpers")
-require("init")
+set -u
+
+config_dir="${CONFIG_DIR:-$HOME/.config/sketchybar}"
+lua="$HOME/.local/share/mise/shims/lua"
+pid_file="${TMPDIR:-/tmp}/sketchybar-sbarlua-${USER}.pid"
+child=""
+
+remove_pid_file() {
+  if [ -n "$child" ] && [ -f "$pid_file" ] \
+    && [ "$(cat "$pid_file" 2>/dev/null)" = "$child" ]; then
+    rm -f "$pid_file"
+  fi
+}
+
+stop_child() {
+  if [ -n "$child" ] && kill -0 "$child" 2>/dev/null; then
+    kill "$child" 2>/dev/null || true
+    wait "$child" 2>/dev/null || true
+  fi
+  remove_pid_file
+}
+
+if [ ! -x "$lua" ]; then
+  echo "SketchyBar: mise-managed Lua is unavailable at $lua" >&2
+  exit 1
+fi
+
+if [ -f "$pid_file" ]; then
+  old_pid="$(cat "$pid_file" 2>/dev/null || true)"
+  case "$old_pid" in
+    ''|*[!0-9]*) ;;
+    *)
+      if kill -0 "$old_pid" 2>/dev/null; then
+        kill "$old_pid" 2>/dev/null || true
+        attempts=0
+        while kill -0 "$old_pid" 2>/dev/null && [ "$attempts" -lt 50 ]; do
+          sleep 0.02
+          attempts=$((attempts + 1))
+        done
+        kill -9 "$old_pid" 2>/dev/null || true
+      fi
+      ;;
+  esac
+fi
+
+trap stop_child HUP INT TERM EXIT
+
+cd "$config_dir" || exit 1
+"$lua" "$config_dir/config.lua" &
+child=$!
+printf '%s\n' "$child" > "$pid_file"
+wait "$child"
+status=$?
+remove_pid_file
+child=""
+exit "$status"

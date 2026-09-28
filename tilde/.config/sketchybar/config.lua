@@ -1,3 +1,5 @@
+require("helpers")
+
 sbar = require("sketchybar")
 
 sbar.begin_config()

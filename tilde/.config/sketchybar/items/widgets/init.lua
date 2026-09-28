@@ -29,7 +29,7 @@ sbar.add("item", "stats_connectivity_spacer", {
 require("items.widgets.memory")
 require("items.widgets.cpu")
 
-sbar.add("bracket", "system_stats", { "memory", "cpu" }, {
+sbar.add("bracket", "system_stats", { "/memory.*/", "/cpu.*/" }, {
   padding_left = 0,
   padding_right = 0,
   background = {

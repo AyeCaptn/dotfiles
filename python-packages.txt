@@ -1,1 +1,9 @@
+awsume
+keymap-drawer
+osxphotos
+pirate-get
+poetry
+posting
+shandy-sqlfmt
 yt-dlp
+zmk

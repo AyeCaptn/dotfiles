@@ -13,6 +13,14 @@ return {
   danger = 0xffed8796,
   muted = 0xff6e738d,
 
+  chart = {
+    0xffa6da95, -- green
+    0xffeed49f, -- yellow
+    0xfff5a97f, -- peach
+    0xffee99a0, -- maroon
+    0xffed8796, -- red
+  },
+
   space = {
     active_bg = 0xff8aadf4,
     active_fg = 0xff1e1e2e,

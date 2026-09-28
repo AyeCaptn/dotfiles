@@ -1,55 +1,16 @@
-local colors = require("colors")
 local icons = require("icons")
-local settings = require("settings")
+local bar_chart = require("items.widgets.bar_chart")
 
-local memory = sbar.add("graph", "memory", 30, {
-  position = "right",
-  y_offset = settings.item.right_y_offset,
-  graph = {
-    color = colors.success,
-    fill_color = colors.with_alpha(colors.success, 0.2),
-    line_width = 1.5,
-  },
-  icon = {
-    string = icons.memory,
-    font = { family = settings.font.icon, style = "Semibold", size = 12.0 },
-    color = colors.item,
-    padding_left = 6,
-    padding_right = 3,
-  },
-  label = {
-    font = { family = settings.font.text_mono, style = "Regular", size = 11.0 },
-    color = colors.item,
-    padding_left = 3,
-    padding_right = 6,
-  },
-  width = 84,
-  padding_left = 0,
-  padding_right = 8,
-  background = {
-    color = 0x00000000,
-    height = settings.bracket.height,
-    drawing = true,
-  },
+local memory_chart = bar_chart.new({
+  name = "memory",
+  icon = icons.memory,
+  icon_width = 22,
   click_script = "open -na /Applications/Ghostty.app --args -e btop",
 })
+local memory = memory_chart.item
 
 local function update_memory(used_percent)
-  local color = colors.success
-
-  if used_percent > 85 then
-    color = colors.danger
-  elseif used_percent > 70 then
-    color = colors.warning
-  end
-
-  sbar.animate("tanh", 20, function()
-    memory:set({
-      graph = { color = color },
-      label = { string = string.format("%02d%%", math.floor(used_percent)) },
-    })
-  end)
-  memory:push({ used_percent / 100 })
+  memory_chart.push(used_percent)
 end
 
 memory:set({ update_freq = 5 })

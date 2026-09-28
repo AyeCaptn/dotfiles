@@ -15,11 +15,6 @@
       "action": "read",
       "resource": "*.env.*",
       "effect": "deny"
-    },
-    {
-      "action": "read",
-      "resource": "*.env.example",
-      "effect": "allow"
     }
   ],
   "mcp": {
@@ -45,7 +40,7 @@
       "shadcn": {
         "type": "local",
         "command": [
-          "npx",
+          "/Users/sem/.local/share/mise/shims/npx",
           "-y",
           "shadcn@latest",
           "mcp"
@@ -54,7 +49,7 @@
       "tldraw": {
         "type": "local",
         "command": [
-          "npx",
+          "/Users/sem/.local/share/mise/shims/npx",
           "-y",
           "@talhaorak/tldraw-mcp@0.1.1"
         ],
@@ -65,7 +60,7 @@
       "affinity": {
         "type": "local",
         "command": [
-          "/opt/homebrew/bin/uvx",
+          "/Users/sem/.local/bin/uvx",
           "--with",
           "mcp==1.25.0",
           "--from",

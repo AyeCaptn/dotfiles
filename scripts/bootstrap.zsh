@@ -27,7 +27,7 @@ cd $DOTFILES
 # Homebrew Bundle
 if _exists brew; then
   info "running brew bundle"
-  brew bundle
+  brew bundle --file "$DOTFILES/Brewfile"
 else
   info "brew not installed"
 fi
@@ -35,20 +35,50 @@ fi
 # Accept xcode license
 sudo xcodebuild -license accept
 
-# Python global packages
-if _exists uv; then
-  info "installing python packages"
-  cat python-packages.txt | xargs -I % uv tool install % --force
+# Developer language runtimes
+if _exists mise; then
+  info "installing mise development environments"
+  mise install
+  eval "$(mise activate zsh)"
 else
-  info "uv not installed"
+  info "mise not installed"
 fi
 
-# NPM global packages
+# Rust follows upstream rustup, as in Omarchy.
+if ! _exists rustup; then
+  info "installing Rust with rustup"
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+  export PATH="$HOME/.cargo/bin:$PATH"
+fi
+
+if _exists rustup; then
+  rustup toolchain install stable --component clippy,rust-analyzer,rust-src,rustfmt
+fi
+
+# uv and Python CLI applications stay in the Python ecosystem rather than mise.
+if ! _exists uv; then
+  info "installing uv"
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  export PATH="$HOME/.local/bin:$PATH"
+fi
+
+if _exists uv; then
+  info "installing Python CLI applications"
+  while IFS= read -r package; do
+    [[ -n "$package" ]] && uv tool install "$package" --force
+  done < "$DOTFILES/python-packages.txt"
+fi
+
+# pnpm owns globally installed JavaScript CLIs; application dependencies remain
+# in each project's package.json and lockfile.
 if _exists pnpm; then
-  info "installing pnpm packages"
-  cat pnpm-packages.txt | xargs -n1 pnpm add -g
-else
-  info "pnpm not installed"
+  info "installing pnpm CLI applications"
+  export PNPM_HOME="$HOME/Library/pnpm"
+  export PATH="$PNPM_HOME:$PATH"
+  pnpm config set global-bin-dir "$PNPM_HOME"
+  while IFS= read -r package; do
+    [[ -n "$package" ]] && pnpm add --global "$package"
+  done < "$DOTFILES/pnpm-packages.txt"
 fi
 
 # Restic restore
@@ -68,8 +98,8 @@ if _exists restic; then
       resticprofile -c ~/.resticprofiles.conf --name full-backup restore latest --tag "$TAG" --overwrite if-changed --target /
     done
 
-    info "set up schedule for restic backups"
-    #resticprofile --config ~/.resticprofiles.conf schedule --all
+    info "setting up restic backup schedules"
+    resticprofile --config ~/.resticprofiles.conf schedule --all --start
   else
     info "1Password CLI not installed"
   fi
@@ -109,6 +139,18 @@ if _exists sketchybar && _exists git && _exists make; then
     make -C /tmp/SbarLua -f makefile install
     rm -rf /tmp/SbarLua
   fi
+fi
+
+# Make OmniWM the default desktop at login. The switcher keeps yabai and its
+# original skhd profile available through `desktop-wm yabai`.
+desktop_wm_agent="$DOTFILES/tilde/Library/LaunchAgents/com.sem.desktop-wm.plist"
+if [[ -f "$desktop_wm_agent" ]]; then
+  info "installing OmniWM login agent"
+  mkdir -p "$HOME/Library/LaunchAgents"
+  cp "$desktop_wm_agent" "$HOME/Library/LaunchAgents/com.sem.desktop-wm.plist"
+  launchctl bootout "gui/$(id -u)/com.sem.desktop-wm" >/dev/null 2>&1 || true
+  launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.sem.desktop-wm.plist"
+  launchctl enable "gui/$(id -u)/com.sem.desktop-wm"
 fi
 
 # Remove terminal last login text

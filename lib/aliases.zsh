@@ -42,18 +42,13 @@ cook() {
 alias o='open'
 alias oo='open .'
 
-# Get updates, and update npm and its installed packages
-alias update="source $DOTFILES/scripts/update.zsh"
+# Update the complete managed system through the blessed entry point.
+alias update='dot update'
 
 # Reload desktop tools after updating their configuration.
 reload-desktop() {
   _exists tmux && tmux source-file "$HOME/.tmux.conf"
-  if _exists yabai && pgrep -x yabai >/dev/null; then
-    yabai --restart-service
-    _exists skhd && skhd --restart-service
-    _exists borders && brew services restart borders >/dev/null
-  fi
-  _exists sketchybar && sketchybar --reload
+  "$DOTFILES/bin/desktop-wm" reload
 }
 
 alias reload='reload-desktop'

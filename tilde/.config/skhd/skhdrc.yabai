@@ -1,0 +1,83 @@
+# Omarchy-style keyboard layer for macOS.
+# App launchers use cmd + shift. Window and workspace controls use alt.
+
+# Launch/focus apps
+cmd + shift - return : "$HOME/.config/yabai/focus_or_open_app.sh" terminal "Ghostty"
+cmd + shift - b : "$HOME/.config/yabai/focus_or_open_app.sh" web "Zen"
+cmd + shift - m : "$HOME/.config/yabai/focus_or_open_app.sh" comms "Microsoft Outlook" "Mail"
+cmd + shift - w : "$HOME/.config/yabai/focus_or_open_app.sh" comms "Microsoft Teams" "WhatsApp"
+cmd + shift - s : "$HOME/.config/yabai/focus_or_open_app.sh" media "Spotify"
+cmd + shift - o : "$HOME/.config/yabai/focus_or_open_app.sh" notes "Obsidian"
+cmd + shift - k : "$HOME/.config/yabai/focus_or_open_app.sh" calendar "Calendar"
+cmd + shift - 0x2C : "$HOME/.config/yabai/summon_finder.sh"
+
+# New app windows
+alt + shift - return : open -na "Ghostty"
+alt + shift - b : "$HOME/.config/yabai/open_zen_window.sh"
+
+# Focus windows
+alt - h : yabai -m window --focus west 2>/dev/null || "$HOME/.config/yabai/focus_space.sh" prev
+alt - j : yabai -m window --focus south 2>/dev/null
+alt - k : yabai -m window --focus north 2>/dev/null
+alt - l : yabai -m window --focus east 2>/dev/null || "$HOME/.config/yabai/focus_space.sh" next
+
+# Swap windows
+alt + shift - h : yabai -m window --swap west 2>/dev/null
+alt + shift - j : yabai -m window --swap south 2>/dev/null
+alt + shift - k : yabai -m window --swap north 2>/dev/null
+alt + shift - l : yabai -m window --swap east 2>/dev/null
+
+# Resize windows
+alt + ctrl - h : yabai -m window --resize left:-80:0 2>/dev/null || yabai -m window --resize right:-80:0 2>/dev/null
+alt + ctrl - j : yabai -m window --resize bottom:0:80 2>/dev/null || yabai -m window --resize top:0:80 2>/dev/null
+alt + ctrl - k : yabai -m window --resize top:0:-80 2>/dev/null || yabai -m window --resize bottom:0:-80 2>/dev/null
+alt + ctrl - l : yabai -m window --resize right:80:0 2>/dev/null || yabai -m window --resize left:80:0 2>/dev/null
+
+# Workspace navigation
+alt - 1 : "$HOME/.config/yabai/focus_space.sh" 1
+alt - 2 : "$HOME/.config/yabai/focus_space.sh" 2
+alt - 3 : "$HOME/.config/yabai/focus_space.sh" 3
+alt - 4 : "$HOME/.config/yabai/focus_space.sh" 4
+alt - 5 : "$HOME/.config/yabai/focus_space.sh" 5
+alt - 6 : "$HOME/.config/yabai/focus_space.sh" 6
+alt - 7 : "$HOME/.config/yabai/focus_space.sh" 7
+alt - 8 : "$HOME/.config/yabai/focus_space.sh" 8
+alt - 9 : "$HOME/.config/yabai/focus_space.sh" 9
+alt - tab : "$HOME/.config/yabai/focus_space.sh" recent
+
+# Move all managed windows to their default workspaces.
+alt + shift - d : "$HOME/.config/yabai/move_windows_to_default_spaces.sh"
+alt - d : "$HOME/.config/yabai/move_to_default_space.sh"
+alt + shift - 1 : "$HOME/.config/yabai/move_window_to_space.sh" 1
+alt + shift - 2 : "$HOME/.config/yabai/move_window_to_space.sh" 2
+alt + shift - 3 : "$HOME/.config/yabai/move_window_to_space.sh" 3
+alt + shift - 4 : "$HOME/.config/yabai/move_window_to_space.sh" 4
+alt + shift - 5 : "$HOME/.config/yabai/move_window_to_space.sh" 5
+alt + shift - 6 : "$HOME/.config/yabai/move_window_to_space.sh" 6
+alt + shift - 7 : "$HOME/.config/yabai/move_window_to_space.sh" 7
+alt + shift - 8 : "$HOME/.config/yabai/move_window_to_space.sh" 8
+alt + shift - 9 : "$HOME/.config/yabai/move_window_to_space.sh" 9
+
+# Window/layout controls
+alt - q : "$HOME/.config/yabai/close_or_hide_window.sh"
+alt - f : yabai -m window --toggle zoom-fullscreen
+alt + shift - f : yabai -m window --toggle float --grid 4:4:1:1:2:2
+alt - c : if [ "$(yabai -m query --windows --window | jq -r '."is-floating"')" = "true" ]; then yabai -m window --toggle float; else yabai -m window --toggle float; yabai -m window --grid 5:5:1:1:3:3; fi
+alt - s : yabai -m window --toggle split
+alt - e : yabai -m space --balance
+alt - r : yabai -m space --rotate 90
+alt - y : yabai -m space --mirror y-axis
+alt + shift - r : yabai --restart-service; sketchybar --reload
+
+# Service mode: enter with alt + shift + ;, leave with escape.
+:: service
+alt + shift - 0x29 ; service
+service < escape ; default
+service < r : yabai -m space --balance; skhd -k "escape"
+service < f : yabai -m window --toggle float --grid 4:4:1:1:2:2; skhd -k "escape"
+service < c : yabai -m window --grid 4:4:1:1:2:2; skhd -k "escape"
+service < backspace : yabai -m query --windows --space | jq -r '.[] | select(."has-focus" == false) | .id' | while read -r id; do yabai -m window "$id" --close; done; skhd -k "escape"
+service < h : yabai -m window --warp west 2>/dev/null; skhd -k "escape"
+service < j : yabai -m window --warp south 2>/dev/null; skhd -k "escape"
+service < k : yabai -m window --warp north 2>/dev/null; skhd -k "escape"
+service < l : yabai -m window --warp east 2>/dev/null; skhd -k "escape"

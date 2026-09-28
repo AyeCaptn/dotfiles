@@ -8,9 +8,11 @@ local SPACE_COUNT = settings.space.count
 sbar.add("event", "workspace_update")
 sbar.add("event", "windows_on_spaces")
 
+-- Plain items work for OmniWM's virtual workspaces and for yabai's native
+-- Spaces. Selection and occupancy are rendered from the active WM's query.
 for i = 1, SPACE_COUNT do
-  local space = sbar.add("space", "space." .. i, {
-    associated_space = i,
+  local space = sbar.add("item", "space." .. i, {
+    position = "left",
     icon = {
       string = tostring(i),
       font = { family = settings.font.text_mono, style = "Bold", size = 12.0 },
@@ -33,7 +35,7 @@ for i = 1, SPACE_COUNT do
     },
     padding_left = 2,
     padding_right = 2,
-    click_script = "$HOME/.config/yabai/focus_space.sh " .. i,
+    click_script = "$HOME/.config/omniwm/focus_workspace.sh " .. i,
   })
 
   spaces[i] = space
@@ -42,7 +44,7 @@ end
 local focused_space = nil
 local space_labels = {}
 local occupied_spaces = {}
-local apps_refresh_id = 0
+local refresh_id = 0
 local has_data = false
 
 for sid = 1, SPACE_COUNT do
@@ -50,12 +52,11 @@ for sid = 1, SPACE_COUNT do
   occupied_spaces[sid] = false
 end
 
-local function render_space(sid, selected)
+local function render_space(sid)
   if not sid or sid < 1 or sid > SPACE_COUNT then return end
 
+  local selected = sid == focused_space
   local color = colors.space.colors[sid] or colors.highlight
-  if selected == nil then selected = sid == focused_space end
-
   spaces[sid]:set({
     icon = { color = selected and colors.space.active_fg or color },
     label = {
@@ -70,97 +71,88 @@ local function render_space(sid, selected)
   })
 end
 
-local function set_focused_space(sid)
-  if not sid or sid < 1 or sid > SPACE_COUNT then return end
-
-  local previous_space = focused_space
-  focused_space = sid
-
-  if previous_space ~= focused_space then
-    render_space(previous_space)
-    render_space(focused_space)
-  end
+local function render_all()
+  for sid = 1, SPACE_COUNT do render_space(sid) end
 end
 
-local function refresh_yabai_focus()
-  sbar.exec("yabai -m query --spaces --space", function(focused)
-    if type(focused) ~= "table" or not focused.index then return end
-    set_focused_space(focused.index)
-  end)
-end
+local function refresh_omniwm(id)
+  sbar.exec("omniwmctl query workspace-bar", function(response)
+    if id ~= refresh_id or type(response) ~= "table" then return end
+    local payload = response.result and response.result.payload
+    if type(payload) ~= "table" or type(payload.monitors) ~= "table" then return end
 
-local function refresh_yabai_apps()
-  apps_refresh_id = apps_refresh_id + 1
-  local refresh_id = apps_refresh_id
+    local apps_by_space = {}
+    for sid = 1, SPACE_COUNT do apps_by_space[sid] = {} end
 
-  sbar.exec("yabai -m query --windows", function(windows_json)
-    if refresh_id ~= apps_refresh_id or type(windows_json) ~= "table" then return end
-
-    local space_apps = {}
-    for sid = 1, SPACE_COUNT do space_apps[sid] = {} end
-
-    for _, win in ipairs(windows_json) do
-      local sid = win.space
-      if sid >= 1 and sid <= SPACE_COUNT and win.app then
-        space_apps[sid][win.app] = true
+    for _, monitor in ipairs(payload.monitors) do
+      for _, workspace in ipairs(monitor.workspaces or {}) do
+        local sid = tonumber(workspace.rawName)
+        if sid and sid >= 1 and sid <= SPACE_COUNT then
+          if workspace.isFocused then focused_space = sid end
+          for _, app in ipairs(workspace.windows or {}) do
+            if app.appName then apps_by_space[sid][app.appName] = true end
+          end
+        end
       end
     end
 
     for sid = 1, SPACE_COUNT do
-      local app_names = {}
-      for app_name in pairs(space_apps[sid]) do
-        table.insert(app_names, app_name)
-      end
-      table.sort(app_names)
-
-      local icon_strip = {}
-      for _, app_name in ipairs(app_names) do
-        table.insert(icon_strip, app_icons(app_name))
-      end
-
-      space_labels[sid] = table.concat(icon_strip, " ")
-      occupied_spaces[sid] = #app_names > 0
-      render_space(sid)
+      local names = {}
+      for app_name in pairs(apps_by_space[sid]) do table.insert(names, app_name) end
+      table.sort(names)
+      local icons = {}
+      for _, app_name in ipairs(names) do table.insert(icons, app_icons(app_name)) end
+      space_labels[sid] = table.concat(icons, " ")
+      occupied_spaces[sid] = #names > 0
     end
+    has_data = true
+    render_all()
   end)
 end
 
--- SketchyBar's native space event arrives with the macOS workspace change and
--- avoids waiting for yabai's delayed space_changed signal on this machine.
-for sid, space in ipairs(spaces) do
-  space:subscribe("space_change", function(env)
-    local selected = env.SELECTED == "true"
-    if selected then focused_space = sid end
-    render_space(sid, selected)
+local function refresh_yabai(id)
+  sbar.exec("yabai -m query --spaces --space", function(focused)
+    if id == refresh_id and type(focused) == "table" then focused_space = focused.index end
+  end)
+  sbar.exec("yabai -m query --windows", function(windows)
+    if id ~= refresh_id or type(windows) ~= "table" then return end
+    local apps_by_space = {}
+    for sid = 1, SPACE_COUNT do apps_by_space[sid] = {} end
+    for _, window in ipairs(windows) do
+      local sid = window.space
+      if sid and sid >= 1 and sid <= SPACE_COUNT and window.app then
+        apps_by_space[sid][window.app] = true
+      end
+    end
+    for sid = 1, SPACE_COUNT do
+      local names = {}
+      for app_name in pairs(apps_by_space[sid]) do table.insert(names, app_name) end
+      table.sort(names)
+      local icons = {}
+      for _, app_name in ipairs(names) do table.insert(icons, app_icons(app_name)) end
+      space_labels[sid] = table.concat(icons, " ")
+      occupied_spaces[sid] = #names > 0
+    end
+    has_data = true
+    render_all()
   end)
 end
-
-local observer = sbar.add("item", "space_observer", {
-  drawing = false,
-  updates = true,
-})
 
 local function refresh()
-  refresh_yabai_focus()
-  refresh_yabai_apps()
-  has_data = true
+  refresh_id = refresh_id + 1
+  local id = refresh_id
+  sbar.exec("pgrep -x OmniWM >/dev/null && omniwmctl ping >/dev/null 2>&1 && echo omniwm || echo yabai", function(result)
+    if id ~= refresh_id then return end
+    if tostring(result):match("omniwm") then refresh_omniwm(id) else refresh_yabai(id) end
+  end)
 end
 
-observer:subscribe({ "workspace_update", "windows_on_spaces", "forced" }, function()
-  refresh()
-end)
+local observer = sbar.add("item", "space_observer", { drawing = false, updates = true })
+observer:subscribe({ "workspace_update", "windows_on_spaces", "forced" }, refresh)
 
--- Heal the launch-order race, then stop polling once yabai answers.
-local watchdog = sbar.add("item", "workspace_watchdog", {
-  drawing = false,
-  update_freq = 2,
-})
+local watchdog = sbar.add("item", "workspace_watchdog", { drawing = false, update_freq = 2 })
 watchdog:subscribe("routine", function()
-  if has_data then
-    watchdog:set({ update_freq = 0 })
-  else
-    refresh()
-  end
+  if has_data then watchdog:set({ update_freq = 0 }) else refresh() end
 end)
 
 refresh()
