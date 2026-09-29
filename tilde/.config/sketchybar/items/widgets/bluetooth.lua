@@ -5,16 +5,14 @@ local settings = require("settings")
 local bluetooth = sbar.add("item", "bluetooth", {
   position = "right",
   y_offset = settings.item.right_y_offset,
+  update_freq = 30,
   icon = {
     string = icons.bluetooth.connected,
     font = { family = "Symbols Nerd Font", style = "Regular", size = 14.0 },
     padding_left = 7,
-    padding_right = 5,
+    padding_right = 7,
   },
-  label = {
-    string = "0",
-    padding_right = 6,
-  },
+  label = { drawing = false },
   padding_left = 0,
   padding_right = 0,
   click_script = "open x-apple.systempreferences:com.apple.BluetoothSettings",
@@ -30,15 +28,19 @@ local function update()
   ']=], function(result)
     local value = result:gsub("%s+", "")
     local is_off = value == "off"
+    local is_connected = (tonumber(value) or 0) > 0
+    local color = colors.item
+
+    if is_off then
+      color = colors.muted
+    elseif is_connected then
+      color = colors.highlight
+    end
 
     bluetooth:set({
       icon = {
         string = icons.bluetooth.connected,
-        color = is_off and colors.muted or colors.item,
-      },
-      label = {
-        string = is_off and "off" or value,
-        color = is_off and colors.muted or colors.item,
+        color = color,
       },
     })
   end)

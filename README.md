@@ -80,12 +80,17 @@ remote workstation while it is connected to AC power, use the native
 
 ```sh
 remote-workstation on
+remote-workstation all-on
 remote-workstation status
 remote-workstation off
 ```
 
-The enabled profile persists across logins until it is turned off. It allows
-the display to sleep and does not override the MacBook's lid-close behavior.
+The `on` profile persists across logins until it is turned off, allows the
+display to sleep, and only prevents system sleep on AC power. The `all-on`
+profile also keeps the display on and suppresses the screen saver. Neither mode
+overrides the MacBook's lid-close behavior. The SketchyBar coffee cup cycles
+through normal (green), `on` (orange), and `all-on` (purple); red means another
+process is blocking sleep.
 
 ## Desktop
 
