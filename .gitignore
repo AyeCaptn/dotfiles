@@ -33,6 +33,7 @@ tilde/.config/k9s/screen-dumps/
 !tilde/.config/lazygit/config.yml
 !tilde/.config/pi/
 !tilde/.config/pi/**
+tilde/.config/pi/agent/auth.json
 !tilde/.config/television/
 !tilde/.config/television/**
 !tilde/.config/sketchybar/

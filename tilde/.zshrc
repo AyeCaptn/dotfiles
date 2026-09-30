@@ -60,6 +60,9 @@ _extend_path() {
 export PNPM_HOME="$HOME/Library/pnpm"
 [[ -d "$PNPM_HOME" ]] && _extend_path "$PNPM_HOME"
 
+# Prefer GNU Make when it is available.
+command -v gmake >/dev/null 2>&1 && alias make='gmake'
+
 # Let the dedicated Ghostty launcher enter Herdr without nesting tmux.
 if [[ "${DOTFILES_LAUNCH_HERDR:-}" == "1" ]]; then
   unset DOTFILES_LAUNCH_HERDR
@@ -267,3 +270,6 @@ if [[ -o interactive && "${HERDR_ENV:-}" == "1" && -z "${HERDR_OPENCODE_STARTED:
   export HERDR_OPENCODE_STARTED=1
   opencode
 fi
+
+# Added by the Hunk installer (https://hunk.dev)
+[[ -d "$HOME/.hunk/bin" ]] && _extend_path "$HOME/.hunk/bin"

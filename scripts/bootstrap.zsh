@@ -39,7 +39,7 @@ restore_desktop_services() {
 cd $DOTFILES
 
 info "syncing $DOTFILES_PROFILE profile configuration"
-"$DOTFILES/sync.py"
+"$DOTFILES/sync.py" --yes
 
 # Homebrew Bundle. Stop global input hooks before Homebrew replaces any of
 # their executables, then restore the active desktop mode.
