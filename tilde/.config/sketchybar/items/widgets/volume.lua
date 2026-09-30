@@ -1,25 +1,23 @@
 local colors = require("colors")
 local icons = require("icons")
 local settings = require("settings")
+local vertical_meter = require("items.widgets.vertical_meter")
 
 local volume = sbar.add("item", "volume", {
   position = "right",
   y_offset = settings.item.right_y_offset,
   icon = {
     padding_left = 6,
-    padding_right = 5,
+    padding_right = 4,
   },
-  label = {
-    font = { family = settings.font.text_mono, style = "Regular", size = 11.0 },
-    padding_right = 7,
-  },
+  label = vertical_meter.label(),
   padding_left = 0,
-  padding_right = 0,
+  padding_right = 7,
   click_script = "open x-apple.systempreferences:com.apple.preference.sound",
 })
 
-volume:subscribe("volume_change", function(env)
-  local vol = tonumber(env.INFO)
+local function update_volume(value)
+  local vol = math.max(0, math.min(100, tonumber(value) or 0))
   local icon = icons.vol._0
 
   if vol >= 60 then
@@ -32,6 +30,12 @@ volume:subscribe("volume_change", function(env)
 
   volume:set({
     icon = { string = icon },
-    label = { string = vol .. "%" },
+    label = vertical_meter.properties(vol, colors.highlight),
   })
+end
+
+volume:subscribe("volume_change", function(env)
+  update_volume(env.INFO)
 end)
+
+sbar.exec("osascript -e 'output volume of (get volume settings)'", update_volume)

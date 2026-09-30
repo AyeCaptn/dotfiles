@@ -16,7 +16,7 @@
   },
   "attention": {
     "notifications": true,
-    "sound": true,
+    "sound": false,
     "volume": 0.5,
     "sound_pack": "opencode.default"
   },

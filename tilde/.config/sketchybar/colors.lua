@@ -8,8 +8,11 @@ return {
   border = 0x66494d64,
 
   highlight = 0xff8aadf4,
+  lavender = 0xffb7bdf8,
   success = 0xffa6da95,
   warning = 0xffeed49f,
+  orange = 0xfff5a97f,
+  purple = 0xffc6a0f6,
   danger = 0xffed8796,
   muted = 0xff6e738d,
 

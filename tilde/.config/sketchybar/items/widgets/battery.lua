@@ -49,7 +49,10 @@ battery:subscribe({ "routine", "power_source_change", "system_woke" }, function(
 
     battery:set({
       icon = { string = icon, color = color },
-      label = { string = charge .. "%" },
+      label = {
+        drawing = charge_num < 100,
+        string = charge .. "%",
+      },
     })
   end)
 end)

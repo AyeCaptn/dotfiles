@@ -29,7 +29,7 @@ sbar.add("bracket", "workspaces", space_items, {
   },
 })
 
-sbar.add("bracket", "connectivity", { "volume", "battery", "wifi", "bluetooth" }, {
+sbar.add("bracket", "connectivity", { "volume", "battery", "wifi", "bluetooth", "keep_awake" }, {
   padding_left = 0,
   padding_right = 0,
   background = {

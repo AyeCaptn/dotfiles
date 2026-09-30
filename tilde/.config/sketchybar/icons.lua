@@ -3,6 +3,7 @@ return {
   calendar = "􀉉",        -- SF Symbol: calendar
   clock = "􀐫",           -- SF Symbol: clock
   music = "\u{f001}",    -- nf-fa-music
+  awake = "\u{f0f4}",    -- nf-fa-coffee
   cpu   = "􀧓",           -- SF Symbol: cpu
   memory = "􀫦",        -- SF Symbol: memorychip
   vol = {

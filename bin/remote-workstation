@@ -8,10 +8,13 @@ agent="$HOME/Library/LaunchAgents/$label.plist"
 
 usage() {
   cat <<'EOF'
-Usage: remote-workstation <on|off|status>
+Usage: remote-workstation <on|all-on|off|toggle|mode|status>
 
   on      Keep macOS awake while connected to AC power
+  all-on  Keep macOS, the display, and the screen saver awake
   off     Return to the configured macOS sleep schedule
+  toggle  Cycle through off, on, and all-on
+  mode    Print the active mode
   status  Show whether the keep-awake profile is active
 EOF
 }
@@ -20,28 +23,29 @@ is_loaded() {
   launchctl print "$domain/$label" >/dev/null 2>&1
 }
 
-show_status() {
-  if is_loaded; then
-    echo "Remote workstation profile: on"
-    if ! pmset -g batt | grep -q "AC Power"; then
-      echo "Warning: the native prevent-system-sleep assertion only applies on AC power."
-    fi
-  else
-    echo "Remote workstation profile: off"
-  fi
-  pmset -g custom | awk '
-    /^Battery Power:/ { source="battery" }
-    /^AC Power:/ { source="ac" }
-    /^[[:space:]]*sleep[[:space:]]/ { print source " sleep timer: " $2 " minute(s)" }
-  '
+refresh_indicator() {
+  command -v sketchybar >/dev/null 2>&1 && sketchybar --trigger keep_awake_change >/dev/null 2>&1 || true
 }
 
-case "${1:-}" in
-  on)
-    mkdir -p "$HOME/Library/LaunchAgents"
-    tmp="$(mktemp "${TMPDIR:-/tmp}/$label.XXXXXX")"
-    trap 'rm -f "$tmp"' EXIT
-    cat > "$tmp" <<EOF
+current_mode() {
+  if ! is_loaded || [[ ! -f "$agent" ]]; then
+    echo "off"
+  elif [[ -f "$agent" ]] && grep -q '<string>run-all-on</string>' "$agent"; then
+    echo "all-on"
+  else
+    echo "on"
+  fi
+}
+
+install_profile() {
+  local flags="$1"
+  local keep_display_on="${2:-false}"
+
+  mkdir -p "$HOME/Library/LaunchAgents"
+  local tmp
+  tmp="$(mktemp "${TMPDIR:-/tmp}/$label.XXXXXX")"
+  trap 'rm -f "$tmp"' EXIT
+  cat > "$tmp" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -50,8 +54,19 @@ case "${1:-}" in
   <string>$label</string>
   <key>ProgramArguments</key>
   <array>
+EOF
+  if [[ "$keep_display_on" == "true" ]]; then
+    cat >> "$tmp" <<EOF
+    <string>$HOME/.dotfiles/bin/remote-workstation</string>
+    <string>run-all-on</string>
+EOF
+  else
+    cat >> "$tmp" <<EOF
     <string>/usr/bin/caffeinate</string>
-    <string>-s</string>
+    <string>$flags</string>
+EOF
+  fi
+  cat >> "$tmp" <<'EOF'
   </array>
   <key>KeepAlive</key>
   <true/>
@@ -64,18 +79,68 @@ case "${1:-}" in
 </dict>
 </plist>
 EOF
-    plutil -lint "$tmp" >/dev/null
-    launchctl bootout "$domain/$label" >/dev/null 2>&1 || true
-    mv "$tmp" "$agent"
-    chmod 644 "$agent"
-    trap - EXIT
-    launchctl bootstrap "$domain" "$agent"
+  plutil -lint "$tmp" >/dev/null
+  launchctl bootout "$domain/$label" >/dev/null 2>&1 || true
+  mv "$tmp" "$agent"
+  chmod 644 "$agent"
+  trap - EXIT
+  launchctl bootstrap "$domain" "$agent"
+  refresh_indicator
+}
+
+show_status() {
+  local mode
+  mode="$(current_mode)"
+  echo "Remote workstation profile: $mode"
+  if [[ "$mode" == "on" ]]; then
+    if ! pmset -g batt | grep -q "AC Power"; then
+      echo "Warning: the native prevent-system-sleep assertion only applies on AC power."
+    fi
+  fi
+  pmset -g custom | awk '
+    /^Battery Power:/ { source="battery" }
+    /^AC Power:/ { source="ac" }
+    /^[[:space:]]*sleep[[:space:]]/ { print source " sleep timer: " $2 " minute(s)" }
+  '
+}
+
+action="${1:-}"
+if [[ "$action" == "toggle" ]]; then
+  case "$(current_mode)" in
+    off) action="on" ;;
+    on) action="all-on" ;;
+    all-on) action="off" ;;
+  esac
+fi
+
+case "$action" in
+  run-all-on)
+    /usr/bin/caffeinate -dis &
+    inhibitor_pid=$!
+    trap 'kill "$inhibitor_pid" >/dev/null 2>&1 || true' EXIT INT TERM
+    while kill -0 "$inhibitor_pid" >/dev/null 2>&1; do
+      # A user-active assertion suppresses the screen saver, but macOS limits
+      # it to a timeout. Renew it while the persistent display/sleep inhibitor runs.
+      /usr/bin/caffeinate -u -t 300
+    done
+    wait "$inhibitor_pid"
+    ;;
+  on)
+    install_profile "-s"
+    show_status
+    ;;
+  all-on)
+    install_profile "" true
     show_status
     ;;
   off)
     launchctl bootout "$domain/$label" >/dev/null 2>&1 || true
     rm -f "$agent"
+    refresh_indicator
     show_status
+    ;;
+  mode)
+    current_mode
     ;;
   status)
     show_status

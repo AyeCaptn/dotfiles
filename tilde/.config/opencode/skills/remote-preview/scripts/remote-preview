@@ -1,0 +1,116 @@
+#!/bin/zsh
+
+set -euo pipefail
+
+readonly listen_port=8766
+readonly https_port=8443
+readonly preview_root="${TMPDIR%/}/opencode/remote-preview"
+readonly public_dir="$preview_root/public"
+readonly pid_file="$preview_root/http.pid"
+readonly log_file="$preview_root/http.log"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  remote-preview publish <file>
+  remote-preview status
+  remote-preview stop
+EOF
+}
+
+server_is_running() {
+  [[ -f "$pid_file" ]] || return 1
+  local pid
+  pid=$(<"$pid_file")
+  [[ "$pid" == <-> ]] || return 1
+  kill -0 "$pid" 2>/dev/null || return 1
+  ps -p "$pid" -o command= | grep -Fq "python3 -m http.server $listen_port"
+}
+
+start_server() {
+  mkdir -p "$public_dir"
+  if server_is_running; then return; fi
+
+  rm -f "$pid_file"
+  nohup python3 -m http.server "$listen_port" \
+    --bind 127.0.0.1 \
+    --directory "$public_dir" \
+    >"$log_file" 2>&1 &
+  local pid=$!
+  print -r -- "$pid" > "$pid_file"
+
+  for _ in {1..20}; do
+    if curl --fail --silent --output /dev/null "http://127.0.0.1:$listen_port/"; then
+      return
+    fi
+    sleep 0.1
+  done
+
+  print -u2 -- "Preview HTTP server failed to start; see $log_file"
+  exit 1
+}
+
+publish() {
+  [[ $# -eq 1 ]] || { usage >&2; exit 2; }
+  local source_file="$1"
+  [[ -f "$source_file" ]] || { print -u2 -- "File not found: $source_file"; exit 1; }
+  command -v tailscale >/dev/null || { print -u2 -- "tailscale is required"; exit 1; }
+
+  mkdir -p "$public_dir"
+  local old_file
+  for old_file in "$public_dir"/*(N.); do
+    rm -f "$old_file"
+  done
+
+  local filename="${source_file:t}"
+  cp "$source_file" "$public_dir/$filename"
+  start_server
+
+  tailscale serve --bg --yes --https="$https_port" "http://127.0.0.1:$listen_port" >/dev/null
+
+  local dns_name
+  dns_name=$(tailscale status --json | python3 -c \
+    'import json, sys; print(json.load(sys.stdin)["Self"]["DNSName"].rstrip("."))')
+  local stamp
+  stamp=$(date +%s)
+  print -r -- "https://$dns_name:$https_port/$filename?v=$stamp"
+}
+
+status() {
+  if server_is_running; then
+    print -r -- "HTTP server: running (PID $(<"$pid_file"))"
+  else
+    print -r -- "HTTP server: stopped"
+  fi
+  tailscale serve status
+}
+
+stop() {
+  tailscale serve --https="$https_port" off >/dev/null 2>&1 || true
+  if server_is_running; then
+    local pid
+    pid=$(<"$pid_file")
+    kill "$pid"
+  fi
+  rm -f "$pid_file"
+  print -r -- "Remote preview stopped"
+}
+
+case "${1:-}" in
+  publish)
+    shift
+    publish "$@"
+    ;;
+  status)
+    [[ $# -eq 1 ]] || { usage >&2; exit 2; }
+    status
+    ;;
+  stop)
+    [[ $# -eq 1 ]] || { usage >&2; exit 2; }
+    stop
+    ;;
+  *)
+    usage >&2
+    exit 2
+    ;;
+esac

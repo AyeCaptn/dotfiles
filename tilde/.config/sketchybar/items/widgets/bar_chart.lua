@@ -8,7 +8,8 @@ local function clamp(value)
 end
 
 function bar_chart.new(options)
-  local sample_count = options.sample_count or 10
+  local sample_count = options.sample_count or 6
+  local bar_width = options.bar_width or 4
   local max_height = options.max_height or 18
   local min_height = options.min_height or 4
   local history = {}
@@ -20,35 +21,40 @@ function bar_chart.new(options)
     history[index] = { value = 0, color = colors.accent }
   end
 
-  -- Right-positioned items appear in reverse creation order. Creating the
-  -- percentage first and the icon last keeps the visual order icon/chart/%.
-  local percentage = sbar.add("item", options.name, {
+  -- Right-positioned items render in reverse creation order. This spacer is
+  -- therefore placed after the chart, keeping its last bar inside the bracket.
+  sbar.add("item", options.name .. ".chart_padding", {
     position = "right",
-    width = 37,
-    y_offset = settings.item.right_y_offset,
+    width = options.chart_padding or 8,
     padding_left = 0,
     padding_right = 0,
     icon = { drawing = false },
-    label = {
-      string = "00%",
-      width = 31,
-      align = "left",
-      font = { family = settings.font.text_mono, style = "Regular", size = 11.0 },
-      color = colors.item,
-      padding_left = 3,
-      padding_right = 3,
-    },
+    label = { drawing = false },
     background = { drawing = false },
-    click_script = options.click_script,
   })
 
   for index = sample_count, 1, -1 do
     bars[index] = sbar.add("item", options.name .. ".bar." .. index, {
       position = "right",
-      width = 3,
+      width = bar_width,
       padding_left = 0,
       padding_right = 0,
-      icon = { drawing = false },
+      icon = {
+        drawing = true,
+        string = "",
+        width = bar_width,
+        align = "center",
+        font = { family = settings.font.text_mono, style = "Bold", size = 8.0 },
+        color = colors.lavender,
+        padding_left = 0,
+        padding_right = 0,
+        shadow = {
+          drawing = true,
+          color = colors.bracket,
+          angle = 90,
+          distance = 1,
+        },
+      },
       label = { drawing = false },
       background = {
         drawing = true,
@@ -63,7 +69,7 @@ function bar_chart.new(options)
     })
   end
 
-  sbar.add("item", options.name .. ".icon", {
+  local icon = sbar.add("item", options.name .. ".icon", {
     position = "right",
     width = options.icon_width or 20,
     y_offset = settings.item.right_y_offset,
@@ -102,11 +108,23 @@ function bar_chart.new(options)
     end
   end
 
+  local function render_percentage(value)
+    local text = string.format("%d", math.floor(value + 0.5))
+    local first_index = math.floor((sample_count - #text) / 2) + 1
+
+    for index = 1, sample_count do
+      local character_index = index - first_index + 1
+      local character = ""
+      if character_index >= 1 and character_index <= #text then
+        character = text:sub(character_index, character_index)
+      end
+      bars[index]:set({ icon = { string = character } })
+    end
+  end
+
   local function push(value)
     value = clamp(value)
-    percentage:set({
-      label = { string = string.format("%02d%%", math.floor(value)) },
-    })
+    render_percentage(value)
 
     if not initialized then
       for index = 1, sample_count do
@@ -125,7 +143,7 @@ function bar_chart.new(options)
   end
 
   return {
-    item = percentage,
+    item = icon,
     push = push,
   }
 end
