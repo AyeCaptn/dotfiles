@@ -14,7 +14,15 @@ local keep_awake = sbar.add("item", "keep_awake", {
     padding_left = 7,
     padding_right = 7,
   },
-  label = { drawing = false },
+  label = {
+    string = "●",
+    font = { family = settings.font.text, style = "Bold", size = 12.0 },
+    color = colors.danger,
+    y_offset = 5,
+    padding_left = -13,
+    padding_right = 6,
+    drawing = false,
+  },
   padding_left = 0,
   padding_right = 0,
   click_script = "$HOME/.dotfiles/bin/remote-workstation toggle",
@@ -43,6 +51,11 @@ local command = [=[
       }
     }
   ')
+  mode=off
+  if launchctl print "gui/$(id -u)/com.sem.remote-workstation-awake" >/dev/null 2>&1; then
+    mode=$("$HOME/.dotfiles/bin/remote-workstation" mode)
+  fi
+  blocked=false
   if pmset -g assertions | awk -v profile_pids="$profile_pids" '
     BEGIN { split(profile_pids, own, " ") }
     /^Listed by owning process:/ { owners=1; next }
@@ -56,22 +69,17 @@ local command = [=[
     }
     END { exit !found }
   '; then
-    printf blocked
-  elif launchctl print "gui/$(id -u)/com.sem.remote-workstation-awake" >/dev/null 2>&1; then
-    "$HOME/.dotfiles/bin/remote-workstation" mode
-  else
-    printf off
+    blocked=true
   fi
+  printf '%s %s\n' "$mode" "$blocked"
 ]=]
 
 local function update()
   sbar.exec(command, function(result)
     local mode = result:match("%S+") or "off"
-    local blocked = mode == "blocked"
+    local blocked = result:match("%S+%s+(%S+)") == "true"
     local color = colors.success
-    if blocked then
-      color = colors.danger
-    elseif mode == "all-on" then
+    if mode == "all-on" then
       color = colors.purple
     elseif mode == "on" then
       color = colors.orange
@@ -80,6 +88,7 @@ local function update()
     keep_awake:set({
       drawing = true,
       icon = { color = color },
+      label = { drawing = blocked },
     })
   end)
 end

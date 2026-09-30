@@ -1021,19 +1021,19 @@ binding = "Unassigned"
 id = "moveColumnToWorkspace.8"
 
 [[hotkeys]]
-binding = "Option+Shift+Left Arrow"
+binding = "Unassigned"
 id = "move.left"
 
 [[hotkeys]]
-binding = "Option+Shift+Down Arrow"
+binding = "Unassigned"
 id = "move.down"
 
 [[hotkeys]]
-binding = "Option+Shift+Up Arrow"
+binding = "Unassigned"
 id = "move.up"
 
 [[hotkeys]]
-binding = "Option+Shift+Right Arrow"
+binding = "Unassigned"
 id = "move.right"
 
 [[hotkeys]]

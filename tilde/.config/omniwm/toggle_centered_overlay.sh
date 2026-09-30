@@ -8,6 +8,7 @@ mode=$(omniwmctl query windows --focused --fields mode | jq -r \
 
 if [ "$mode" = "floating" ]; then
   omniwmctl command toggle-focused-window-floating >/dev/null
+  sketchybar --trigger window_state_update 2>/dev/null || true
   exit 0
 fi
 

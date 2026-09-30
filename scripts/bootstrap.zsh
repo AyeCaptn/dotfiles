@@ -235,6 +235,13 @@ mkdir -p ~/Projects/Playground
 mkdir -p ~/Projects/Repos
 [[ "$DOTFILES_PROFILE" == "personal" ]] && mkdir -p ~/Projects/Personal
 
+# Keyboard
+# Omarchy uses 40 repeats/second after a 250 ms delay. macOS only offers
+# discrete repeat intervals; these are its closest stable equivalents.
+info "configuring keyboard repeat"
+defaults write NSGlobalDomain KeyRepeat -int 2
+defaults write NSGlobalDomain InitialKeyRepeat -int 15
+
 # Dock
 info "configuring dock"
 defaults write com.apple.dock autohide-delay -float 0

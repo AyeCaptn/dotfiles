@@ -2,6 +2,11 @@
 
 set -eu
 
+notify_sketchybar() {
+  sketchybar --trigger window_state_update 2>/dev/null || true
+}
+trap notify_sketchybar EXIT
+
 window=$(omniwmctl query windows --focused \
   --fields id,pid,display,frame,mode 2>/dev/null)
 window_id=$(printf '%s' "$window" | jq -er '.result.payload.windows[0].id')

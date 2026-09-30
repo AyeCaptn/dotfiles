@@ -14,8 +14,11 @@ window_id=$(find_finder_window)
 if [ -z "$window_id" ]; then
   osascript \
     -e 'tell application "Finder"' \
+    -e 'if (count of Finder windows) is 0 then' \
+    -e 'set newWindow to make new Finder window' \
+    -e 'set target of newWindow to (path to downloads folder)' \
+    -e 'end if' \
     -e 'activate' \
-    -e 'if (count of Finder windows) is 0 then make new Finder window' \
     -e 'end tell' >/dev/null
   for _ in 1 2 3 4 5 6 7 8 9 10; do
     sleep 0.1
@@ -34,4 +37,5 @@ if [ "$mode" != "floating" ]; then
   omniwmctl command toggle-focused-window-floating >/dev/null
   sleep 0.08
 fi
-"$HOME/.config/omniwm/resize_focused_window.sh" 0.60
+# Stay compact on notebooks without scaling into an oversized 6K overlay.
+"$HOME/.config/omniwm/resize_focused_window.sh" 0.55 1200 800

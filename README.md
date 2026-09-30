@@ -129,8 +129,11 @@ The nine OmniWM workspaces are semantic: `terminal`, `web`, `comms`, `notes`,
 window of an assigned app opens on its home workspace; additional windows
 remain where they are opened. Utilities such as Finder, Preview, 1Password, and
 System Settings float on the current workspace. `alt + c` toggles a centered
-60% floating overlay, while `cmd + shift + /` summons and sizes the persistent
-Finder overlay on the current workspace.
+60% floating overlay, while `cmd + shift + /` summons the persistent Finder
+overlay on the current workspace. Finder uses 55% of smaller displays and is
+capped near 1200×800 points on larger displays; a fresh window opens Downloads.
+In SketchyBar, the app icon in its left workspace turns orange for the `FULL`
+overlay or purple for the `60%` overlay.
 
 Centered floating windows use OmniWM's native floating mode plus the
 `omniwm-set-frame` Accessibility helper. Direct AX sizing keeps OmniWM's native

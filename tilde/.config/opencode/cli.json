@@ -26,5 +26,8 @@
     "layout": "horizontal",
     "indicators": "numbers"
   },
+  "keybinds": {
+    "prompt.queue": "alt+return"
+  },
   "animations": true
 }

@@ -3,4 +3,7 @@
 # omniwmctl watch sends one event on stdin. It is a state notification; the
 # SketchyBar module performs one fresh coalesced query for both focus and apps.
 cat >/dev/null
-sketchybar --trigger workspace_update --trigger windows_on_spaces 2>/dev/null || true
+sketchybar \
+  --trigger workspace_update \
+  --trigger windows_on_spaces \
+  --trigger window_state_update 2>/dev/null || true

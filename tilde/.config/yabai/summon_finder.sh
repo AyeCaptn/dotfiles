@@ -20,8 +20,11 @@ fi
 
 osascript \
   -e 'tell application "Finder"' \
+  -e 'if (count of Finder windows) is 0 then' \
+  -e 'set newWindow to make new Finder window' \
+  -e 'set target of newWindow to (path to downloads folder)' \
+  -e 'end if' \
   -e 'activate' \
-  -e 'if (count of Finder windows) is 0 then make new Finder window' \
   -e 'end tell' >/dev/null || exit 1
 
 attempt=0
@@ -37,5 +40,19 @@ is_floating=$(yabai -m query --windows is-floating --window "$window_id" | jq -r
 if [ "$is_floating" != "true" ]; then
   yabai -m window "$window_id" --toggle float 2>/dev/null || exit 1
 fi
-yabai -m window "$window_id" --grid 5:14:3:1:8:3 2>/dev/null || exit 1
+
+# Use 55% on smaller displays, capped near 1200x800 points on large displays.
+# A 100x100 grid keeps the sizing display-relative while allowing the caps to
+# be approximated without relying on global multi-display coordinates.
+display=$(yabai -m query --spaces display --space "$current_space" | jq -er '.display') || exit 1
+display_frame=$(yabai -m query --displays frame --display "$display") || exit 1
+grid=$(printf '%s' "$display_frame" | jq -er '
+  .frame as $f |
+  ([0.55, (1200 / $f.w)] | min | . * 100 | round) as $w |
+  ([0.55, (800 / $f.h)] | min | . * 100 | round) as $h |
+  ((100 - $w) / 2 | floor) as $x |
+  ((100 - $h) / 2 | floor) as $y |
+  "100:100:\($x):\($y):\($w):\($h)"
+') || exit 1
+yabai -m window "$window_id" --grid "$grid" 2>/dev/null || exit 1
 yabai -m window "$window_id" --focus 2>/dev/null

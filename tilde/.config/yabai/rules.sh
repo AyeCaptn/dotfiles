@@ -40,7 +40,7 @@ yabai -m rule --add label="system_information_float" app="^System Information$" 
 yabai -m rule --add label="activity_monitor_float" app="^Activity Monitor$" manage=off
 yabai -m rule --add label="archive_utility_float" app="^Archive Utility$" manage=off grid=5:7:2:1:3:3
 yabai -m rule --add label="calculator_float" app="^Calculator$" manage=off
-yabai -m rule --add label="finder_window_float" app="^Finder$" subrole="^AXStandardWindow$" manage=off grid=5:14:3:1:8:3
+yabai -m rule --add label="finder_window_float" app="^Finder$" subrole="^AXStandardWindow$" manage=off
 yabai -m rule --add label="finder_quick_look_float" app="^Finder$" title="^Quick Look$" manage=off
 yabai -m rule --add label="finder_utility_float" app="^Finder$" title="^(Copy|Move|Info|Preferences)" manage=off
 yabai -m rule --add label="onepassword_float" app="^1Password$" manage=off

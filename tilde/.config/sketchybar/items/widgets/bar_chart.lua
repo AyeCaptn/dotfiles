@@ -8,8 +8,9 @@ local function clamp(value)
 end
 
 function bar_chart.new(options)
-  local sample_count = options.sample_count or 6
+  local sample_count = options.sample_count or 8
   local bar_width = options.bar_width or 4
+  local number_stride = options.number_stride or 1
   local max_height = options.max_height or 18
   local min_height = options.min_height or 4
   local history = {}
@@ -44,7 +45,7 @@ function bar_chart.new(options)
         string = "",
         width = bar_width,
         align = "center",
-        font = { family = settings.font.text_mono, style = "Bold", size = 8.0 },
+        font = { family = settings.font.text_mono, style = "Bold", size = 10.0 },
         color = colors.lavender,
         padding_left = 0,
         padding_right = 0,
@@ -110,13 +111,17 @@ function bar_chart.new(options)
 
   local function render_percentage(value)
     local text = string.format("%d", math.floor(value + 0.5))
-    local first_index = math.floor((sample_count - #text) / 2) + 1
+    local text_span = (#text - 1) * number_stride + 1
+    local first_index = math.floor((sample_count - text_span) / 2) + 1
 
     for index = 1, sample_count do
-      local character_index = index - first_index + 1
       local character = ""
-      if character_index >= 1 and character_index <= #text then
-        character = text:sub(character_index, character_index)
+      local offset = index - first_index
+      if offset >= 0 and offset % number_stride == 0 then
+        local character_index = offset / number_stride + 1
+        if character_index <= #text then
+          character = text:sub(character_index, character_index)
+        end
       end
       bars[index]:set({ icon = { string = character } })
     end
