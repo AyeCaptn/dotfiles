@@ -8,6 +8,7 @@ tap "anomalyco/tap", trusted: { formula: "opencode-v2" }
 tap "tursodatabase/tap", trusted: { formula: "turso" }
 
 # CLI tools
+brew "age"
 brew "ast-grep"
 brew "aws-vault"
 brew "awscli"
