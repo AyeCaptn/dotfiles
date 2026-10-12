@@ -139,10 +139,11 @@ export K9S_CONFIG_DIR="$HOME/.config/k9s"
 
 # Set Lazygit config directory
 export LG_CONFIG_FILE="$HOME/.config/lazygit/config.yml"
+if [[ -f "$HOME/.config/lazygit/config.local.yml" ]]; then
+  export LG_CONFIG_FILE="$LG_CONFIG_FILE,$HOME/.config/lazygit/config.local.yml"
+fi
 
-# Engie specific
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
-[[ -f "$HOME/.engie-full-ca.pem" ]] && export REQUESTS_CA_BUNDLE="$HOME/.engie-full-ca.pem"
 
 # ------------------------------------------------------------------------------
 # Dependencies
@@ -165,6 +166,10 @@ eval "$(sheldon source)"
 # mise owns language runtimes and project development environments. Activate it
 # after plugins and local configuration so its managed tools remain first.
 command -v mise >/dev/null 2>&1 && eval "$(mise activate zsh)"
+
+# Prefer OpenCode V2 over the legacy Homebrew V1 binary. This must follow mise,
+# which rebuilds PATH while activating its managed development environments.
+[[ -d "$HOME/.opencode/bin" ]] && _extend_path "$HOME/.opencode/bin"
 
 _dotfiles_zprof_finish() {
   if [[ -n "${_dotfiles_zprof_enabled:-}" ]]; then
@@ -264,11 +269,11 @@ if [[ -o interactive && -z "$TMUX" && -z "${HERDR_ENV:-}" && "$TERM" != "dumb" ]
   fi
 fi
 
-# Start OpenCode once in each new Herdr pane, then leave the shell available.
+# Start OpenCode without its tab strip in each new Herdr pane.
 if [[ -o interactive && "${HERDR_ENV:-}" == "1" && -z "${HERDR_OPENCODE_STARTED:-}" ]] &&
   command -v opencode >/dev/null 2>&1; then
   export HERDR_OPENCODE_STARTED=1
-  opencode
+  OPENCODE_CLI_CONFIG_CONTENT='{"tabs":{"enabled":false}}' opencode
 fi
 
 # Added by the Hunk installer (https://hunk.dev)

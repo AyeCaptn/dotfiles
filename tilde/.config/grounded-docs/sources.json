@@ -1,0 +1,16 @@
+[
+  {
+    "name": "opencode",
+    "version": "v2",
+    "url": "https://github.com/anomalyco/opencode/tree/dev/services/www/src/docs/content",
+    "scope": "hostname",
+    "includePatterns": ["**/services/www/src/docs/content/**"]
+  },
+  { "name": "grounded-docs", "url": "https://raw.githubusercontent.com/arabold/docs-mcp-server/main/README.md" },
+  { "name": "skills-cli", "url": "https://raw.githubusercontent.com/vercel-labs/skills/main/README.md" },
+  { "name": "python", "url": "https://docs.python.org/3/" },
+  { "name": "uv", "url": "https://docs.astral.sh/uv/" },
+  { "name": "ruff", "url": "https://docs.astral.sh/ruff/" },
+  { "name": "ty", "url": "https://docs.astral.sh/ty/" },
+  { "name": "pytest", "url": "https://docs.pytest.org/en/stable/" }
+]

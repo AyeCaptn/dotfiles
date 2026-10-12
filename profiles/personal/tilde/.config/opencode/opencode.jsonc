@@ -1,0 +1,58 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "openai/gpt-6.1-sol",
+  "providers": {
+    "openai": {
+      "models": {
+        "gpt-6.1-sol": {
+          "settings": {
+            "reasoningEffort": "high"
+          }
+        }
+      }
+    }
+  },
+  "mcp": {
+    "servers": {
+      "ugos": {
+        "type": "local",
+        "command": [
+          "/bin/zsh",
+          "-c",
+          "UGOS_PASSWORD=\"$(/usr/bin/security find-generic-password -a \"$UGOS_USER\" -s ugos-cli -w)\" || exit $?; export UGOS_PASSWORD; exec /opt/homebrew/bin/ugos-mcp"
+        ],
+        "environment": {
+          "UGOS_HOST": "ugreen-nas",
+          "UGOS_PORT": "9443",
+          "UGOS_NAME": "ugreen-nas",
+          "UGOS_USER": "Sem"
+        }
+      },
+      "tldraw": {
+        "type": "local",
+        "command": [
+          "npx",
+          "-y",
+          "@talhaorak/tldraw-mcp@0.1.1"
+        ],
+        "environment": {
+          "TLDRAW_DIR": "{env:HOME}/Projects/Repos/obsidian-vault/Drawings"
+        }
+      },
+      "affinity": {
+        "type": "local",
+        "command": [
+          "uvx",
+          "--with",
+          "mcp==1.25.0",
+          "--from",
+          "mcp-proxy==0.12.0",
+          "mcp-proxy",
+          "--transport",
+          "sse",
+          "http://localhost:6767/sse"
+        ]
+      }
+    }
+  }
+}

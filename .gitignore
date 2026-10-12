@@ -15,6 +15,7 @@ tilde/.config/herdr/*
 !tilde/.config/herdr/config.toml
 !tilde/.config/opencode/
 tilde/.config/opencode/*
+!tilde/.config/opencode/AGENTS.md
 !tilde/.config/opencode/cli.json
 !tilde/.config/opencode/opencode.json
 !tilde/.config/opencode/herdr-opencode/
@@ -24,6 +25,10 @@ tilde/.config/opencode/*
 !tilde/.config/opencode/plugins/**
 !tilde/.config/opencode/skills/
 !tilde/.config/opencode/skills/**
+!tilde/.config/grounded-docs/
+tilde/.config/grounded-docs/*
+!tilde/.config/grounded-docs/config.yaml
+!tilde/.config/grounded-docs/sources.json
 !tilde/.config/k9s/
 !tilde/.config/k9s/skins/
 !tilde/.config/k9s/config.yaml
@@ -31,6 +36,7 @@ tilde/.config/k9s/clusters/
 tilde/.config/k9s/screen-dumps/
 !tilde/.config/lazygit/
 !tilde/.config/lazygit/config.yml
+tilde/.config/lazygit/config.local.yml
 !tilde/.config/pi/
 !tilde/.config/pi/**
 tilde/.config/pi/agent/auth.json
@@ -62,6 +68,7 @@ tilde/.config/omniwm/*.backup
 tilde/.config/omniwm/*.bak
 
 # Generated application state must not enter the configuration mirror
+tilde/.config/nvim/lua/plugins/obsidian.lua
 tilde/.config/**/*.log
 tilde/.config/**/*.mdb
 tilde/.config/**/*receipt*.json
@@ -73,6 +80,8 @@ tilde/.config/**/session.json
 tilde/.local/state/pi/
 
 # macOS
+.zshlocal
+tilde/.zshlocal
 .DS_Store
 .gitsecret/keys/random_seed
 !*.secret

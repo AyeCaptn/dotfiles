@@ -15,6 +15,7 @@ log_file="$state_dir/update.log"
 desktop_services_suspended=0
 desktop_wm_before_update="none"
 skhd_before_update=0
+grounded_docs_suspended=0
 
 e='\033'
 RESET="${e}[0m"
@@ -47,6 +48,9 @@ cleanup() {
   local status=$?
   trap - EXIT
   restore_desktop_services || true
+  if (( grounded_docs_suspended )); then
+    "$DOTFILES/bin/grounded-docs" setup || error "Could not restore Grounded Docs. Run: grounded-docs setup"
+  fi
   rm -rf -- "$lock_dir"
   if (( status != 0 )); then
     error "Update failed. Review $log_file"
@@ -161,6 +165,8 @@ update_rust() {
 update_pnpm() {
   _exists pnpm || return
   section "Updating pnpm CLI applications"
+  [[ -x "$HOME/Library/pnpm/docs-mcp-server" ]] && grounded_docs_suspended=1
+  "$DOTFILES/bin/grounded-docs" stop
   pnpm update --global --latest
 }
 
@@ -179,6 +185,11 @@ update_shell_plugins() {
 
 refresh_services() {
   section "Refreshing managed services"
+
+  if [[ -x "$HOME/Library/pnpm/docs-mcp-server" ]]; then
+    "$DOTFILES/bin/grounded-docs" setup
+    grounded_docs_suspended=0
+  fi
 
   local resticprofile_bin="/opt/homebrew/bin/resticprofile"
   if _exists brew; then

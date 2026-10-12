@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+DOTFILES="${DOTFILES:-$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)}"
+config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/grounded-docs"
+store_dir="$HOME/.local/share/grounded-docs"
+log_dir="$HOME/Library/Logs/grounded-docs"
+export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
+export PATH="$PNPM_HOME:$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+export NODE_USE_SYSTEM_CA=1
+
+case "${1:-}" in
+  setup)
+    mkdir -p "$config_dir" "$store_dir" "$log_dir" "$HOME/Library/LaunchAgents"
+    # Build only this application's native dependencies; pnpm skips their scripts.
+    global_dir="$(pnpm root --global)"
+    global_dir="${global_dir%/node_modules}"
+    native_dirs="$(mise exec node -- node - "$global_dir/node_modules/@arabold/docs-mcp-server" <<'JS'
+const fs = require('node:fs');
+const path = require('node:path');
+const root = fs.realpathSync(process.argv[2]);
+for (const name of ['better-sqlite3', 'tree-sitter', 'tree-sitter-javascript', 'tree-sitter-python', 'tree-sitter-typescript']) {
+  console.log(path.dirname(require.resolve(name + '/package.json', {paths: [root]})));
+}
+JS
+)"
+    while IFS= read -r native_dir; do
+      mise exec node -- npm rebuild --prefix "$native_dir"
+    done <<< "$native_dirs"
+    playwright_cli="$(mise exec node -- node - "$global_dir/node_modules/@arabold/docs-mcp-server" <<'JS'
+const fs = require('node:fs');
+const path = require('node:path');
+const root = fs.realpathSync(process.argv[2]);
+const pkg = require.resolve('playwright/package.json', {paths: [root]});
+console.log(path.join(path.dirname(pkg), 'cli.js'));
+JS
+)"
+    mise exec node -- node "$playwright_cli" install chromium
+    for file in config.yaml sources.json; do
+      [[ -e "$config_dir/$file" ]] || ln -s "$DOTFILES/tilde/.config/grounded-docs/$file" "$config_dir/$file"
+    done
+    for name in grounded-docs grounded-docs-refresh; do
+      source="$DOTFILES/tilde/Library/LaunchAgents/com.sem.$name.plist"
+      target="$HOME/Library/LaunchAgents/com.sem.$name.plist"
+      [[ "$source" -ef "$target" ]] || cp "$source" "$target"
+      launchctl bootout "gui/$(id -u)/com.sem.$name" >/dev/null 2>&1 || true
+      launchctl enable "gui/$(id -u)/com.sem.$name"
+      launchctl bootstrap "gui/$(id -u)" "$target"
+    done
+    ;;
+  stop)
+    for name in grounded-docs-refresh grounded-docs; do
+      launchctl bootout "gui/$(id -u)/com.sem.$name" >/dev/null 2>&1 || true
+    done
+    ;;
+  status)
+    launchctl print "gui/$(id -u)/com.sem.grounded-docs"
+    ;;
+  sync)
+    exec mise exec node -- node "$DOTFILES/scripts/grounded-docs-sync.mjs"
+    ;;
+  *)
+    command -v mise >/dev/null || { echo 'grounded-docs: mise is required (run dot bootstrap).' >&2; exit 1; }
+    [[ -x "$PNPM_HOME/docs-mcp-server" ]] || { echo 'grounded-docs: docs-mcp-server is missing (run dot bootstrap).' >&2; exit 1; }
+    args=(--config "$config_dir/config.yaml" --store-path "$store_dir")
+    if [[ "${1:-}" == serve ]]; then
+      shift
+      args+=(--protocol http --resume)
+    else
+      case "${1:-}" in
+        list|search|find-version|scrape|refresh|remove)
+          args+=(--server-url http://127.0.0.1:6280/api)
+          ;;
+      esac
+    fi
+    exec mise exec node -- "$PNPM_HOME/docs-mcp-server" "${args[@]}" "$@"
+    ;;
+esac

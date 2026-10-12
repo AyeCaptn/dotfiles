@@ -3,7 +3,7 @@ monitorDwindleOverrides = []
 monitorGapOverrides = []
 monitorNiriOverrides = []
 monitorOrientationOverrides = []
-schemaVersion = 3
+schemaVersion = 4
 
 [appearance]
 mode = "dark"
@@ -18,6 +18,27 @@ alpha = 1.0
 blue = 0.9647058823529412
 green = 0.6274509803921569
 red = 0.7764705882352941
+
+[borders.glow]
+enabled = false
+opacity = 0.6
+radius = 8.0
+
+[borders.gradient]
+direction = "topLeftToBottomRight"
+enabled = true
+
+[borders.gradient.end]
+alpha = 1.0
+blue = 0.9649203419685364
+green = 0.6273094415664673
+red = 0.7766956090927124
+
+[borders.gradient.start]
+alpha = 1.0
+blue = 0.9649203419685364
+green = 0.6273094415664673
+red = 0.7766956090927124
 
 [clipboard]
 historyEnabled = false
@@ -98,11 +119,14 @@ alwaysCenterSingleColumn = false
 centerFocusedColumn = "never"
 containerPrimarySpanPresets = [0.3333333333333333, 0.5, 0.6666666666666666]
 defaultContainerPrimarySpan = 0.5
+edgeGaps = true
 infiniteLoop = false
+resizeStepPercent = 5
 singleWindowFit = "fill"
 visibleContainerCount = 2
 
 [overview]
+enabled = true
 invertScrollDirection = false
 matchFocusBorder = true
 mouseScrollSpeed = 1.0
@@ -139,7 +163,7 @@ animationDuration = 0.1
 autoHide = false
 backgroundBlurRadius = 0
 backgroundEffect = "standardBlur"
-enabled = true
+enabled = false
 heightPercent = 50.0
 monitorMode = "focusedWindow"
 opacity = 1.0
@@ -167,6 +191,7 @@ excludedBundleIDs = []
 height = 24.0
 hideEmptyWorkspaces = false
 hideInNativeFullscreen = false
+hoverPreviewsEnabled = true
 notchActiveZoneWidth = 180.0
 notchMode = "moveBelowMenuBar"
 position = "overlappingMenuBar"
@@ -205,22 +230,22 @@ minHeight = 375.0
 minWidth = 500.0
 
 [[appRules]]
-bundleId = "dev.zed.Zed"
 assignToWorkspace = "7"
+bundleId = "dev.zed.Zed"
 id = "979F05F4-FFA2-4EDD-B23F-08A9944C759F"
 minHeight = 240.0
 minWidth = 360.0
 
 [[appRules]]
-bundleId = "com.apple.Safari"
 assignToWorkspace = "2"
+bundleId = "com.apple.Safari"
 id = "81426D13-C1A5-475E-AFBC-00BBA05042D0"
 minHeight = 220.0
 minWidth = 574.0
 
 [[appRules]]
-bundleId = "app.zen-browser.zen"
 assignToWorkspace = "2"
+bundleId = "app.zen-browser.zen"
 id = "1CF39647-F30D-4E76-9686-79B551F1B094"
 minHeight = 495.0
 minWidth = 500.0
@@ -238,8 +263,8 @@ minHeight = 420.0
 minWidth = 500.0
 
 [[appRules]]
-bundleId = "com.spotify.client"
 assignToWorkspace = "5"
+bundleId = "com.spotify.client"
 id = "2DE9390B-0DB4-4D0C-9ABA-06F76F1D4EA9"
 minHeight = 600.0
 minWidth = 800.0
@@ -251,426 +276,426 @@ minHeight = 500.0
 minWidth = 800.0
 
 [[appRules]]
-bundleId = "com.mitchellh.ghostty"
 assignToWorkspace = "1"
+bundleId = "com.mitchellh.ghostty"
 id = "7876C9EF-437E-4D4F-9C27-B1B02F4AABCE"
 minHeight = 48.0
 minWidth = 90.0
 
 [[appRules]]
-bundleId = "com.microsoft.Outlook"
 assignToWorkspace = "3"
+bundleId = "com.microsoft.Outlook"
 id = "8ECAB78B-BCDD-4245-BC25-1609A49B1C86"
 minHeight = 650.0
 minWidth = 930.0
 
 [[appRules]]
-bundleId = "com.apple.MobileSMS"
 assignToWorkspace = "3"
+bundleId = "com.apple.MobileSMS"
 id = "552FB77D-BF0E-4737-90A6-B5BC6986C579"
 minHeight = 320.0
 minWidth = 660.0
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Helium"
 assignToWorkspace = "2"
+bundleId = ""
 id = "B89425D2-EE97-5A88-B572-10ECC9A2B29D"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Mail"
 assignToWorkspace = "3"
+bundleId = ""
 id = "242D7569-04BB-5A84-A0EB-ABA39920EE57"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "MSTeams"
 assignToWorkspace = "3"
+bundleId = ""
 id = "E1FB2BE7-FABC-5903-8215-88BE2BF595C2"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Microsoft Teams"
 assignToWorkspace = "3"
+bundleId = ""
 id = "B3108C37-488F-5CB8-8C29-2069841D0988"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "WhatsApp"
 assignToWorkspace = "3"
+bundleId = ""
 id = "7DFFB5F6-7E7D-5861-A523-D6B9BFBE6E6A"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "FaceTime"
 assignToWorkspace = "3"
+bundleId = ""
 id = "A0AF2B38-A54A-556B-A8FC-2B19FFDD6013"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Obsidian"
 assignToWorkspace = "4"
+bundleId = ""
 id = "D97A5926-6BF4-5AFA-80B2-BA1EC54C088C"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Notes"
 assignToWorkspace = "4"
+bundleId = ""
 id = "FE05D0AC-FCA9-59EA-8B7E-F5863DB3B510"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Reminders"
 assignToWorkspace = "4"
+bundleId = ""
 id = "A22914FD-7604-5F47-A205-AE884057DFB9"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Freeform"
 assignToWorkspace = "4"
+bundleId = ""
 id = "5B20CDBB-9582-50D3-8D94-75F990D63A17"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Journal"
 assignToWorkspace = "4"
+bundleId = ""
 id = "5A3C744F-291E-5385-BDF2-68720A1C913B"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Stickies"
 assignToWorkspace = "4"
+bundleId = ""
 id = "DF5954CF-BAB6-5E71-9485-22B6F2473A59"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Music"
 assignToWorkspace = "5"
+bundleId = ""
 id = "E2D16C5A-474B-509D-8165-56F267A28C1A"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "VLC"
 assignToWorkspace = "5"
+bundleId = ""
 id = "679E35F1-51D6-5EE7-85DB-BB8506065B0D"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "TV"
 assignToWorkspace = "5"
+bundleId = ""
 id = "F78D6754-42DC-56F1-8D26-934C6C53B16A"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Podcasts"
 assignToWorkspace = "5"
+bundleId = ""
 id = "CA289B55-1670-5271-84F2-96341F8EE031"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Books"
 assignToWorkspace = "5"
+bundleId = ""
 id = "2529A94C-112C-5A3F-9F88-E2B7A7BC311C"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "News"
 assignToWorkspace = "5"
+bundleId = ""
 id = "6D9A072D-932A-5EF1-A435-382670E436EE"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "VoiceMemos"
 assignToWorkspace = "5"
+bundleId = ""
 id = "D83049B1-4900-5837-A6D1-DE242DBEEA38"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Voice Memos"
 assignToWorkspace = "5"
+bundleId = ""
 id = "EC5D0AD4-8598-5453-902E-4C919C152CC8"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Chess"
 assignToWorkspace = "5"
+bundleId = ""
 id = "A252598F-D5B2-5337-A7B6-1E04EE66AFF1"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Games"
 assignToWorkspace = "5"
+bundleId = ""
 id = "A74FBA36-A65A-5A25-A598-02BD6F6A284F"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Calendar"
 assignToWorkspace = "6"
+bundleId = ""
 id = "497F25C9-61BD-5DE9-995C-42F383DA1BAD"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Contacts"
 assignToWorkspace = "6"
+bundleId = ""
 id = "B5C294B1-92BF-5161-83BC-9237699C3399"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Clock"
 assignToWorkspace = "6"
+bundleId = ""
 id = "2FCC709D-CD13-5E10-A189-6456977B426E"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Visual Studio Code"
 assignToWorkspace = "7"
+bundleId = ""
 id = "A45393A1-88EE-58ED-AAE5-31C4182BDDE6"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Code"
 assignToWorkspace = "7"
+bundleId = ""
 id = "360B58F2-A4AB-5E9F-A4D0-5027C794064E"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Xcode"
 assignToWorkspace = "7"
+bundleId = ""
 id = "A17C066E-BD93-5248-BC9F-91373244668A"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Docker"
 assignToWorkspace = "7"
+bundleId = ""
 id = "6C842662-3CC3-5C32-AA19-4E989EDEC462"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Emdash"
 assignToWorkspace = "7"
+bundleId = ""
 id = "030F0924-273F-5760-8872-B361039D1806"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Poedit"
 assignToWorkspace = "7"
+bundleId = ""
 id = "A5C5D75E-70DE-5162-8381-1A12A6F7B6B2"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "SF Symbols"
 assignToWorkspace = "7"
+bundleId = ""
 id = "30AF1674-AD35-5696-AF6A-313D790AE5FD"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Syntax Highlight"
 assignToWorkspace = "7"
+bundleId = ""
 id = "D88E170A-6B37-5903-A5D6-5189FD3F927A"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "react-tailwind-vite-canary"
 assignToWorkspace = "7"
+bundleId = ""
 id = "CBB0BF15-0E11-5951-933F-783D83BF5ADB"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Affinity"
 assignToWorkspace = "8"
+bundleId = ""
 id = "DEB20821-1BAF-5714-AA19-67838891DDEC"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Canva"
 assignToWorkspace = "8"
+bundleId = ""
 id = "6F4B37BB-49AD-59A6-825B-749B61632598"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "DaVinci Resolve"
 assignToWorkspace = "8"
+bundleId = ""
 id = "C0056275-34E8-5ABC-A48A-C57710FEAA15"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Logic Pro"
 assignToWorkspace = "8"
+bundleId = ""
 id = "0BFBA1B4-866D-53ED-B0F4-8F55FABF8B6E"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "HandBrake"
 assignToWorkspace = "8"
+bundleId = ""
 id = "BA9024F1-5946-5D52-B53C-51768FF49A6C"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Blackmagic"
 assignToWorkspace = "8"
+bundleId = ""
 id = "859CF38A-9290-5B17-94E6-5D706CE7FD48"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Photos"
 assignToWorkspace = "8"
+bundleId = ""
 id = "92C6C411-64E7-5E2F-BAF4-E268DDA53D7B"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "PowerPhotos"
 assignToWorkspace = "8"
+bundleId = ""
 id = "8F4B01DC-533B-57C9-B37F-4EF58DB68172"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Image Capture"
 assignToWorkspace = "8"
+bundleId = ""
 id = "2577351A-7B43-515F-8BD5-FF7F7882BECE"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Image Playground"
 assignToWorkspace = "8"
+bundleId = ""
 id = "D299A8B1-F3EC-50E9-8271-876ED3C2DB77"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Photo Booth"
 assignToWorkspace = "8"
+bundleId = ""
 id = "F9706705-5AC3-5DAB-81F2-397504B9081F"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "QuickTime Player"
 assignToWorkspace = "8"
+bundleId = ""
 id = "059549A3-48E1-5BDC-8C2D-3A1F9D4F15E5"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Pages"
 assignToWorkspace = "9"
+bundleId = ""
 id = "DF14750E-1A13-5D08-B54A-FB9780203285"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Numbers"
 assignToWorkspace = "9"
+bundleId = ""
 id = "82B78A90-7E35-5A03-9432-1254AA6656A7"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Keynote"
 assignToWorkspace = "9"
+bundleId = ""
 id = "47D9E4E6-9B1D-562E-9330-5B1481B4EA91"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "TextEdit"
 assignToWorkspace = "9"
+bundleId = ""
 id = "5F03260D-371A-5B27-9313-4455254E69CB"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Mail"
-titleRegex = "^(New Message|Message|Re:|Fwd:)"
-layout = "float"
+bundleId = ""
 id = "00116166-9448-5ECC-AE3E-440CF1F31353"
+layout = "float"
+titleRegex = "^(New Message|Message|Re:|Fwd:)"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Mail"
-titleRegex = "^(Preferences|Settings|Rules|Signatures)"
-layout = "float"
+bundleId = ""
 id = "2022AF6C-31DF-561B-BBCD-799A0F74D0E2"
+layout = "float"
+titleRegex = "^(Preferences|Settings|Rules|Signatures)"
 
 [[appRules]]
 bundleId = ""
-titleRegex = "^(Preferences|Settings|About|Open|Save|Print)$"
-layout = "float"
 id = "46BAE9A8-ACC4-5D46-998A-AE648947AE92"
+layout = "float"
+titleRegex = "^(Preferences|Settings|About|Open|Save|Print)$"
 
 [[appRules]]
 bundleId = ""
-titleRegex = "^(Downloads|Developer Tools|Picture in Picture)$"
-layout = "float"
 id = "589EB875-3CC1-53D2-9D5C-C16B0D0257AC"
+layout = "float"
+titleRegex = "^(Downloads|Developer Tools|Picture in Picture)$"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Preview"
-layout = "float"
+bundleId = ""
 id = "9CE21F4C-4175-5054-B29C-38854DB9CAFD"
+layout = "float"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "System Settings"
-layout = "float"
+bundleId = ""
 id = "42CE0F36-9AFE-532A-95B8-737291B1DD1F"
+layout = "float"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "System Information"
-layout = "float"
+bundleId = ""
 id = "E0541721-B6FD-5528-BC5B-EFD0E0E38679"
+layout = "float"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Activity Monitor"
-layout = "float"
+bundleId = ""
 id = "E7A8769B-8A84-596B-8FD4-9B4B0F017AB6"
+layout = "float"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Archive Utility"
-layout = "float"
-id = "9A7B1B94-7619-5410-B6B1-8B548518E1E7"
-
-[[appRules]]
 bundleId = ""
-appNameSubstring = "Calculator"
+id = "9A7B1B94-7619-5410-B6B1-8B548518E1E7"
 layout = "float"
-id = "704CB425-9392-560E-8647-15081B5A44DE"
 
 [[appRules]]
-bundleId = "com.apple.finder"
+appNameSubstring = "Calculator"
+bundleId = ""
+id = "704CB425-9392-560E-8647-15081B5A44DE"
+layout = "float"
+
+[[appRules]]
 axRole = "AXWindow"
 axSubrole = "AXStandardWindow"
-layout = "float"
+bundleId = "com.apple.finder"
 id = "140719CA-B24E-5FD5-9E73-7C5D34066448"
+layout = "float"
 
 [[appRules]]
 bundleId = "com.apple.finder"
-titleRegex = "^(Quick Look|Copy|Move|Info|Preferences)$"
-layout = "float"
 id = "8BAF26FE-DC6D-5786-9F0D-A756A2FE886F"
+layout = "float"
+titleRegex = "^(Quick Look|Copy|Move|Info|Preferences)$"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "1Password"
-layout = "float"
+bundleId = ""
 id = "23E0E0D8-D77C-5B1D-9244-1D30E89B2B05"
+layout = "float"
 
 [[appRules]]
-bundleId = ""
 appNameSubstring = "Tailscale"
-layout = "float"
+bundleId = ""
 id = "8B353CBE-F393-58AE-9F14-C8D9055658BC"
-
-[[appRules]]
-bundleId = ""
-appNameSubstring = "Cisco AnyConnect Secure Mobility Client"
 layout = "float"
-id = "2BD442B1-FA91-5691-A1E6-36020C32961E"
 
 [[appRules]]
+appNameSubstring = "Cisco AnyConnect Secure Mobility Client"
 bundleId = ""
+id = "2BD442B1-FA91-5691-A1E6-36020C32961E"
+layout = "float"
+
+[[appRules]]
 axRole = "AXWindow"
 axSubrole = "AXSystemDialog"
-titleRegex = ".*"
-layout = "float"
+bundleId = ""
 id = "0E53E175-91F7-57B3-ADF5-8ED3D9B68BC1"
+layout = "float"
+titleRegex = ".*"
 
 [[hotkeys]]
 binding = "Unassigned"
@@ -1333,19 +1358,19 @@ binding = "Option+R"
 id = "swapSplit"
 
 [[hotkeys]]
-binding = "Option+Control+L"
+binding = "Control+Option+L"
 id = "resizeGrow.horizontal"
 
 [[hotkeys]]
-binding = "Option+Control+J"
+binding = "Control+Option+J"
 id = "resizeGrow.vertical"
 
 [[hotkeys]]
-binding = "Option+Control+H"
+binding = "Control+Option+H"
 id = "resizeShrink.horizontal"
 
 [[hotkeys]]
-binding = "Option+Control+K"
+binding = "Control+Option+K"
 id = "resizeShrink.vertical"
 
 [[hotkeys]]
@@ -1399,6 +1424,14 @@ id = "closeFocusedWindow"
 [[hotkeys]]
 binding = "Control+Option+M"
 id = "openMenuAnywhere"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "setWindowMark"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "removeWindowMark"
 
 [[hotkeys]]
 binding = "Unassigned"
