@@ -32,7 +32,8 @@
     "directory": ".lane/trees"
   },
   "plugins": [
-    "-herdr.*"
+    "-herdr.*",
+    "-opencode.browser"
   ],
   "permissions": [
     {
