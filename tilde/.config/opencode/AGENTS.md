@@ -41,9 +41,9 @@ approved for automatic writes, migrations, and refreshes. Other databases still 
 
 # Keep output lean
 
-- Use ASD-STE100-inspired language: short sentences, direct wording, and consistent
-  terminology. Omit filler and repetition.
-- Keep explanations and unsolicited documentation brief, direct, and developer-focused.
-  Document stable intent or constraints; avoid duplicating code details that need syncing.
+- Use short, direct sentences and consistent terminology.
+- Lead with the answer. Include only what the user needs to understand, decide, or act.
+- State each point once. Omit investigation narratives and unnecessary implementation detail.
+- Apply this to responses and generated docs. Expand only when requested or necessary.
 - Create files, schemas, and scripts only when required by the task or core project
   structure. Avoid speculative helpers, generated paperwork, and unused artifacts.
