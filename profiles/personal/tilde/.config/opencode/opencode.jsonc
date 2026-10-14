@@ -27,31 +27,6 @@
           "UGOS_NAME": "ugreen-nas",
           "UGOS_USER": "Sem"
         }
-      },
-      "tldraw": {
-        "type": "local",
-        "command": [
-          "npx",
-          "-y",
-          "@talhaorak/tldraw-mcp@0.1.1"
-        ],
-        "environment": {
-          "TLDRAW_DIR": "{env:HOME}/Projects/Repos/obsidian-vault/Drawings"
-        }
-      },
-      "affinity": {
-        "type": "local",
-        "command": [
-          "uvx",
-          "--with",
-          "mcp==1.25.0",
-          "--from",
-          "mcp-proxy==0.12.0",
-          "mcp-proxy",
-          "--transport",
-          "sse",
-          "http://localhost:6767/sse"
-        ]
       }
     }
   }
