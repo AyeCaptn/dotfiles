@@ -18,17 +18,6 @@ refresh_bar() {
   sketchybar --trigger workspace_update
 }
 
-select_skhd_profile() {
-  profile="$1"
-  config_dir="$HOME/.config/skhd"
-  profile_file="skhdrc.$profile"
-  [ -f "$config_dir/$profile_file" ] || {
-    printf 'desktop-wm: missing %s\n' "$config_dir/$profile_file" >&2
-    exit 1
-  }
-  ln -sfn "$profile_file" "$config_dir/skhdrc"
-}
-
 restart_skhd() {
   command -v skhd >/dev/null 2>&1 || return 0
   if pgrep -x skhd >/dev/null; then
@@ -88,7 +77,6 @@ stop_omniwm() {
 }
 
 start_omniwm() {
-  select_skhd_profile omniwm
   "$HOME/.config/omniwm/build_set_window_frame.sh"
   restart_skhd
 
@@ -108,7 +96,6 @@ stop_all() {
 
 reload_active() {
   if pgrep -x OmniWM >/dev/null; then
-    select_skhd_profile omniwm
     restart_skhd
     start_omniwm_watcher
   fi
@@ -137,8 +124,6 @@ case "${1:-}" in
     pgrep -x OmniWM >/dev/null && printf 'running\n' || printf 'stopped\n'
     printf 'skhd: '
     pgrep -x skhd >/dev/null && printf 'running\n' || printf 'stopped\n'
-    printf 'skhd profile: '
-    readlink "$HOME/.config/skhd/skhdrc" 2>/dev/null | sed 's/^skhdrc\.//' || printf 'unknown\n'
     ;;
   *) usage ;;
 esac

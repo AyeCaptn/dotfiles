@@ -101,7 +101,6 @@ cask "poedit"
 cask "utm"
 cask "sf-symbols"
 cask "session-manager-plugin"
-cask "visual-studio-code"
 cask "zen"
 cask "raycast"
 
