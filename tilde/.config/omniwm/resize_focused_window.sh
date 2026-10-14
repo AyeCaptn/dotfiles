@@ -46,3 +46,4 @@ if [ ! -x "$helper" ] \
 fi
 
 "$helper" "$pid" "$x" "$y" "$width" "$height"
+sketchybar --trigger window_state_update 2>/dev/null || true

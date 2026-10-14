@@ -23,6 +23,10 @@ is_loaded() {
   launchctl print "$domain/$label" >/dev/null 2>&1
 }
 
+refresh_indicator() {
+  command -v sketchybar >/dev/null 2>&1 && sketchybar --trigger keep_awake_change >/dev/null 2>&1 || true
+}
+
 current_mode() {
   if ! is_loaded || [[ ! -f "$agent" ]]; then
     echo "off"
@@ -81,6 +85,7 @@ EOF
   chmod 644 "$agent"
   trap - EXIT
   launchctl bootstrap "$domain" "$agent"
+  refresh_indicator
 }
 
 show_status() {
@@ -131,6 +136,7 @@ case "$action" in
   off)
     launchctl bootout "$domain/$label" >/dev/null 2>&1 || true
     rm -f "$agent"
+    refresh_indicator
     show_status
     ;;
   mode)

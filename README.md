@@ -1,7 +1,7 @@
 # macOS dotfiles
 
 Configuration for zsh, Ghostty, tmux, Neovim, OpenCode, and a keyboard-driven
-desktop using OmniWM and skhd.
+desktop using OmniWM, skhd, and SketchyBar.
 
 ## Setup
 

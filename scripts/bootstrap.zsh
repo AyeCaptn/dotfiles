@@ -185,6 +185,17 @@ else
   info "tmux not installed"
 fi
 
+# Install SbarLua for SketchyBar Lua config
+if _exists sketchybar && _exists git && _exists make; then
+  if [ ! -f "$HOME/.local/share/sketchybar_lua/sketchybar.so" ]; then
+    info "installing SbarLua"
+    rm -rf /tmp/SbarLua
+    git clone https://github.com/FelixKratz/SbarLua.git /tmp/SbarLua
+    make -C /tmp/SbarLua -f makefile install
+    rm -rf /tmp/SbarLua
+  fi
+fi
+
 # Start OmniWM at login.
 desktop_wm_agent="$DOTFILES/tilde/Library/LaunchAgents/com.sem.desktop-wm.plist"
 if [[ -f "$desktop_wm_agent" ]]; then
