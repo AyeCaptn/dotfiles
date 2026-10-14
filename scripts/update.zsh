@@ -45,17 +45,17 @@ _exists() {
 }
 
 cleanup() {
-  local status=$?
+  local exit_status=$?
   trap - EXIT
   restore_desktop_services || true
   if (( grounded_docs_suspended )); then
     "$DOTFILES/bin/grounded-docs" setup || error "Could not restore Grounded Docs. Run: grounded-docs setup"
   fi
   rm -rf -- "$lock_dir"
-  if (( status != 0 )); then
+  if (( exit_status != 0 )); then
     error "Update failed. Review $log_file"
   fi
-  exit $status
+  exit $exit_status
 }
 
 if ! mkdir "$lock_dir" 2>/dev/null; then
