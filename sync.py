@@ -22,7 +22,6 @@ PROFILES = ("personal", "work")
 WORK_EXCLUDES = (
     Path(".resticprofiles.conf"),
     Path("Library/LaunchAgents/com.sem.opencode-tailnet.plist"),
-    Path(".config/opencode/skills/obsidian-tldraw"),
     Path(".config/opencode/skills/remote-preview"),
     Path(".config/opencode/skills/ugreen-nas-docker-deploy"),
 )
