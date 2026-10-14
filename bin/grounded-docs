@@ -11,12 +11,21 @@ export PATH="$PNPM_HOME:$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 export NODE_USE_SYSTEM_CA=1
 
 case "${1:-}" in
+  package-path)
+    pnpm list --global --json --depth 0 | mise exec node -- node -e '
+const fs = require("node:fs");
+const installs = JSON.parse(fs.readFileSync(0, "utf8"));
+const dependency = installs.find(item => item.dependencies?.["@arabold/docs-mcp-server"])
+  ?.dependencies["@arabold/docs-mcp-server"];
+if (!dependency) throw new Error("Grounded Docs is not installed (run dot bootstrap).");
+console.log(fs.realpathSync(dependency.path));
+'
+    ;;
   setup)
     mkdir -p "$config_dir" "$store_dir" "$log_dir" "$HOME/Library/LaunchAgents"
     # Build only this application's native dependencies; pnpm skips their scripts.
-    global_dir="$(pnpm root --global)"
-    global_dir="${global_dir%/node_modules}"
-    native_dirs="$(mise exec node -- node - "$global_dir/node_modules/@arabold/docs-mcp-server" <<'JS'
+    package_dir="$("$DOTFILES/bin/grounded-docs" package-path)"
+    native_dirs="$(mise exec node -- node - "$package_dir" <<'JS'
 const fs = require('node:fs');
 const path = require('node:path');
 const root = fs.realpathSync(process.argv[2]);
@@ -28,7 +37,7 @@ JS
     while IFS= read -r native_dir; do
       mise exec node -- npm rebuild --prefix "$native_dir"
     done <<< "$native_dirs"
-    playwright_cli="$(mise exec node -- node - "$global_dir/node_modules/@arabold/docs-mcp-server" <<'JS'
+    playwright_cli="$(mise exec node -- node - "$package_dir" <<'JS'
 const fs = require('node:fs');
 const path = require('node:path');
 const root = fs.realpathSync(process.argv[2]);

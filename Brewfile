@@ -2,7 +2,6 @@
 # https://github.com/Homebrew/homebrew-bundle
 
 # Taps
-tap "FelixKratz/formulae", trusted: { formula: "sketchybar" }
 tap "asmvik/formulae", trusted: { formula: "skhd" }
 tap "tursodatabase/tap", trusted: { formula: "turso" }
 
@@ -77,7 +76,6 @@ brew "tailspin"
 
 # macOS-integrated tools
 brew "cocoapods"
-brew "sketchybar"
 brew "asmvik/formulae/skhd"
 
 # Monitoring
@@ -114,7 +112,6 @@ cask "font-jetbrains-mono-nerd-font"
 cask "font-monaspace"
 cask "font-monaspice-nerd-font"
 cask "font-sf-pro"
-cask "font-sketchybar-app-font"
 cask "font-symbols-only-nerd-font"
 
 # QuickLook plugins

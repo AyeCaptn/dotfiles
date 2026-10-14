@@ -30,15 +30,15 @@ enabled = true
 
 [borders.gradient.end]
 alpha = 1.0
-blue = 0.9649203419685364
-green = 0.6273094415664673
-red = 0.7766956090927124
+blue = 0.9647058823529412
+green = 0.6274509803921569
+red = 0.7764705882352941
 
 [borders.gradient.start]
 alpha = 1.0
-blue = 0.9649203419685364
-green = 0.6273094415664673
-red = 0.7766956090927124
+blue = 0.9647058823529412
+green = 0.6274509803921569
+red = 0.7764705882352941
 
 [clipboard]
 historyEnabled = false
@@ -1053,19 +1053,19 @@ binding = "Unassigned"
 id = "moveColumnToWorkspace.8"
 
 [[hotkeys]]
-binding = "Option+Shift+Left Arrow"
+binding = "Unassigned"
 id = "move.left"
 
 [[hotkeys]]
-binding = "Option+Shift+Down Arrow"
+binding = "Unassigned"
 id = "move.down"
 
 [[hotkeys]]
-binding = "Option+Shift+Up Arrow"
+binding = "Unassigned"
 id = "move.up"
 
 [[hotkeys]]
-binding = "Option+Shift+Right Arrow"
+binding = "Unassigned"
 id = "move.right"
 
 [[hotkeys]]

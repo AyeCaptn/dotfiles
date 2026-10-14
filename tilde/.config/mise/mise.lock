@@ -47,13 +47,13 @@ checksum = "sha256:751fdf7439f115d87ee2a8f3f18c065b6151852068e3e666ac60ac2996f75
 url = "https://nodejs.org/dist/v26.10.0/node-v26.10.0-darwin-arm64.tar.gz"
 
 [[tools.python]]
-version = "3.13.16"
+version = "3.14.7"
 backend = "core:python"
-specifiers = ["3.13"]
+specifiers = ["3.14"]
 
 [tools.python."platforms.macos-arm64"]
-checksum = "blake3:20d7ddcae080b6c5074b7c0ce62baff09c3cda255ed30f2e32f90bf1ca41ebc7"
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20261003/cpython-3.13.16+20261003-aarch64-apple-darwin-install_only_stripped.tar.gz"
+checksum = "sha256:44b4716f4e63bc85e1c07ea2aca730d13a0ec3557d06526d84a13b1d111cf4f9"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260929/cpython-3.14.7+20260929-aarch64-apple-darwin-install_only_stripped.tar.gz"
 provenance = "github-attestations"
 
 [[tools.ruby]]

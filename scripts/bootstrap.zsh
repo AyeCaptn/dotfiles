@@ -185,17 +185,6 @@ else
   info "tmux not installed"
 fi
 
-# Install SbarLua for SketchyBar Lua config
-if _exists sketchybar && _exists git && _exists make; then
-  if [ ! -f "$HOME/.local/share/sketchybar_lua/sketchybar.so" ]; then
-    info "installing SbarLua"
-    rm -rf /tmp/SbarLua
-    git clone https://github.com/FelixKratz/SbarLua.git /tmp/SbarLua
-    make -C /tmp/SbarLua -f makefile install
-    rm -rf /tmp/SbarLua
-  fi
-fi
-
 # Start OmniWM at login.
 desktop_wm_agent="$DOTFILES/tilde/Library/LaunchAgents/com.sem.desktop-wm.plist"
 if [[ -f "$desktop_wm_agent" ]]; then
@@ -238,6 +227,13 @@ mkdir -p ~/Projects/Job
 mkdir -p ~/Projects/Playground
 mkdir -p ~/Projects/Repos
 [[ "$DOTFILES_PROFILE" == "personal" ]] && mkdir -p ~/Projects/Personal
+
+# Keyboard
+# Omarchy uses 40 repeats/second after a 250 ms delay. macOS only offers
+# discrete repeat intervals; these are its closest stable equivalents.
+info "configuring keyboard repeat"
+defaults write NSGlobalDomain KeyRepeat -int 2
+defaults write NSGlobalDomain InitialKeyRepeat -int 15
 
 # Dock
 info "configuring dock"

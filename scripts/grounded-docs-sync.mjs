@@ -2,7 +2,7 @@
 
 // Queue core docs and refresh cached versions through the running MCP service.
 import { execFileSync } from 'node:child_process';
-import { readFileSync, realpathSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -11,8 +11,8 @@ import { setTimeout } from 'node:timers/promises';
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const cli = join(root, 'bin/grounded-docs');
 const config = join(process.env.XDG_CONFIG_HOME ?? join(process.env.HOME, '.config'), 'grounded-docs');
-const modules = execFileSync('pnpm', ['root', '--global'], {encoding: 'utf8'}).trim();
-const pkg = realpathSync(join(modules, '@arabold/docs-mcp-server/package.json'));
+const packageDir = execFileSync(cli, ['package-path'], {encoding: 'utf8'}).trim();
+const pkg = join(packageDir, 'package.json');
 const require = createRequire(pkg);
 const {Client} = await import(pathToFileURL(require.resolve('@modelcontextprotocol/sdk/client/index.js')));
 const {StreamableHTTPClientTransport} = await import(pathToFileURL(require.resolve('@modelcontextprotocol/sdk/client/streamableHttp.js')));
