@@ -216,7 +216,8 @@ def link_files(
             if not dry_run:
                 destination.unlink()
 
-        relative_target = os.path.relpath(str(source), str(destination.parent))
+        # Relative links are interpreted from the real parent, not its symlink alias.
+        relative_target = os.path.relpath(str(source), str(destination.parent.resolve()))
         print(f"link    {destination} -> {relative_target}")
         if not dry_run:
             destination.symlink_to(relative_target)

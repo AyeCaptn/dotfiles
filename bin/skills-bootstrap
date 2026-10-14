@@ -1,0 +1,100 @@
+#!/usr/bin/env node
+
+// Restore Vercel-managed project skills without silently updating their lockfile.
+import { createHash } from 'node:crypto';
+import { readFile, readdir, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
+
+const cliVersion = '1.7.2';
+const lockPath = join(process.cwd(), 'skills-lock.json');
+
+async function folderHash(directory) {
+  const files = [];
+  async function collect(current, prefix = '') {
+    for (const entry of await readdir(current, { withFileTypes: true })) {
+      const relative = prefix + entry.name;
+      if (entry.isDirectory()) {
+        if (entry.name !== '.git' && entry.name !== 'node_modules') {
+          await collect(join(current, entry.name), relative + '/');
+        }
+      } else if (entry.isFile()) {
+        files.push([relative, await readFile(join(current, entry.name))]);
+      } else {
+        throw new Error(`Unexpected non-regular skill file: ${relative}`);
+      }
+    }
+  }
+  await collect(directory);
+  files.sort(([a], [b]) => a.localeCompare(b));
+  const hash = createHash('sha256');
+  for (const [relative, content] of files) {
+    hash.update(relative);
+    hash.update(content);
+  }
+  return hash.digest('hex');
+}
+
+async function main() {
+  if (process.argv.length !== 2) {
+    throw new Error('Usage: skills-bootstrap (run in the directory containing skills-lock.json)');
+  }
+  const original = await readFile(lockPath);
+  const lock = JSON.parse(original.toString());
+  if (lock.version !== 1 || !lock.skills || typeof lock.skills !== 'object' || Array.isArray(lock.skills)) {
+    throw new Error('Unsupported skills-lock.json format; expected version 1.');
+  }
+  const entries = Object.entries(lock.skills);
+  for (const [name, entry] of entries) {
+    if (!name || name === '.' || name === '..' || /[/\\\0]/.test(name)) {
+      throw new Error(`Invalid skill name: ${name}`);
+    }
+    if (!entry || !['github', 'gitlab', 'git'].includes(entry.sourceType)) {
+      throw new Error(`${name}: use a Git source for reproducible skill versions.`);
+    }
+    if (typeof entry.source !== 'string' || !entry.source) {
+      throw new Error(`${name}: missing Git source.`);
+    }
+    if (entry.sourceType !== 'github' && !entry.sourceUrl) {
+      throw new Error(`${name}: missing original Git sourceUrl.`);
+    }
+    if (!/^[a-f0-9]{40}$/.test(entry.ref ?? '')) {
+      throw new Error(`${name}: pin ref to a full Git commit SHA before bootstrapping.`);
+    }
+    if (!/^[a-f0-9]{64}$/.test(entry.computedHash ?? '')) {
+      throw new Error(`${name}: missing or invalid skill content hash.`);
+    }
+  }
+  if (!entries.length) {
+    console.log('No project skills to restore.');
+    return;
+  }
+
+  try {
+    const result = spawnSync('npx', ['--yes', `skills@${cliVersion}`, 'experimental_install'], {
+      stdio: 'inherit',
+    });
+    if (result.error) throw result.error;
+    if (result.status !== 0) throw new Error('Vercel skills restore failed.');
+
+    for (const [name, entry] of entries) {
+      const directory = join(process.cwd(), '.agents', 'skills', name);
+      await readFile(join(directory, 'SKILL.md'));
+      if (await folderHash(directory) !== entry.computedHash) {
+        throw new Error(`${name}: restored content does not match skills-lock.json.`);
+      }
+    }
+  } finally {
+    // The experimental CLI rewrites the lock while installing. Bootstrap must
+    // preserve the committed lock even if installation or verification fails.
+    await writeFile(lockPath, original);
+  }
+  console.log(`Verified ${entries.length} project skill(s) against skills-lock.json.`);
+}
+
+main().catch((error) => {
+  console.error(`skills-bootstrap: ${error.code === 'ENOENT' && error.path === lockPath
+    ? 'No skills-lock.json in this directory.'
+    : error.message}`);
+  process.exitCode = 1;
+});

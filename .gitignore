@@ -15,6 +15,7 @@ tilde/.config/herdr/*
 !tilde/.config/herdr/config.toml
 !tilde/.config/opencode/
 tilde/.config/opencode/*
+!tilde/.config/opencode/AGENTS.md
 !tilde/.config/opencode/cli.json
 !tilde/.config/opencode/opencode.json
 !tilde/.config/opencode/herdr-opencode/
@@ -24,6 +25,10 @@ tilde/.config/opencode/*
 !tilde/.config/opencode/plugins/**
 !tilde/.config/opencode/skills/
 !tilde/.config/opencode/skills/**
+!tilde/.config/grounded-docs/
+tilde/.config/grounded-docs/*
+!tilde/.config/grounded-docs/config.yaml
+!tilde/.config/grounded-docs/sources.json
 !tilde/.config/k9s/
 !tilde/.config/k9s/skins/
 !tilde/.config/k9s/config.yaml
@@ -31,8 +36,7 @@ tilde/.config/k9s/clusters/
 tilde/.config/k9s/screen-dumps/
 !tilde/.config/lazygit/
 !tilde/.config/lazygit/config.yml
-!tilde/.config/pi/
-!tilde/.config/pi/**
+tilde/.config/lazygit/config.local.yml
 !tilde/.config/television/
 !tilde/.config/television/**
 !tilde/.config/sketchybar/
@@ -59,19 +63,21 @@ tilde/.config/mise/*
 tilde/.config/omniwm/backups/
 tilde/.config/omniwm/*.backup
 tilde/.config/omniwm/*.bak
+tilde/.config/omniwm/settings.toml.pre-v*
 
 # Generated application state must not enter the configuration mirror
+tilde/.config/nvim/lua/plugins/obsidian.lua
 tilde/.config/**/*.log
 tilde/.config/**/*.mdb
 tilde/.config/**/*receipt*.json
 tilde/.config/**/state.json
 tilde/.config/**/session.json
 
-# Pi local state should never be tracked
 /~
-tilde/.local/state/pi/
 
 # macOS
+.zshlocal
+tilde/.zshlocal
 .DS_Store
 .gitsecret/keys/random_seed
 !*.secret

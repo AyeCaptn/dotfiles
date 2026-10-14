@@ -1,30 +1,78 @@
 {
   "$schema": "https://opencode.ai/v2/cli.json",
   "theme": {
-    "name": "catppuccin"
+    "name": "catppuccin",
+    "mode": "system"
+  },
+  "cursor": {
+    "style": "default"
+  },
+  "mouse": true,
+  "scroll": {
+    "speed": 3,
+    "acceleration": true
+  },
+  "prompt": {
+    "editor": true,
+    "paste": "compact",
+    "image_preview": true
   },
   "plugins": [
-    "./herdr-opencode"
+    "-herdr.*"
   ],
   "diffs": {
-    "wrap": "word"
+    "source": "branch",
+    "wrap": "word",
+    "tree": true,
+    "single": false,
+    "view": "auto"
   },
   "session": {
     "sidebar": "auto",
     "scrollbar": false,
-    "thinking": "hide"
+    "thinking": "hide",
+    "grouping": "auto",
+    "image_preview": true,
+    "tps": true,
+    "markdown": "rendered",
+    "new_location": "inherit",
+    "permissions": "prompt"
   },
   "attention": {
     "notifications": true,
-    "sound": false,
-    "volume": 0.5,
+    "sound": true,
+    "volume": 0.75,
     "sound_pack": "opencode.default"
   },
   "tabs": {
     "enabled": true,
     "scope": "cwd",
-    "layout": "horizontal",
-    "indicators": "numbers"
+    "layout": "vertical",
+    "indicators": "status"
+  },
+  "terminal": {
+    "title": true,
+    "copy": "select"
+  },
+  "mini": {
+    "thinking": "hide",
+    "tools": "show",
+    "shell_output": "hide",
+    "turn_summary": "show",
+    "footer": "show",
+    "splash": "hide",
+    "mono": false,
+    "replay": true,
+    "replay_limit": 200,
+    "work_spinner": "block-soft-slide"
+  },
+  "debug": {
+    "devtools": false,
+    "timing": false,
+    "turn_tokens": false
+  },
+  "leader": {
+    "timeout": 2000
   },
   "keybinds": {
     "prompt.queue": "alt+return"

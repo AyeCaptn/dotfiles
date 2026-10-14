@@ -1,3 +1,4 @@
 @native-sdk/cli
 hunkdiff
 ralph-tui
+@arabold/docs-mcp-server

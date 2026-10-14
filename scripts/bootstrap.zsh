@@ -39,7 +39,7 @@ restore_desktop_services() {
 cd $DOTFILES
 
 info "syncing $DOTFILES_PROFILE profile configuration"
-"$DOTFILES/sync.py"
+"$DOTFILES/sync.py" --yes
 
 # Homebrew Bundle. Stop global input hooks before Homebrew replaces any of
 # their executables, then restore the active desktop mode.
@@ -117,12 +117,19 @@ fi
 # in each project's package.json and lockfile.
 if _exists pnpm; then
   info "installing pnpm CLI applications"
+  "$DOTFILES/bin/grounded-docs" stop
   export PNPM_HOME="$HOME/Library/pnpm"
   export PATH="$PNPM_HOME:$PATH"
   pnpm config set global-bin-dir "$PNPM_HOME"
   while IFS= read -r package; do
     [[ -n "$package" ]] && pnpm add --global "$package"
   done < "$DOTFILES/pnpm-packages.txt"
+fi
+
+# Grounded Docs runs for both profiles and maintains its own local docs index.
+if [[ -x "$HOME/Library/pnpm/docs-mcp-server" ]]; then
+  info "installing Grounded Docs service and daily documentation refresh"
+  "$DOTFILES/bin/grounded-docs" setup
 fi
 
 # Restic restore

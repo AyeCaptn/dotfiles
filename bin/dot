@@ -113,6 +113,22 @@ doctor() {
     fi
   fi
 
+  if [[ -x "$HOME/Library/pnpm/docs-mcp-server" ]]; then
+    if launchctl print "gui/$(id -u)/com.sem.grounded-docs" >/dev/null 2>&1 \
+      && curl --fail --silent --max-time 3 http://127.0.0.1:6280/ >/dev/null; then
+      pass "Grounded Docs service is running"
+    else
+      fail "Grounded Docs is unavailable (run: grounded-docs setup)"
+    fi
+    if launchctl print "gui/$(id -u)/com.sem.grounded-docs-refresh" >/dev/null 2>&1; then
+      pass "daily documentation refresh is scheduled"
+    else
+      fail "documentation refresh is not scheduled (run: grounded-docs setup)"
+    fi
+  else
+    fail "Grounded Docs is missing (run: dot bootstrap)"
+  fi
+
   local sync_output
   sync_output="$("$DOTFILES/sync.py" --dry-run 2>&1 || true)"
   if [[ -n $sync_output ]]; then

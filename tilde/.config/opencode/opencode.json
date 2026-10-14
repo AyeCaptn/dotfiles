@@ -1,6 +1,39 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "update": "auto",
+  "shell": "/bin/zsh",
+  "default_agent": "build",
+  "snapshots": true,
+  "formatter": false,
+  "compaction": {
+    "auto": true,
+    "keep": {
+      "tokens": 15000
+    },
+    "buffer": 20000
+  },
+  "warming": true,
+  "tool_output": {
+    "max_lines": 2000,
+    "max_bytes": 51200
+  },
+  "media": {
+    "image": {
+      "auto_resize": true,
+      "max_width": 4000,
+      "max_height": 4000,
+      "max_base64_bytes": 10485760
+    }
+  },
+  "websearch": {
+    "provider": "random"
+  },
+  "worktree": {
+    "directory": ".lane/trees"
+  },
+  "plugins": [
+    "-herdr.*"
+  ],
   "permissions": [
     {
       "action": "*",
@@ -20,57 +53,9 @@
   ],
   "mcp": {
     "servers": {
-      "ugos": {
-        "type": "local",
-        "command": [
-          "/bin/zsh",
-          "-c",
-          "UGOS_PASSWORD=\"$(/usr/bin/security find-generic-password -a \"$UGOS_USER\" -s ugos-cli -w)\" || exit $?; export UGOS_PASSWORD; exec /opt/homebrew/bin/ugos-mcp"
-        ],
-        "environment": {
-          "UGOS_HOST": "ugreen-nas",
-          "UGOS_PORT": "9443",
-          "UGOS_NAME": "ugreen-nas",
-          "UGOS_USER": "Sem"
-        }
-      },
-      "context7": {
+      "grounded-docs": {
         "type": "remote",
-        "url": "https://mcp.context7.com/mcp"
-      },
-      "shadcn": {
-        "type": "local",
-        "command": [
-          "npx",
-          "-y",
-          "shadcn@latest",
-          "mcp"
-        ]
-      },
-      "tldraw": {
-        "type": "local",
-        "command": [
-          "npx",
-          "-y",
-          "@talhaorak/tldraw-mcp@0.1.1"
-        ],
-        "environment": {
-          "TLDRAW_DIR": "{env:HOME}/Projects/Repos/obsidian-vault/Drawings"
-        }
-      },
-      "affinity": {
-        "type": "local",
-        "command": [
-          "uvx",
-          "--with",
-          "mcp==1.25.0",
-          "--from",
-          "mcp-proxy==0.12.0",
-          "mcp-proxy",
-          "--transport",
-          "sse",
-          "http://localhost:6767/sse"
-        ]
+        "url": "http://127.0.0.1:6280/mcp"
       }
     }
   }

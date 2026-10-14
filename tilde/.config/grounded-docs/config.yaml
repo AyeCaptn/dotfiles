@@ -1,0 +1,14 @@
+app:
+  telemetryEnabled: false
+  embeddingModel: ""
+server:
+  name: grounded-docs
+  title: Grounded Docs
+  protocol: http
+  host: 127.0.0.1
+  ports:
+    default: 6280
+scraper:
+  maxPages: 1000
+  maxDepth: 5
+  maxConcurrency: 3
