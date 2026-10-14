@@ -1,7 +1,7 @@
 # macOS dotfiles
 
 Configuration for zsh, Ghostty, tmux, Neovim, OpenCode, and a keyboard-driven
-desktop using OmniWM, skhd, and SketchyBar. Yabai remains available as a fallback.
+desktop using OmniWM, skhd, and SketchyBar.
 
 ## Setup
 
@@ -34,7 +34,6 @@ replacing their executables and restores the active window manager afterward.
 ```sh
 desktop-wm status
 desktop-wm omniwm
-desktop-wm yabai
 desktop-wm stop # Release input hooks for recovery from a remote shell
 ```
 

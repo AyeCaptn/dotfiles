@@ -2,9 +2,8 @@
 # https://github.com/Homebrew/homebrew-bundle
 
 # Taps
-tap "FelixKratz/formulae", trusted: { formulae: ["borders", "sketchybar"] }
-tap "asmvik/formulae", trusted: { formulae: ["skhd", "yabai"] }
-tap "anomalyco/tap", trusted: { formula: "opencode-v2" }
+tap "FelixKratz/formulae", trusted: { formula: "sketchybar" }
+tap "asmvik/formulae", trusted: { formula: "skhd" }
 tap "tursodatabase/tap", trusted: { formula: "turso" }
 
 # CLI tools
@@ -78,10 +77,8 @@ brew "tailspin"
 
 # macOS-integrated tools
 brew "cocoapods"
-brew "borders"
 brew "sketchybar"
 brew "asmvik/formulae/skhd"
-brew "asmvik/formulae/yabai"
 
 # Monitoring
 brew "btop"
@@ -89,8 +86,8 @@ brew "btop"
 # Development environment manager
 brew "mise"
 
-# OpenCode V2 (the unversioned core formula is V1)
-brew "anomalyco/tap/opencode-v2"
+# OpenCode
+brew "opencode"
 
 # Desktop applications
 cask "1password"

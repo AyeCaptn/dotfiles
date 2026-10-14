@@ -29,7 +29,7 @@ skhd_before_bootstrap=0
 restore_desktop_services() {
   (( desktop_services_suspended )) || return 0
   case "$desktop_wm_before_bootstrap" in
-    omniwm|yabai) "$DOTFILES/bin/desktop-wm" "$desktop_wm_before_bootstrap" ;;
+    omniwm) "$DOTFILES/bin/desktop-wm" "$desktop_wm_before_bootstrap" ;;
     *) (( skhd_before_bootstrap )) && _exists skhd && skhd --start-service ;;
   esac
   desktop_services_suspended=0
@@ -49,8 +49,6 @@ if _exists brew; then
   if [[ -x "$DOTFILES/bin/desktop-wm" ]]; then
     if pgrep -x OmniWM >/dev/null; then
       desktop_wm_before_bootstrap="omniwm"
-    elif pgrep -x yabai >/dev/null; then
-      desktop_wm_before_bootstrap="yabai"
     fi
     pgrep -x skhd >/dev/null && skhd_before_bootstrap=1
     if [[ "$desktop_wm_before_bootstrap" != "none" ]] || pgrep -x skhd >/dev/null; then
@@ -198,8 +196,7 @@ if _exists sketchybar && _exists git && _exists make; then
   fi
 fi
 
-# Make OmniWM the default desktop at login. The switcher keeps yabai and its
-# original skhd profile available through `desktop-wm yabai`.
+# Start OmniWM at login.
 desktop_wm_agent="$DOTFILES/tilde/Library/LaunchAgents/com.sem.desktop-wm.plist"
 if [[ -f "$desktop_wm_agent" ]]; then
   info "installing OmniWM login agent"

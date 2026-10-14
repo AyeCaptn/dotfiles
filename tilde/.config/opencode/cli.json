@@ -72,7 +72,10 @@
     "turn_tokens": false
   },
   "keybinds": {
-    "leader": "ctrl+x"
+    "leader": "ctrl+x",
+    "prompt.queue": "return,<leader>return",
+    "prompt.submit": "alt+return",
+    "input.newline": "shift+return,ctrl+return,ctrl+j"
   },
   "leader": {
     "timeout": 2000

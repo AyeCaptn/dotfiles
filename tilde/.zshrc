@@ -167,10 +167,6 @@ eval "$(sheldon source)"
 # after plugins and local configuration so its managed tools remain first.
 command -v mise >/dev/null 2>&1 && eval "$(mise activate zsh)"
 
-# Prefer OpenCode V2 over the legacy Homebrew V1 binary. This must follow mise,
-# which rebuilds PATH while activating its managed development environments.
-[[ -d "$HOME/.opencode/bin" ]] && _extend_path "$HOME/.opencode/bin"
-
 _dotfiles_zprof_finish() {
   if [[ -n "${_dotfiles_zprof_enabled:-}" ]]; then
     zprof > "$HOME/.zsh_profile.log"

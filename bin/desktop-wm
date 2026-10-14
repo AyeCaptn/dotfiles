@@ -2,13 +2,13 @@
 
 set -eu
 
-# launchd supplies a minimal PATH. Keep the switcher usable both at login and
+# launchd supplies a minimal PATH. Keep the desktop controller usable at login and
 # from an interactive shell without depending on shell initialization.
 PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/.dotfiles/bin"
 export PATH
 
 usage() {
-  printf 'usage: desktop-wm {omniwm|yabai|stop|reload|status}\n' >&2
+  printf 'usage: desktop-wm {omniwm|stop|reload|status}\n' >&2
   exit 2
 }
 
@@ -16,25 +16,6 @@ refresh_bar() {
   command -v sketchybar >/dev/null 2>&1 || return 0
   sketchybar --reload
   sketchybar --trigger workspace_update
-}
-
-start_jankyborders() {
-  command -v borders >/dev/null 2>&1 || return 0
-  # Undo disabled overrides left by older versions of this switcher.
-  launchctl enable "gui/$(id -u)/homebrew.mxcl.borders" >/dev/null 2>&1 || true
-  launchctl enable "gui/$(id -u)/sh.brew.borders" >/dev/null 2>&1 || true
-  if command -v brew >/dev/null 2>&1; then
-    brew services start borders >/dev/null
-  else
-    borders >/dev/null 2>&1 &
-  fi
-}
-
-stop_jankyborders() {
-  if command -v brew >/dev/null 2>&1; then
-    brew services stop borders >/dev/null 2>&1 || true
-  fi
-  pkill -x borders >/dev/null 2>&1 || true
 }
 
 select_skhd_profile() {
@@ -96,16 +77,6 @@ start_omniwm_watcher() {
   printf '%s\n' "$!" >"$cache_dir/omniwm-sketchybar.pid"
 }
 
-stop_yabai() {
-  command -v yabai >/dev/null 2>&1 && yabai --stop-service >/dev/null 2>&1 || true
-  launchctl disable "gui/$(id -u)/com.asmvik.yabai" >/dev/null 2>&1 || true
-  attempts=0
-  while pgrep -x yabai >/dev/null && [ "$attempts" -lt 30 ]; do
-    sleep 0.1
-    attempts=$((attempts + 1))
-  done
-}
-
 stop_omniwm() {
   stop_omniwm_watcher
   pkill -TERM -x OmniWM >/dev/null 2>&1 || true
@@ -117,8 +88,6 @@ stop_omniwm() {
 }
 
 start_omniwm() {
-  stop_yabai
-  stop_jankyborders
   select_skhd_profile omniwm
   "$HOME/.config/omniwm/build_set_window_frame.sh"
   restart_skhd
@@ -130,34 +99,11 @@ start_omniwm() {
   start_omniwm_watcher
 }
 
-start_yabai() {
-  stop_omniwm
-  select_skhd_profile yabai
-  launchctl enable "gui/$(id -u)/com.asmvik.yabai" >/dev/null 2>&1 || true
-  "$HOME/.config/yabai/configure_mission_control_shortcuts.sh"
-  "$HOME/.config/yabai/build_space_switcher.sh"
-  if command -v yabai >/dev/null 2>&1; then
-    yabai --start-service
-    attempts=0
-    while ! yabai -m query --spaces >/dev/null 2>&1 && [ "$attempts" -lt 100 ]; do
-      sleep 0.1
-      attempts=$((attempts + 1))
-    done
-    # launchd starts yabai asynchronously. Explicitly applying the preserved
-    # configuration after the socket is ready makes fallback deterministic.
-    "$HOME/.config/yabai/yabairc"
-  fi
-  restart_skhd
-  start_jankyborders
-}
-
 stop_all() {
   # Release every process that owns a global input or window-management event
   # tap. This is also the remote recovery command if local input becomes stuck.
   stop_skhd
   stop_omniwm
-  stop_yabai
-  stop_jankyborders
 }
 
 reload_active() {
@@ -165,11 +111,6 @@ reload_active() {
     select_skhd_profile omniwm
     restart_skhd
     start_omniwm_watcher
-  elif pgrep -x yabai >/dev/null; then
-    select_skhd_profile yabai
-    yabai --restart-service
-    restart_skhd
-    start_jankyborders
   fi
   refresh_bar
 }
@@ -177,10 +118,6 @@ reload_active() {
 case "${1:-}" in
   omniwm)
     start_omniwm
-    refresh_bar
-    ;;
-  yabai)
-    start_yabai
     refresh_bar
     ;;
   stop)
@@ -193,19 +130,13 @@ case "${1:-}" in
     printf 'active: '
     if pgrep -x OmniWM >/dev/null; then
       printf 'omniwm\n'
-    elif pgrep -x yabai >/dev/null; then
-      printf 'yabai\n'
     else
       printf 'none\n'
     fi
     printf 'OmniWM: '
     pgrep -x OmniWM >/dev/null && printf 'running\n' || printf 'stopped\n'
-    printf 'yabai: '
-    pgrep -x yabai >/dev/null && printf 'running\n' || printf 'stopped\n'
     printf 'skhd: '
     pgrep -x skhd >/dev/null && printf 'running\n' || printf 'stopped\n'
-    printf 'JankyBorders: '
-    pgrep -x borders >/dev/null && printf 'running\n' || printf 'stopped\n'
     printf 'skhd profile: '
     readlink "$HOME/.config/skhd/skhdrc" 2>/dev/null | sed 's/^skhdrc\.//' || printf 'unknown\n'
     ;;

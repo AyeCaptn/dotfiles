@@ -10,6 +10,8 @@ Write the simplest clear solution that satisfies the actual requirements.
 1. **Solve today's problem.** Follow existing conventions and reuse available
    tools. Add features, dependencies, configuration, and extensibility only for
    concrete requirements.
+   Only handle edge cases that can occur within the application's supported inputs
+   and workflows. Verify relevance before adding workarounds; ask if unclear.
 2. **Make contracts clear.** Validate external input at boundaries; trust
    established types and internal invariants. Handle supported edge cases without
    inventing extra input formats, coercions, or repeated defensive checks.

@@ -18,6 +18,8 @@ tilde/.config/opencode/*
 !tilde/.config/opencode/AGENTS.md
 !tilde/.config/opencode/cli.json
 !tilde/.config/opencode/opencode.json
+!tilde/.config/opencode/commands/
+!tilde/.config/opencode/commands/**
 !tilde/.config/opencode/herdr-opencode/
 !tilde/.config/opencode/herdr-opencode/**
 !tilde/.config/opencode/herdr-tui-session.js
@@ -46,8 +48,6 @@ tilde/.config/pi/agent/auth.json
 !tilde/.config/sketchybar/**
 tilde/.config/sketchybar/helpers/event_providers/cpu_load/bin/
 !tilde/.config/starship.toml
-!tilde/.config/borders/
-!tilde/.config/borders/**
 !tilde/.config/hunk/
 !tilde/.config/hunk/**
 tilde/.config/hunk/state.json
@@ -59,8 +59,6 @@ tilde/.config/mise/*
 !tilde/.config/ripgrep/**
 !tilde/.config/skhd/
 !tilde/.config/skhd/**
-!tilde/.config/yabai/
-!tilde/.config/yabai/**
 !tilde/.config/omniwm/
 !tilde/.config/omniwm/**
 tilde/.config/omniwm/backups/

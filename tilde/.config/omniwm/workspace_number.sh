@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-# Translate the semantic workspace names shared with the yabai fallback.
+# Translate semantic workspace names to OmniWM workspace numbers.
 case "${1:-}" in
   terminal) printf '1\n' ;;
   web) printf '2\n' ;;

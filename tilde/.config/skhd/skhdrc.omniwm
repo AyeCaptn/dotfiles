@@ -1,4 +1,4 @@
-# App launchers and yabai-compatible shell actions for OmniWM.
+# App launchers and shell actions for OmniWM.
 # Native window/layout hotkeys live in ~/.config/omniwm/settings.toml so they
 # follow OmniWM's animation and focus paths without an extra process hop.
 
@@ -21,7 +21,7 @@ alt + shift - b : open -na "Zen"
 alt - h : "$HOME/.config/omniwm/focus_or_workspace.sh" left
 alt - l : "$HOME/.config/omniwm/focus_or_workspace.sh" right
 
-# Move to a workspace and follow, matching the yabai profile.
+# Move to a workspace and follow.
 alt + shift - 1 : "$HOME/.config/omniwm/move_window_to_workspace.sh" 1
 alt + shift - 2 : "$HOME/.config/omniwm/move_window_to_workspace.sh" 2
 alt + shift - 3 : "$HOME/.config/omniwm/move_window_to_workspace.sh" 3

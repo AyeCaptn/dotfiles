@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
-# Print the home space for apps with a persistent workspace. Unlisted utility
-# apps intentionally stay on the space where they are opened.
+# Print the home workspace for apps with a persistent workspace. Unlisted utility
+# apps intentionally stay on the workspace where they are opened.
 case "${1:-}" in
   Ghostty)
     printf '%s\n' terminal

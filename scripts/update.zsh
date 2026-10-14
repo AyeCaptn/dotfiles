@@ -97,8 +97,6 @@ suspend_desktop_services() {
 
   if pgrep -x OmniWM >/dev/null; then
     desktop_wm_before_update="omniwm"
-  elif pgrep -x yabai >/dev/null; then
-    desktop_wm_before_update="yabai"
   fi
   pgrep -x skhd >/dev/null && skhd_before_update=1
 
@@ -111,7 +109,7 @@ restore_desktop_services() {
   (( desktop_services_suspended )) || return 0
 
   case "$desktop_wm_before_update" in
-    omniwm|yabai)
+    omniwm)
       info "Restoring $desktop_wm_before_update desktop services"
       "$DOTFILES/bin/desktop-wm" "$desktop_wm_before_update"
       ;;

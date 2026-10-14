@@ -75,6 +75,7 @@ right = 10.0
 top = 50.0
 
 [general]
+animationSpeed = 1.0
 animationsEnabled = true
 defaultLayoutType = "dwindle"
 hotkeysEnabled = true
@@ -180,10 +181,14 @@ mode = "macOS"
 
 [statusBar]
 showAppNames = false
+showIcon = true
 showWorkspaceName = true
 useWorkspaceId = false
 
 [workspaceBar]
+autoHide = false
+autoHideHideDelayMilliseconds = 0.0
+autoHideRevealDelayMilliseconds = 0.0
 backgroundOpacity = 0.1
 deduplicateAppIcons = false
 enabled = false
@@ -194,6 +199,8 @@ hideInNativeFullscreen = false
 hoverPreviewsEnabled = true
 notchActiveZoneWidth = 180.0
 notchMode = "moveBelowMenuBar"
+notificationBadgeRefreshIntervalSeconds = 5.0
+notificationBadges = "off"
 position = "overlappingMenuBar"
 reserveLayoutSpace = false
 revealHoldMilliseconds = 200.0
@@ -1408,6 +1415,10 @@ id = "openCommandPalette"
 [[hotkeys]]
 binding = "Unassigned"
 id = "raiseAllFloatingWindows"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "toggleFloatingFocus"
 
 [[hotkeys]]
 binding = "Unassigned"

@@ -8,8 +8,7 @@ local SPACE_COUNT = settings.space.count
 sbar.add("event", "workspace_update")
 sbar.add("event", "windows_on_spaces")
 
--- Plain items work for OmniWM's virtual workspaces and for yabai's native
--- Spaces. Selection and occupancy are rendered from the active WM's query.
+-- Render selection and occupancy for OmniWM's virtual workspaces.
 for i = 1, SPACE_COUNT do
   local space = sbar.add("item", "space." .. i, {
     position = "left",
@@ -110,41 +109,9 @@ local function refresh_omniwm(id)
   end)
 end
 
-local function refresh_yabai(id)
-  sbar.exec("yabai -m query --spaces --space", function(focused)
-    if id == refresh_id and type(focused) == "table" then focused_space = focused.index end
-  end)
-  sbar.exec("yabai -m query --windows", function(windows)
-    if id ~= refresh_id or type(windows) ~= "table" then return end
-    local apps_by_space = {}
-    for sid = 1, SPACE_COUNT do apps_by_space[sid] = {} end
-    for _, window in ipairs(windows) do
-      local sid = window.space
-      if sid and sid >= 1 and sid <= SPACE_COUNT and window.app then
-        apps_by_space[sid][window.app] = true
-      end
-    end
-    for sid = 1, SPACE_COUNT do
-      local names = {}
-      for app_name in pairs(apps_by_space[sid]) do table.insert(names, app_name) end
-      table.sort(names)
-      local icons = {}
-      for _, app_name in ipairs(names) do table.insert(icons, app_icons(app_name)) end
-      space_labels[sid] = table.concat(icons, " ")
-      occupied_spaces[sid] = #names > 0
-    end
-    has_data = true
-    render_all()
-  end)
-end
-
 local function refresh()
   refresh_id = refresh_id + 1
-  local id = refresh_id
-  sbar.exec("pgrep -x OmniWM >/dev/null && omniwmctl ping >/dev/null 2>&1 && echo omniwm || echo yabai", function(result)
-    if id ~= refresh_id then return end
-    if tostring(result):match("omniwm") then refresh_omniwm(id) else refresh_yabai(id) end
-  end)
+  refresh_omniwm(refresh_id)
 end
 
 local observer = sbar.add("item", "space_observer", { drawing = false, updates = true })
