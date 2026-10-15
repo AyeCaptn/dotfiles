@@ -1,6 +1,17 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "model": "github-copilot/gpt-6.1-sol",
+  "experimental": {
+    "policies": [
+      { "action": "provider.use", "resource": "*", "effect": "deny" },
+      { "action": "provider.use", "resource": "github-copilot", "effect": "allow" }
+    ]
+  },
+  "agents": {
+    "title": {
+      "model": "github-copilot/gpt-6-luna"
+    }
+  },
   "providers": {
     "github-copilot": {
       "models": {
