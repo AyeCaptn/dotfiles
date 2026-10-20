@@ -13,8 +13,29 @@
 Use `ticket-kickoff` for a brief pair-programming discussion before substantial
 implementation. Skip small, straightforward edits; don't produce plans or planning files.
 
+# Checkout state and coordination
+
+- Before the first edit, inspect checkout state and upstream status. If there is
+  pre-existing uncommitted work or unpushed commits, ask whether to commit/push
+  them or intentionally leave them pending before proceeding. Do not commit,
+  push, stash, discard, or overwrite existing work without approval.
+- Coordinate or sequence concurrent tasks touching the same files; separate
+  worktrees do not prevent overlapping edits.
+
+# Long-running local jobs
+
+- Prefer a named, detached `tmux` session for long-running encoding, uploads,
+  backups, and similar jobs so they survive terminal disconnection and can be
+  reattached. Report the session name and retain a log and exit status.
+- On macOS, also use `caffeinate -i` around jobs that must prevent idle sleep.
+  It complements `tmux`; `tmux` alone does not prevent sleep. Neither protects
+  against shutdown, forced sleep, or disconnected external storage.
+- Do not interrupt or restart an active job just to move it into `tmux`.
+
 # Project validation
 
+Verify required paths and project dependencies before running validation.
+Dependency installation remains subject to the existing approval rules.
 Use the project's fast check while iterating and its full check before finishing.
 Use `project-checks-setup` when asked to create or improve these commands.
 Use the project's formatting command and configuration, such as `make format`
@@ -38,6 +59,9 @@ approved for automatic writes, migrations, and refreshes. Other databases still 
 - Use `gh` for GitHub pull requests and GitHub Actions status and logs.
 - Use Hunk for interactive diff review and `hunk-comment-review` for human feedback.
 - Use the active client's browser tools for browser interaction and page screenshots.
+- Prefer dedicated file-search tools over shell globs.
+- After two similar preview failures, diagnose or report the blocker instead of
+  repeating unchanged attempts.
 
 # Keep output lean
 
