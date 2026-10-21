@@ -22,9 +22,13 @@ Write fast, trustworthy tests that catch meaningful regressions.
    fixtures. Small amounts of duplication are acceptable.
 6. **Assert independently.** Use explicit expected values derived from the
    contract. Prefer precise results over truthiness or non-null checks.
-7. **Choose cases by risk.** Establish a happy-path baseline, then vary relevant
-   conditions for meaningful boundaries and errors. Use coverage to find gaps;
-   prioritize plausible regressions.
+7. **Choose cases by risk.** Before adding a test, name the plausible defect it
+   would catch. Choose the test level that can observe that failure. Skip tests
+   that merely repeat static configuration or library wiring without exercising
+   a meaningful contract. For behavior worth testing, establish a happy-path
+   baseline, then vary relevant conditions for boundaries and errors. This is not
+   a requirement to add tests for every changed module. Use coverage to find gaps,
+   not to justify low-value tests.
 8. **Keep execution deterministic.** Use fresh state; control time, randomness,
    and environment. Await async work, avoid arbitrary sleeps, and clean up
    resources even after failures.
