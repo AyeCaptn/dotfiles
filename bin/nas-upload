@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: nas-upload [--dry-run] FILE [UPLOAD_SUBDIRECTORY]
+
+Upload one file to the NAS upload container.
+Files land in /volume1/downloads/Uploads; the default subdirectory is '.'.
+Rerun the same command after an interruption to reuse the partial transfer.
+The local file is kept; an existing destination file may be replaced.
+
+Options:
+  --dry-run  Preview without uploading
+  -h, --help Show this help
+
+Environment overrides:
+  NAS_HOST        Default: 192.168.1.145 (direct LAN connection)
+  NAS_PORT        Default: 2222
+  NAS_USER        Default: upload
+  NAS_UPLOAD_DIR  Default: . (relative to the restricted Uploads directory)
+  NAS_SSH_KEY     Default: ~/.ssh/ugreen_nas_ed25519
+
+The destination subdirectory must already exist. Absolute paths and '..'
+components are not allowed.
+macOS idle sleep is prevented during the transfer. For terminal-disconnect
+protection, start a tmux session first: tmux new -s nas-upload
+EOF
+}
+
+# Apple's rsync forwards -h to the server, where rrsync rejects it.
+options=(-tv --progress --stats --partial-dir=.rsync-partial --timeout=120)
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dry-run) options+=(--dry-run); shift ;;
+    -h | --help) usage; exit 0 ;;
+    --) shift; break ;;
+    -*) printf 'Unknown option: %s\n' "$1" >&2; exit 64 ;;
+    *) break ;;
+  esac
+done
+
+if [[ $# -lt 1 || $# -gt 2 ]]; then
+  usage >&2
+  exit 64
+fi
+
+file="$1"
+destination="${2:-${NAS_UPLOAD_DIR:-.}}"
+host="${NAS_HOST:-192.168.1.145}"
+port="${NAS_PORT:-2222}"
+user="${NAS_USER:-upload}"
+identity="${NAS_SSH_KEY:-$HOME/.ssh/ugreen_nas_ed25519}"
+
+if [[ ! -f "$file" || -L "$file" ]]; then
+  printf 'Not a regular file (symlinks are not supported): %s\n' "$file" >&2
+  exit 66
+fi
+if [[ "$destination" == /* || "/$destination/" == *"/../"* ]]; then
+  printf 'Use a subdirectory within Uploads, without absolute paths or ..: %s\n' "$destination" >&2
+  exit 64
+fi
+if [[ ! "$port" =~ ^[0-9]{1,5}$ ]] || ((10#$port < 1 || 10#$port > 65535)); then
+  printf 'Invalid SSH port: %s\n' "$port" >&2
+  exit 64
+fi
+if [[ ! -r "$identity" ]]; then
+  printf 'SSH key is missing or unreadable: %s\n' "$identity" >&2
+  exit 66
+fi
+
+for dependency in rsync ssh caffeinate; do
+  if ! command -v "$dependency" >/dev/null 2>&1; then
+    printf 'Required command is missing: %s\n' "$dependency" >&2
+    exit 69
+  fi
+done
+
+# Absolute source paths avoid interpreting colons or leading dashes as options.
+file="$(cd -- "$(dirname -- "$file")" && pwd)/$(basename -- "$file")"
+# Apple's rsync does not support --protect-args; quote the remote shell path.
+# rrsync accepts '.' for the root but rejects './'.
+printf -v remote_directory '%q' "${destination%/}"
+printf -v transport 'ssh -T -p %s -i %q -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=10 -o ServerAliveInterval=15 -o ServerAliveCountMax=3' "$port" "$identity"
+
+exec caffeinate -i rsync \
+  "${options[@]}" \
+  -e "$transport" -- "$file" "$user@$host:$remote_directory"

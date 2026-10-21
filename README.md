@@ -37,6 +37,27 @@ desktop-wm omniwm
 desktop-wm stop # Release input hooks for recovery from a remote shell
 ```
 
+## NAS uploads
+
+The [manual Docker settings](https://github.com/AyeCaptn/nas-images/tree/main/images/nas-upload)
+are maintained in the private `nas-images` repository.
+
+```sh
+nas-upload "/path/to/movie.mkv"             # Upload to downloads/Uploads
+nas-upload --dry-run "/path/to/movie.mkv"   # Preview only
+nas-upload "/path/to/movie.mkv" incoming    # Existing subfolder of Uploads
+```
+
+Uses rsync over SSH directly to `192.168.1.145:2222`, with idle-sleep prevention.
+Rerun the same command to reuse interrupted transfers. Local files are kept;
+matching destination files may be replaced. For transfers that should survive
+closing the terminal, run inside `tmux new -s nas-upload`.
+
+Requires the dedicated local key `~/.ssh/ugreen_nas_ed25519`, its public key
+authorized for container user `upload`, and a trusted container host key in
+`~/.ssh/known_hosts`. Access is restricted to Uploads. Host SSH, SMB, SFTP, and
+the rsync daemon are not needed. See `nas-upload --help` for overrides.
+
 ## Repository layout
 
 - `tilde/`: shared home-directory configuration; only tracked files are linked.
