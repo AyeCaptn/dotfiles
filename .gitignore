@@ -45,9 +45,6 @@ tilde/.config/lazygit/config.local.yml
 !tilde/.config/sketchybar/**
 tilde/.config/sketchybar/helpers/event_providers/cpu_load/bin/
 !tilde/.config/starship.toml
-!tilde/.config/hunk/
-!tilde/.config/hunk/**
-tilde/.config/hunk/state.json
 !tilde/.config/mise/
 tilde/.config/mise/*
 !tilde/.config/mise/config.toml

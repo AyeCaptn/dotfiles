@@ -75,7 +75,8 @@ These guidelines apply to documentation for end users, not developer guidelines.
 # Review tools
 
 - Use `gh` for GitHub pull requests and GitHub Actions status and logs.
-- Use Hunk for interactive diff review and `hunk-comment-review` for human feedback.
+- Use `review-comments` when the user says `review`, `review my comments`, or asks
+  to discuss human review feedback. Work through comments one by one with them.
 - Use the active client's browser tools for browser interaction and page screenshots.
 - Prefer dedicated file-search tools over shell globs.
 - After two similar preview failures, diagnose or report the blocker instead of

@@ -271,6 +271,3 @@ if [[ -o interactive && "${HERDR_ENV:-}" == "1" && -z "${HERDR_OPENCODE_STARTED:
   export HERDR_OPENCODE_STARTED=1
   OPENCODE_CLI_CONFIG_CONTENT='{"tabs":{"enabled":false}}' opencode
 fi
-
-# Added by the Hunk installer (https://hunk.dev)
-[[ -d "$HOME/.hunk/bin" ]] && _extend_path "$HOME/.hunk/bin"
