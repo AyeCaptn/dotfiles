@@ -54,6 +54,24 @@ Use Grounded Docs for library APIs; inspect project versions and automatically i
 missing official docs. Its private local index at `~/.local/share/grounded-docs` is
 approved for automatic writes, migrations, and refreshes. Other databases still need confirmation.
 
+## End-user documentation
+
+These guidelines apply to documentation for end users, not developer guidelines.
+
+- Write for the intended reader and task. Explain enough to make each step
+  actionable without assuming hidden knowledge.
+- Verify examples and externally visible behavior against the implementation
+  and configuration, rather than relying on defaults or conventions.
+- Present API calls as a short sentence with the HTTP method and endpoint,
+  followed by the request body. Include response examples when useful.
+  Prefer this format over curl commands unless requested.
+- Keep examples consistent, distinguish identifiers clearly, and explain how
+  readers obtain values needed in later steps.
+- State important limitations and what successful operations do—and do not—
+  guarantee.
+- Match user-provided writing examples. Omit repeated boilerplate and details
+  that do not help the reader complete the task.
+
 # Review tools
 
 - Use `gh` for GitHub pull requests and GitHub Actions status and logs.

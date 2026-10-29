@@ -46,7 +46,7 @@ _exists() {
 
 cleanup() {
   local exit_status=$?
-  trap - EXIT
+  trap - EXIT ZERR
   restore_desktop_services || true
   if (( grounded_docs_suspended )); then
     "$DOTFILES/bin/grounded-docs" setup || error "Could not restore Grounded Docs. Run: grounded-docs setup"
@@ -69,7 +69,9 @@ if ! mkdir "$lock_dir" 2>/dev/null; then
   mkdir "$lock_dir"
 fi
 print $$ > "$lock_dir/pid"
-trap cleanup EXIT
+# zsh can skip EXIT on an errexit failure inside a function. Catch ZERR too so
+# failed updates still restore the desktop input hooks stopped for Homebrew.
+trap cleanup EXIT ZERR
 trap 'exit 130' HUP INT TERM
 
 mkdir -p "$state_dir"
